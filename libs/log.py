@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 class CSTFormatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         time_utc8 = datetime.fromtimestamp(record.created, pytz.timezone('Asia/Shanghai'))
-        return time_utc8.strftime(datefmt or '%Y-%m-%d %H:%M:%S %Z')
+        return time_utc8.strftime(datefmt or '%Y-%m-%d %H:%M:%S(%Z)')
 
 formatter = CSTFormatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
 
