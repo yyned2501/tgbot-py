@@ -11,11 +11,11 @@ ju_pai_api = "https://api.txqq.pro/api/zt.php"
 """
 文字转为举牌人图片
 """
+
 @Client.on_message(                                                                    
         filters.me
         & filters.command("jupai")
         )
-
 async def ju_pai(client: Client, message: Message):
 
     code_message = message
@@ -23,10 +23,10 @@ async def ju_pai(client: Client, message: Message):
         text = message.reply_to_message.text
     else:
         if len(message.command) >= 2:
-            text = message.command[1:]
+            text = ','.join(message.command[1:])            
         else:
-            text = None
-               
+            text = None 
+    print(text)
     if not text:
         return await message.edit("arg_error")
     try:
