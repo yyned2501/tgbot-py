@@ -14,11 +14,11 @@ class CSTFormatter(logging.Formatter):
 
 formatter = CSTFormatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
 
-#formatter = logging.Formatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
+
 logger = logging.getLogger("Mytgbot")
 logger.setLevel(logging.INFO)
-
 # 防止重复添加 handler
+"""
 if not logger.handlers:
     # 文件输出
     file_handler = RotatingFileHandler("logs/Mytgbot.log", maxBytes=10 * 1024 * 1024, backupCount=10, encoding="utf-8")
@@ -27,5 +27,11 @@ if not logger.handlers:
     # 控制台输出，强制使用 UTF-8 编码
     utf8_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     console_handler = logging.StreamHandler(utf8_stdout)
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+"""    
+
+if not logger.handlers:
+    console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
