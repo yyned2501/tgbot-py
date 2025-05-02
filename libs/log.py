@@ -5,7 +5,7 @@ import logging
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
-"""
+
 # 可选：东八区时间格式
 class CSTFormatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
@@ -13,11 +13,8 @@ class CSTFormatter(logging.Formatter):
         return time_utc8.strftime(datefmt or '%Y-%m-%d %H:%M:%S %Z')
 
 formatter = CSTFormatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
-"""
 
-
-
-formatter = logging.Formatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
+#formatter = logging.Formatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
 logger = logging.getLogger("Mytgbot")
 logger.setLevel(logging.INFO)
 
