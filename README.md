@@ -9,7 +9,7 @@
     1.4 pymysql     
     1.5 apscheduler    
     1.6 openai
-
+    1.7
 2.将下载后的所有*_example文件文件名里面的"_example"删除 如config_example.py改成config.py
 
 3.配置config文件:
