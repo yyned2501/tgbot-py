@@ -8,7 +8,7 @@ from aiohttp import ClientTimeout
 from typing import List, Optional
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
-from config.config import GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
+from config.config import GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set,CMS_trans
 
 
 media_path = Path("data/get_media")
@@ -309,8 +309,9 @@ async def forward_to_group(client:Client, message: Message):
     """
     CMS_BOT message 转发 给个人CMS群组
     """
-    await message.copy(GROUP_ID['CMS_TRANS_CHAT'])
-    logger.info(f"成功将CMS_BOT的消息转发给个人CMS群组")
+    if CMS_trans == True:
+        await message.copy(GROUP_ID['CMS_TRANS_CHAT'])
+        logger.info(f"成功将CMS_BOT的消息转发给个人CMS群组")
 
 
 @Client.on_message(
@@ -323,8 +324,9 @@ async def forward_to_CMS_bot(client:Client, message: Message):
     个人CMS群组的特定人员消息转发至CMS_BOT
     """
 
-    await message.copy(GROUP_ID['CMS_BOT_ID'])
-    logger.info(f"成功将群组消息转发给CMS_BOT")
+    if CMS_trans == True:
+        await message.copy(GROUP_ID['CMS_BOT_ID'])
+        logger.info(f"成功将群组消息转发给CMS_BOT")
 
 
 

@@ -65,7 +65,7 @@ auth = create(auth_filter)
 async def test_filter(_, __, m: Message):
     return bool(
         m.from_user
-        and m.from_user.id == 6205754898
+        and m.from_user.id == 6138413603
         )
 test = create(test_filter)
 
