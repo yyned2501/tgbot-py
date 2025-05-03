@@ -12,7 +12,7 @@ class CSTFormatter(logging.Formatter):
         time_utc8 = datetime.fromtimestamp(record.created, pytz.timezone('Asia/Shanghai'))
         return time_utc8.strftime(datefmt or '%Y-%m-%d %H:%M:%S(%Z)')
 formatter = CSTFormatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
-logger = logging.getLogger("Mytgbot")
+logger = logging.getLogger('main')
 logger.setLevel(logging.INFO)
 
 # 防止重复添加 handler

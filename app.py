@@ -2,7 +2,7 @@ import asyncio
 from libs.log import logger
 from pyrogram import Client,idle
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from config.config import API_HASH, API_ID,BOT_TOKEN_TEST,proxy_set
+from config.config import API_HASH, API_ID, BOT_TOKEN_TEST, GROUP_ID, proxy_set
 #
 scheduler = AsyncIOScheduler()
 
@@ -39,14 +39,17 @@ async def start_app():
         
     )
     """
-    logger.info("启动主程序")
+    logger.info("启动Mytgbot监听程序")
     await user_app.start()
     #await bot_app.start()    
     scheduler.start()
-    logger.info("监听主程序")
+    logger.info("Mytgbot监听程序启动成功")
+    #async with user_app:
+    await user_app.send_message(GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
+
     await idle()
     await user_app.stop()
     #await bot_app.stop()
-    logger.info("关闭主程序")
+    logger.info("关闭Mytgbot监听程序")
 
 
