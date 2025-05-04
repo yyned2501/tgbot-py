@@ -1,4 +1,4 @@
-
+import os
 from libs import others
 from models.transform_modle import User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,10 +19,9 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
         leaderboard_top5_imge = await get_leaderboard(leaderboard_top5)
         await transform_message.reply_photo(
             photo = leaderboard_top5_imge,  # 可以是本地路径、URL、或 BytesIO
-            caption = f"{user.name} 您的排名 {user_ranking}, {get_count} {get_bonus}"
-        )
-    
-    await transform_message.reply
+            caption =f"{user.name} 您的排名 {user_ranking}, {get_count} {get_bonus}"
+        )        
+        os.remove(leaderboard_top5_imge)
    
 
     
