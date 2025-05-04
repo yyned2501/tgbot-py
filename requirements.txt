@@ -1,8 +1,6 @@
-pymysql
 kurigram
 tgcrypto
 APScheduler
-python-telegram-bot
 aiohttp
 jinja2
 beautifulsoup4
@@ -17,4 +15,8 @@ httpx
 bs4
 requests
 lxml
-
+imgkit
+wkhtmltopdf
+sqlalchemy
+aiosqlite
+aiomysql
