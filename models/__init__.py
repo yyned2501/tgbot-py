@@ -22,9 +22,7 @@ elif DB_INFO['dbset'] == 'mySQL':
     )
 
 async_engine = create_async_engine(DATABASE_URL, echo=True)
-ASSession = async_scoped_session(
-    async_sessionmaker(bind=async_engine), asyncio.current_task
-)
+async_session_maker = async_sessionmaker(bind=async_engine, expire_on_commit=False)
 
 async def create_all():
     async with async_engine.begin() as conn:

@@ -8,11 +8,8 @@ medal_icons = {
     2: "./emoj_imges/2nd.png",
     3: "./emoj_imges/3rd.png"    
 }
-# 示例数据
-data = []
 
-
-async def get_leaderboard():
+async def get_leaderboard(data):
 
     # 配置 wkhtmltoimage 路径
     if os.name == "nt":

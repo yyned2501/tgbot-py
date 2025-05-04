@@ -5,7 +5,7 @@ from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from filters import custom_filters
 from libs.transform import transform
-
+from models import async_session_maker
 
 TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
@@ -21,7 +21,8 @@ BONUS_NAME = "灵石"
 async def transform_get(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message
-    return await transform(transform_message, float(bonus), SITE_NAME, BONUS_NAME)
+    async with async_session_maker() as session:        
+        return await transform(session, transform_message, float(bonus), SITE_NAME, BONUS_NAME)
 
 ###################转出灵石给他人##################################
 @Client.on_message(
@@ -33,4 +34,5 @@ async def transform_get(client: Client, message: Message):
 async def transform_use(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message.reply_to_message
-    return await transform(transform_message, -float(bonus), SITE_NAME, BONUS_NAME)
+    async with async_session_maker() as session:
+        return await transform(session,transform_message, -float(bonus), SITE_NAME, BONUS_NAME)        

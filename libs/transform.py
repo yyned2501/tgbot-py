@@ -1,23 +1,32 @@
-from pyrogram.types.messages_and_media import Message
 
-from models import ASSession
-from models.transform_modle import User
 from libs import others
+from models.transform_modle import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from pyrogram.types.messages_and_media import Message
+from libs.leaderboard.leaderboard_imge import get_leaderboard
 
+async def transform(session: AsyncSession, transform_message: Message, bonus: int, website: str, bonus_name: str,leaderboard: bool = True):
+    transform_user = transform_message.from_user  
+    user = await User.get(session, transform_user)
+    await user.add_transform_record(session, website, bonus)
+    
+    # 获取统计数据
+    get_count, get_bonus = await user.get_bonus_count_sum_for_website(session, website)
+    pay_count, pay_bonus = await user.pay_bonus_count_sum_for_website(session, website)
+    if leaderboard:       
+        leaderboard_top5 = await user.get_bonus_leaderboard_by_website(session, website,3)
+        user_ranking = await user.get_user_bonus_rank(session, website)
+        leaderboard_top5_imge = await get_leaderboard(leaderboard_top5)
+        await transform_message.reply_photo(
+            photo = leaderboard_top5_imge,  # 可以是本地路径、URL、或 BytesIO
+            caption = f"{user.name} 您的排名 {user_ranking}, {get_count} {get_bonus}"
+        )
+    
+    await transform_message.reply
+   
 
-async def transform(transform_message: Message, bonus: int, website: str, bonus_name: str):
-    transform_user = transform_message.from_user
-    async with ASSession() as session:
-        async with session.begin():
-            user = await User.get(transform_user)
-            await user.add_transform_record(website, bonus)
-            get_count, get_bonus = await user.get_bonus_count_sum_for_website(website)
-            print(get_count,get_bonus)
-            #get_bonus = await user.get_bonus_get_sum_for_site(site)
-            #post_bonus = await user.get_bonus_post_sum_for_site(site)
-
-            
-            """
+    
+    """
             if bonus > 0:
                 reply_message = (
                     f"```\n感谢 {user.name} 大佬赠送的 {bonus} {bonus_name}\n"
@@ -31,5 +40,5 @@ async def transform(transform_message: Message, bonus: int, website: str, bonus_
                     f"我一共给你转了 {post_bonus} {bonus_name}\n"
                     "```"
                 )
-            """
+    """
            
