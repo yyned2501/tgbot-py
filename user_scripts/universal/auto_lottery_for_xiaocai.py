@@ -10,7 +10,6 @@ from random import randint,random
 from datetime import datetime, timedelta,time
 from libs import others
 from libs.log import logger
-from croniter import croniter
 
 lottery_list = {}
 
