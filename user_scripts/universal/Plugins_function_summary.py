@@ -68,28 +68,6 @@ async def testmessage(client: Client, message: Message):
         await others.delete_message(result, 20)
 
 
-
-
-@Client.on_message(
-    (filters.chat(GROUP_ID["ZHUQUE_ID"])
-        | filters.chat(GROUP_ID["ZHUQUEBOCAI_ID"])
-        | filters.chat(GROUP_ID["BOT_MESSAGE_CHAT"])
-    )
-    & filters.regex(r"转账成功, 信息如下: \n.+ 转出 (\d+)\n")
-    & custom_filters.zhuque_bot
-)
-async def transform_pay(client, message: Message):
-    SITE_NAME = "朱雀"
-    BONUS_NAME = "灵石"
-    
-    bonus = message.matches[0].group(1)
-    transform_message = message.reply_to_message
-    await transform.transform(transform_message, int(bonus), SITE_NAME, BONUS_NAME)
-
-
-
-
-
 """
 @Client.on_message(
         filters.private 

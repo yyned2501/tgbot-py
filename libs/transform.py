@@ -5,14 +5,18 @@ from models.transform_modle import User
 from libs import others
 
 
-async def transform(transform_message: Message, bonus: int, site: str, bonus_name: str):
+async def transform(transform_message: Message, bonus: int, website: str, bonus_name: str):
     transform_user = transform_message.from_user
     async with ASSession() as session:
         async with session.begin():
             user = await User.get(transform_user)
-            await user.add_transform_record(site, bonus)
+            await user.add_transform_record(website, bonus)
+            get_count, get_bonus = await user.get_bonus_count_sum_for_website(website)
+            print(get_count,get_bonus)
             #get_bonus = await user.get_bonus_get_sum_for_site(site)
             #post_bonus = await user.get_bonus_post_sum_for_site(site)
+
+            
             """
             if bonus > 0:
                 reply_message = (
