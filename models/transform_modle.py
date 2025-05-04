@@ -2,7 +2,6 @@ import datetime
 import pyrogram
 from models.database import Base, TimeBase
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import ASSession
 from sqlalchemy.orm import mapped_column, DeclarativeBase, Mapped
 from sqlalchemy import ForeignKey, String, Integer, BigInteger,Float,Numeric, CheckConstraint,DateTime,func, desc, select
 
@@ -20,7 +19,15 @@ class User(TimeBase):
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
 
-    async def get_bonus_sum_for_site(self, session: AsyncSession, site_name: str) -> float:
+    async def get_bonus_sum_for_website(self, session: AsyncSession, site_name: str) -> float:
+        """
+        获取当前用户在指定站点的 bonus 总和。
+
+        :param session: SQLAlchemy 异步会话
+        :param site_name: 站点名称
+        :return: 站点 bonus 的总和，如果不存在则返回 0
+        """
+
         bonus_sum_select = select(func.sum(Transform.bonus)).where(
             Transform.user_id == self.user_id,
             Transform.website == site_name
@@ -28,85 +35,63 @@ class User(TimeBase):
         bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
         return bonus_sum if bonus_sum is not None else 0
     
-    async def get_bonus_sum_for_site(self, site_name: str) -> float:
-        """
-        获取当前用户在指定站点的 bonus 总和。
 
-        :param site_name: 站点名称
-        :type site_name: str
-        :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: float
-        """
 
-        session = ASSession()
-        bonus_sum_select = select(
-            func.sum(Transform.bonus)).where(
-                Transform.user_id == self.user_id,
-                Transform.website == site_name
-            )
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
-        return bonus_sum if bonus_sum is not None else 0
-    
-    async def get_bonus_count_sum_for_website(self, site_name: str):
-    
+    async def get_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str):
         """
         获取当前用户在指定站点的 发送给我的 次数 、魔力总和。
-
         :param site_name: 站点名称
         :type site_name: str
         :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: float
-        """
-        session = ASSession()
-        bonus_sum_select = select(
-            func.sum(Transform.bonus)).where(
-                Transform.user_id == self.user_id,
-                Transform.website == site_name,
-                Transform.bonus > 0
-            )   
+        :rtype: float        
+        """        
+        bonus_sum_select = select(func.sum(Transform.bonus)).where(
+            Transform.user_id == self.user_id,
+            Transform.website == site_name,
+            Transform.bonus > 0
+        )
+        bonus_count_select = select(func.count()).where(
+            Transform.user_id == self.user_id,
+            Transform.website == site_name,
+            Transform.bonus > 0
+        )
+        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none() or 0
+        bonus_count = (await session.execute(bonus_count_select)).scalar_one_or_none() or 0
+        
+        return bonus_count, bonus_sum
 
-        bonus_count_select = select(
-            func.count()).where(
-                Transform.user_id == self.user_id,
-                Transform.website == site_name,
-                Transform.bonus > 0
-            )        
-        bonus_count = (await session.execute(bonus_count_select)).scalar_one_or_none()        
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
-        bonus_sum = bonus_sum or 0
-        bonus_count = bonus_count or 0        
-        return bonus_count,bonus_sum    
 
-    
-    async def get_bonus_post_sum_for_site(self, site_name: str) -> int:
+
+    async def pay_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> int:
         """
         获取当前用户在指定站点的 我发送的 bonus 总和。
 
         :param site_name: 站点名称
         :type site_name: str
         :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: int
+        :rtype: int        
         """
-
-        session = ASSession()
-        bonus_sum_select = select(
-            func.sum(Transform.bonus)).where(
-                Transform.user_id == self.user_id,
-                Transform.website == site_name,
-                Transform.bonus < 0
-            )   
-       
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
-        return -bonus_sum if bonus_sum is not None else 0
-
-
+        
+        bonus_sum_select = select(func.sum(Transform.bonus)).where(
+            Transform.user_id == self.user_id,
+            Transform.website == site_name,
+            Transform.bonus < 0
+        )
+        bonus_count_select = select(func.count()).where(
+            Transform.user_id == self.user_id,
+            Transform.website == site_name,
+            Transform.bonus < 0
+        )
+        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none() or 0
+        bonus_count = (await session.execute(bonus_count_select)).scalar_one_or_none() or 0        
+        return bonus_count, bonus_sum
     
-    async def get_bonus_stats_by_site(self, site_name: str, top_n: int=10):
+
+    async def get_bonus_leaderboard_by_website(self, session: AsyncSession, site_name: str, top_n: int = 10):
+
         """
         sssssss
         """
-
-        session = ASSession()
         result_data = (
             select(
                 Transform.user_id,
@@ -117,34 +102,49 @@ class User(TimeBase):
             .join(User, Transform.user_id == User.user_id)
             .where(
                 Transform.bonus > 0,
-                Transform.website == site_name  
+                Transform.website == site_name
             )
             .group_by(Transform.user_id, User.name)
             .order_by(desc("bonus_sum"))
             .limit(top_n)
-
         )
         result = await session.execute(result_data)
         rows = result.all()
-        return [[i + 1, tg_id, name, count, total] for i, (tg_id, name, count, total) in enumerate(rows)]  
+        return [[i + 1, tg_id, name, count, total] for i, (tg_id, name, count, total) in enumerate(rows)]
     
-    @classmethod
-    async def get(cls, tg_user: pyrogram.types.User | None, author_signature: str | None = None):
+    async def get_user_bonus_rank(self, session: AsyncSession, website: str) -> int:
         """
-        获取或创建用户记录。
-        :param tg_user: 用户对象
-        :type tg_user: pyrogram.types.User
-        :return: 用户记录
-        :rtype: User
+        获取当前用户在某网站上的 bonus 总和排名（降序）。
         """
+        bonus_sum_stmt = (
+            select(
+                Transform.user_id,
+                func.sum(Transform.bonus).label("total_bonus")
+            )
+            .where(Transform.website == website)
+            .group_by(Transform.user_id)
+            .order_by(desc("total_bonus"))
+        )
 
-        session = ASSession()
+        result = await session.execute(bonus_sum_stmt)
+        rows = result.all()
+
+        # 遍历查找当前 user_id 的排名
+        for rank, (uid, _) in enumerate(rows, start=1):
+            if uid == self.user_id:
+                return rank
+        return -1  # 没找到
+
+
+   
+    @classmethod
+    async def get(cls, session: AsyncSession, tg_user: pyrogram.types.User | None = None, author_signature: str | None = None):
         if tg_user:
             username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
             user_id = tg_user.id
         else:
             username = author_signature or "匿名用户"
-            user_id = username  # 没有 TGID，只能用 author_signature 作为唯一标识
+            user_id = username  # 没有 TG ID，只能用签名
 
         user = await session.get(cls, user_id)
         if user:
@@ -155,20 +155,9 @@ class User(TimeBase):
             session.add(user)
             await session.flush()
         return user
-    
-    async def add_transform_record(self, website: str, bonus: int):
-        """
-        添加转账记录。
 
-        :param site: 站点名称
-        :type site: str
-        :param bonus: 转账金额
-        :type bonus: int
-        """
-        session = ASSession()
+    async def add_transform_record(self, session: AsyncSession, website: str, bonus: int):
         transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
         session.add(transform)
         await session.flush()
-
-
 
