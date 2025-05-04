@@ -70,8 +70,8 @@ prize_list = {"ZHQUE_ID":['灵石','零食','LS'],
               "HHclub":['憨豆'],
               }   #
 
-db_info = {"address":"db ip", #mysql ip
-           "db_name":"db name", #mysql ip 数据库名称
+db_info = {"address":"192.168.2.11", #mysql ip
+           "db_name":"jizhang", #mysql ip 数据库名称
            "port":3306, #mysql ip
            "user":"root", #mysql 用户名
            "password":"77……"#mysql 密码
