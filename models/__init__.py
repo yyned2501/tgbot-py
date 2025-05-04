@@ -2,6 +2,7 @@ import asyncio
 import os
 from models.database import Base
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker,async_scoped_session
+
 from sqlalchemy.orm import declarative_base
 from config.config import DB_INFO
 
@@ -19,6 +20,7 @@ elif DB_INFO['dbset'] == 'mySQL':
         f"mysql+aiomysql://{DB_INFO['user']}:{password}"
         f"@{DB_INFO['address']}:{DB_INFO['port']}/{DB_INFO['db_name']}"
     )
+
 async_engine = create_async_engine(DATABASE_URL, echo=True)
 ASSession = async_scoped_session(
     async_sessionmaker(bind=async_engine), asyncio.current_task
