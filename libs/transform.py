@@ -25,7 +25,7 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
    
 
     
-    """
+        """
             if bonus > 0:
                 reply_message = (
                     f"```\n感谢 {user.name} 大佬赠送的 {bonus} {bonus_name}\n"

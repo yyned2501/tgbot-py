@@ -1,38 +1,37 @@
 import os
 import imgkit
 import asyncio
-
-# 奖牌图标路径
-medal_icons = {
-    1: "./emoj_imges/1st.png",
-    2: "./emoj_imges/2nd.png",
-    3: "./emoj_imges/3rd.png"    
+from config import config
+medal_emojis = {
+    1: "🥇",
+    2: "🥈",
+    3: "🥉"
 }
 
-async def get_leaderboard(data):
+medal_emoji_others = "🪙"
 
+async def get_leaderboard(data):
     # 配置 wkhtmltoimage 路径
     if os.name == "nt":
         wkhtmltoimage_path = r"D:\Tool Software\wkhtmltopdf\bin\wkhtmltoimage.exe"
-        config = imgkit.config(wkhtmltoimage=wkhtmltoimage_path)
+        wkhtml_config = imgkit.config(wkhtmltoimage=wkhtmltoimage_path)
     elif os.name == "posix":
-        config = None
+        wkhtml_config = None
 
     rows = ""
     for rank, uid, username, count, amount in data:
-        if rank in medal_icons:
-            medal_img = f'<img src="{medal_icons[rank]}" width="20"> TOP{rank}'
-        else:
-            medal_img = f'<img src="./emoj_imges/4th.png" width="20"> TOP{rank}'
+        emoji = medal_emojis.get(rank, medal_emoji_others)
+        medal_img = f'{emoji} TOP{rank}'
         rows += f"""
         <tr>
-            <td>{medal_img} </td>
+            <td>{medal_img}</td>
             <td>{uid}</td>
             <td>{username}</td>
             <td>{count}</td>
             <td>{amount}</td>
         </tr>
         """
+
     html_str = f"""
     <!DOCTYPE html>
     <html>
@@ -67,7 +66,7 @@ async def get_leaderboard(data):
     </head>
     <body>
         <table>
-            <caption>🏆💰 Lucky的个人打赏榜单 🎁📊</caption>
+            <caption>🌟🏅🎉 {config.MY_NAME}哥的个人打赏榜 🎉🏅🌟</caption>
             <thead>
                 <tr>
                     <th>排名</th>
@@ -91,15 +90,11 @@ async def get_leaderboard(data):
         f.write(html_str)
 
     # 生成图片
-    imgkit.from_file(html_file, 'libs/leaderboard/leaderboard.png', config=config, options={
+    imgkit.from_file(html_file, 'libs/leaderboard/leaderboard.png', config=wkhtml_config, options={
         'encoding': 'UTF-8',
         'format': 'png',
         'width': 512,
-        'enable-local-file-access': ''  # 添加这行
+        'enable-local-file-access': ''
     })
-    os.remove(html_file)    
+    #os.remove(html_file)
     return 'libs/leaderboard/leaderboard.png'
-
-
-
-

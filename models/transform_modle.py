@@ -110,7 +110,11 @@ class User(TimeBase):
         )
         result = await session.execute(result_data)
         rows = result.all()
-        return [[i + 1, tg_id, name, count, total] for i, (tg_id, name, count, total) in enumerate(rows)]
+        return [
+            [i + 1, tg_id, name, f"{count:,}", f"{bonus_sum:,.2f}"]
+            for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
+        ]
+        
     
     async def get_user_bonus_rank(self, session: AsyncSession, website: str) -> int:
         """
