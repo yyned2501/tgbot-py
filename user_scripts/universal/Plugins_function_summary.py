@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 from libs import others
-from config.config import GROUP_ID
+from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 
@@ -35,7 +35,7 @@ async def getmessage(client:Client, message: Message):
     file_path = mess_path/file_name   
     with open(file_path, 'w') as f:
             f.write(f"{message.reply_to_message}")   
-    await client.send_document(GROUP_ID['BOT_MESSAGE_CHAT'],file_path)
+    await client.send_document(PT_GROUP_ID['BOT_MESSAGE_CHAT'],file_path)
     shutil.rmtree("data/get_message")
     await message.delete()
 
@@ -75,7 +75,7 @@ async def forward_to_group(client:Client, message: Message):
     # 监听Telegram(777000)
         
     logger.info(f"Telegram(777000): {message.text}")
-    await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],message.text)
+    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],message.text)
 """
 
 @Client.on_message(filters.me & filters.command("helpme"))

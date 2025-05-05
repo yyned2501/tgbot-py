@@ -1,7 +1,5 @@
 
-import os
 from libs.log import logger
-from config.config import GROUP_ID
 from decimal import Decimal
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
