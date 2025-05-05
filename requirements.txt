@@ -20,3 +20,4 @@ wkhtmltopdf
 sqlalchemy
 aiosqlite
 aiomysql
+pypinyin

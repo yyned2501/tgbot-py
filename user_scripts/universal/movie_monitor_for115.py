@@ -8,11 +8,12 @@ from aiohttp import ClientTimeout
 from typing import List, Optional
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
-from config.config import GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set,CMS_trans
+from config.config import GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
 
 
 media_path = Path("data/get_media")
-monitor_enabled = True
+monitor_enabled = False
+otherchat_trans = False
 LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
 
  
@@ -284,21 +285,33 @@ async def monitor_channels(client: Client, message: Message):
 # ================== 开关命令处理 ==================
 @Client.on_message(
         filters.me 
-        & filters.command("dyjk")
+        & (filters.command("dyjk")
+           | filters.command("dyzf")
+        )           
     )
 async def toggle_monitor(client: Client, message: Message):
-    """切换监控功能状态"""
-    global monitor_enabled
+    """切换监控功能或转发功能状态"""
+    global monitor_enabled, otherchat_trans
+    if len(message.command) < 2:
+        await message.reply("参数不足。用法：`/dyjk on|off` 或 `/dyzf on|off`")
+        return
+    cmd_name = message.command[0].lower()
+    action = message.command[1].lower()
 
-    parts = message.text.split()
-    command = parts[1].lower() if len(parts) > 1 else ""
+    if action not in ("on", "off"):
+        await message.reply("无效参数。请使用 `on` 或 `off`")
+        return
+    enable = (action == "on")
+    status = "启动" if enable else "停止"
 
-    if command in ("on", "off"):
-        monitor_enabled = (command == "on")
-        status = "启动" if monitor_enabled else "停止"
-        await message.reply(f"监控功能已{status}！")
+    if cmd_name == "dyjk":
+        monitor_enabled = enable
+        await message.reply(f"✅ 监控功能已{status}！")
+    elif cmd_name == "dyzf":
+        otherchat_trans = enable
+        await message.reply(f"🔄 转发功能已{status}！")
     else:
-        await message.reply("无效命令。请使用 `/dyjk on` 或 `/dyjk off`。")
+        await message.reply("无效命令。支持 `/dyjk` 或 `/dyzf`。")
 
 
 @Client.on_message(
@@ -309,7 +322,8 @@ async def forward_to_group(client:Client, message: Message):
     """
     CMS_BOT message 转发 给个人CMS群组
     """
-    if CMS_trans == True:
+    global otherchat_trans
+    if otherchat_trans:
         await message.copy(GROUP_ID['CMS_TRANS_CHAT'])
         logger.info(f"成功将CMS_BOT的消息转发给个人CMS群组")
 
@@ -323,8 +337,8 @@ async def forward_to_CMS_bot(client:Client, message: Message):
     """
     个人CMS群组的特定人员消息转发至CMS_BOT
     """
-
-    if CMS_trans == True:
+    global otherchat_trans
+    if otherchat_trans:
         await message.copy(GROUP_ID['CMS_BOT_ID'])
         logger.info(f"成功将群组消息转发给CMS_BOT")
 

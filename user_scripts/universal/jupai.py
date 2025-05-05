@@ -1,6 +1,4 @@
 
-import asyncio
-import contextlib
 import urllib.parse
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message

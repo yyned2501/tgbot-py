@@ -28,8 +28,7 @@ def is_within_time_ranges():
 @Client.on_message(
     filters.chat(LOTTERY_TARGET_GROUP)
     & filters.regex(r"^新的抽奖已经创建[\s\S]+参与关键词：「(.+)」")
-    & (custom_filters.choujiang_bot
-       | custom_filters.test)
+    & (custom_filters.choujiang_bot)
 )
 async def lottery_new_message(client:Client, message:Message):
     lottery_info = {}   
@@ -73,8 +72,7 @@ async def lottery_new_message(client:Client, message:Message):
 #################中奖结果监听#######################
 @Client.on_message(
         filters.regex(r"^参与人数够啦！！开奖[\s\S]+中奖信息\n([\s\S]+)")
-        & (custom_filters.choujiang_bot
-           | custom_filters.test)   
+        & (custom_filters.choujiang_bot)   
     )
 async def lottery_draw_result(client:Client, message:Message):
     finish_key = ""

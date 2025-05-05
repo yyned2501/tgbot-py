@@ -70,10 +70,10 @@ async def get_leaderboard(data):
             <thead>
                 <tr>
                     <th>排名</th>
-                    <th>ID</th>
+                    <th>TGID</th>
                     <th>用户名</th>
-                    <th>次数</th>
-                    <th>金额</th>
+                    <th>打赏次数</th>
+                    <th>打赏金额</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,5 +96,5 @@ async def get_leaderboard(data):
         'width': 512,
         'enable-local-file-access': ''
     })
-    #os.remove(html_file)
+    os.remove(html_file)
     return 'libs/leaderboard/leaderboard.png'

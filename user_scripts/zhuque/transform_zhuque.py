@@ -22,8 +22,13 @@ BONUS_NAME = "灵石"
 async def transform_get(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message
-    async with async_session_maker() as session:        
-        return await transform(session, transform_message, float(bonus), SITE_NAME, BONUS_NAME)
+    async with async_session_maker() as session:
+        try:
+            await transform(session, transform_message, Decimal(f"{bonus}"), SITE_NAME, BONUS_NAME)
+            await session.commit() 
+        except Exception as e:
+            await session.rollback() 
+            logger.error(f"提交失败: {e}") 
 
 ###################转出灵石给他人##################################
 @Client.on_message(
