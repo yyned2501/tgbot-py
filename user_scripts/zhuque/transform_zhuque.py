@@ -1,6 +1,7 @@
 import os
 from libs.log import logger
 from config.config import GROUP_ID
+from decimal import Decimal
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from filters import custom_filters
@@ -35,4 +36,10 @@ async def transform_use(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message.reply_to_message
     async with async_session_maker() as session:
-        return await transform(session,transform_message, -float(bonus), SITE_NAME, BONUS_NAME)        
+        try:
+            await transform(session, transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME)
+            await session.commit() 
+        except Exception as e:
+            await session.rollback() 
+            logger.error(f"提交失败: {e}") 
+             
