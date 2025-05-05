@@ -1,3 +1,4 @@
+import os
 import asyncio
 from libs.log import logger
 from pyrogram import Client,idle
@@ -42,12 +43,15 @@ async def start_app():
     """
     logger.info("启动Mytgbot监听程序")
     await user_app.start()
-    #await bot_app.start()   
-    await create_all() 
+    #await bot_app.start()
+    if not os.path.exists("sessions/dbflag.txt"):
+        logger.info(f"文件不存在，首次运行.初始化数据库")
+        await create_all() 
+        with open("sessions/dbflag.txt", "w", encoding="utf-8") as f:
+            f.write("首次运行数据库初始化记录,勿删。")
     scheduler.start()
     logger.info("Mytgbot监听程序启动成功")
-    async with user_app:
-        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
+    await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
 
     await idle()
     await async_engine.dispose()

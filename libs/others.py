@@ -1,6 +1,5 @@
 import asyncio
 from libs.log import logger
-from config.config import GROUP_ID
 from pyrogram import filters, Client
 from pyrogram.errors import PeerIdInvalid
 
