@@ -8,15 +8,20 @@ from aiohttp import ClientTimeout
 from typing import List, Optional
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
-from config.config import GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
+from config.config import M115_GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
 
 
 media_path = Path("data/get_media")
 monitor_enabled = False
 otherchat_trans = False
 LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
-
- 
+TARGET = {
+    
+    "CHANNEL_SHARES_115_ID":-1002188663986,
+    "PAN115_SHARE_ID":-1002343015438,
+    "GUAGUALE115_ID": -1002245898899
+}
+     
 # ================== TMDB API 类 ==================
 class TmdbApi:
     """
@@ -182,7 +187,7 @@ async def send_115_links(client:Client, message, title, year):
     links = await extract_115_links(message)
     if links:
         for link in links:
-            await client.send_message(GROUP_ID['CMS_BOT_ID'], link)
+            await client.send_message(M115_GROUP_ID['CMS_BOT_ID'], link)
             logger.info(f"已发送媒体: [标题: {title}, 年份: {year}] 链接: {link}")
     else:
         logger.warning("未找到 115 链接。")
@@ -238,11 +243,9 @@ async def search_and_send_message(client:Client, title, year,message):
 
 
 @Client.on_message(
-        (filters.chat(GROUP_ID["CHANNEL_SHARES_115_ID"])
-         | filters.chat(GROUP_ID["PAN115_SHARE_ID"])
-         | filters.chat(GROUP_ID['GUAGUALE115_ID']))
-         & filters.regex(r"https://115cdn\.com/s/[^\s]+")
-         )
+        filters.chat(list(TARGET.values()))
+        & filters.regex(r"https://115cdn\.com/s/[^\s]+")
+    )
 async def monitor_channels(client: Client, message: Message):
     """监控频道消息，提取并转发 115 链接。"""
     global monitor_enabled
@@ -251,8 +254,8 @@ async def monitor_channels(client: Client, message: Message):
         return
     
     # 判断是否为电影消息    
-    if (message.chat.id == GROUP_ID["CHANNEL_SHARES_115_ID"]
-        or message.chat.id == GROUP_ID["GUAGUALE115_ID"]):
+    if (message.chat.id == TARGET["CHANNEL_SHARES_115_ID"]
+        or message.chat.id == TARGET["GUAGUALE115_ID"]):
         match = None
         caption = message.caption or "" 
         match = re.search(r"(.*?)\s*\((\d+)\)", caption)         
@@ -261,7 +264,7 @@ async def monitor_channels(client: Client, message: Message):
             year = match.group(2).strip()   
               
         
-    elif message.chat.id == GROUP_ID["PAN115_SHARE_ID"]:
+    elif message.chat.id == TARGET["PAN115_SHARE_ID"]:
         
         match = None
         caption = message.caption or "" 
@@ -316,7 +319,7 @@ async def toggle_monitor(client: Client, message: Message):
 
 @Client.on_message(
         filters.private 
-        & filters.user(GROUP_ID['CMS_BOT_ID'])
+        & filters.user(M115_GROUP_ID['CMS_BOT_ID'])
     )
 async def forward_to_group(client:Client, message: Message):
     """
@@ -324,12 +327,12 @@ async def forward_to_group(client:Client, message: Message):
     """
     global otherchat_trans
     if otherchat_trans:
-        await message.copy(GROUP_ID['CMS_TRANS_CHAT'])
+        await message.copy(M115_GROUP_ID['CMS_TRANS_CHAT'])
         logger.info(f"成功将CMS_BOT的消息转发给个人CMS群组")
 
 
 @Client.on_message(
-        filters.chat(GROUP_ID['CMS_TRANS_CHAT'])
+        filters.chat(M115_GROUP_ID['CMS_TRANS_CHAT'])
         & filters.user(ADMIN_ID)
     )
 
@@ -339,7 +342,7 @@ async def forward_to_CMS_bot(client:Client, message: Message):
     """
     global otherchat_trans
     if otherchat_trans:
-        await message.copy(GROUP_ID['CMS_BOT_ID'])
+        await message.copy(M115_GROUP_ID['CMS_BOT_ID'])
         logger.info(f"成功将群组消息转发给CMS_BOT")
 
 
@@ -367,6 +370,6 @@ async def getmedia(client: Client, message: Message):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(json.dumps(result_mess, ensure_ascii=False, indent=4))
 
-    await client.send_document(GROUP_ID['MESSAGE_TRASN_CHAT'], file_path)
+    await client.send_document(M115_GROUP_ID['MESSAGE_TRASN_CHAT'], file_path)
     shutil.rmtree("data/get_media", ignore_errors=True)
     await message.delete()

@@ -5,7 +5,7 @@ from filters import custom_filters
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_REPLY_MESSAGE,LOTTERY_LOSE_REPLY_MESSAGE
-from config.config import GROUP_ID,MY_TGID,auto_choujiang,LOTTERY_TARGET_GROUP,MY_PTID,PRIZE_LIST, TIME_RANGES
+from config.config import PT_GROUP_ID,MY_TGID,auto_choujiang,LOTTERY_TARGET_GROUP,MY_PTID,PRIZE_LIST, TIME_RANGES
 from random import randint,random
 from datetime import datetime, timedelta,time
 from libs import others
@@ -54,19 +54,19 @@ async def lottery_new_message(client:Client, message:Message):
                     logger.info(f"ID: {lottery_info['ID']}的抽奖,随机等待后未结束，故参与抽奖,参与群组:{message.chat.id},抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']}")
                     re_message = await client.send_message(message.chat.id, lottery_list[lottery_info['ID']]['keyword'])
                     lottery_list[lottery_info['ID']]['flag'] = 1
-                    await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.id},\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
+                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.id},\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
                 else:
-                    await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖在随机等待时间内已经结束，故不参与抽奖。 \n\n{message.text}\n\n{message.link}")
+                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖在随机等待时间内已经结束，故不参与抽奖。 \n\n{message.text}\n\n{message.link}")
                     logger.info(f"ID: {lottery_info['ID']}的抽奖，在随机等待时间内已经结束，故不参与抽奖")
             else:
-                await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖奖品不符合设定范围故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+                await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖奖品不符合设定范围故不参与抽奖 \n\n{message.text}\n\n{message.link}")
                 logger.info(f"抽奖ID: {lottery_info['ID']} 其奖品不符合设定范围故不参与抽奖 ")
             
         else:
-            await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],f"不在设定自动抽奖时间内,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+            await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"不在设定自动抽奖时间内,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
             logger.info(f"抽奖ID: {lottery_info['ID']} 不在设定自动抽奖时间内,故不参与抽奖。")
     else:
-        await client.send_message(GROUP_ID['BOT_MESSAGE_CHAT'],f"自动抽奖使能开关未打开,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+        await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"自动抽奖使能开关未打开,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
         logger.info(f"抽奖ID: {lottery_info['ID']} 自动抽奖使能开关未打开,故不参与抽奖。")
 
 #################中奖结果监听#######################
@@ -92,13 +92,13 @@ async def lottery_draw_result(client:Client, message:Message):
                         else:
                             await client.send_sticker(message.chat.id, LOTTERY_Sticker_REPLY_MESSAGE[f"thank{randint(1,5)}"])
 
-                        if message.chat.id != GROUP_ID[lottery_list[finish_key]['ptsite']]:
+                        if message.chat.id != PT_GROUP_ID[lottery_list[finish_key]['ptsite']]:
                             if random()<0.3:
-                                await client.send_message(GROUP_ID[lottery_list[finish_key]['ptsite']],f"感谢{lottery_list[finish_key]['boss_name']} 爷 小弟在这")
+                                await client.send_message(PT_GROUP_ID[lottery_list[finish_key]['ptsite']],f"感谢{lottery_list[finish_key]['boss_name']} 爷 小弟在这")
                             elif random()>0.7:
-                                await client.send_message(GROUP_ID[lottery_list[finish_key]['ptsite']],f"{lottery_list[finish_key]['boss_name']}爷 射这里")
+                                await client.send_message(PT_GROUP_ID[lottery_list[finish_key]['ptsite']],f"{lottery_list[finish_key]['boss_name']}爷 射这里")
                             else:
-                                await client.send_message(GROUP_ID[lottery_list[finish_key]['ptsite']],f"{lottery_list[finish_key]['boss_name']} 大哥, 这里这里")
+                                await client.send_message(PT_GROUP_ID[lottery_list[finish_key]['ptsite']],f"{lottery_list[finish_key]['boss_name']} 大哥, 这里这里")
                     else:
                         if random()<0.3:
                             await client.send_message(message.chat.id,f"{lottery_list[finish_key]['boss_name']}大佬, \n我的是这个: {MY_PTID}")
