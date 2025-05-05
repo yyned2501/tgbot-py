@@ -3,13 +3,11 @@ __pycache__
 .venv/
 .DS*
 
-
 # 相关运行数据
 logs/
 data/
 
 # 隐私信息
-config/
 session/
 .venv/
 .vscode/
