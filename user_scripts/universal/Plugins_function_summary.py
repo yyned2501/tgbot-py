@@ -13,9 +13,8 @@ mess_path = Path("data/get_message")
 @Client.on_message(filters.me & filters.command("re") )
 async def forward_to_group(client:Client, message: Message):
     """
-    转发消息至本群
+    转发消息至当前群
     """
-
     await message.delete() 
     await message.reply_to_message.forward(message.chat.id)
 
@@ -83,23 +82,23 @@ async def forward_to_group(client:Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("helpme"))
 async def help_message(client:Client, message: Message):
-       dme_code = f"\n/dme 删除消息 /dme 数量 "
-       re_code = f"\n/re 转发消息 "
-       autochangename_code = f"\n/autochangename 更新时间昵称: \n     /autochangename on 打开 \n     /autochangename off  关闭: "
-       zpr_code = f"/zpr 二次元图片 /zpr 0/1 数量 内容 \n举例: /zpr 0 2 亚丝娜 模糊搜索亚丝娜SFW图片2张（0：SFW  1：NSFW"
-       jupai_code = f"/jupai  回复文字内容 转为jupai"
-       xjj_coed = f"/xjj 小姐姐视频"
-       bmh_code = f"/bmh /bmhs 发爆米花 \nbmh username 数量 留言 \nbmhs username username username…… 数量 留言"
-       u2_code = f"/u2 /u2s 发u2糖 \nu2 username 数量 留言 \nu2s username username username…… 数量 留言"
-       zm_code = f"/dl /dls 发织梦魔力 \ndl username 数量 留言 \ndls username username username…… 数量 留言"
-       prizewheel_code = f"/prizewheel 朱雀大转盘 /prizewheel 次数"
-       repackcard_code = f"/repackcard 回收背包卡片"
-       packlist_code = f"/packlist 查询背包卡片"
-       getinfo_code = f"/getinfo 查询个人信息"
-       gamelist_code = f"/gamelist 查询当前菠菜对局"
-       betgame_code = f"/betgame 对局下注 /betgame 场次 下注金额 队伍  场次/gamelist 返回每局信息前的数字 队伍0或1 wbg vs we 0就是下注wbg"
-
-       reult_mess = await message.edit(f"```\n{dme_code}\n{re_code}\n{autochangename_code}\n{zpr_code}\n{jupai_code}\n{xjj_coed}\n{bmh_code}\n{u2_code}\n{zm_code}\n{prizewheel_code}\n{repackcard_code}\n{packlist_code}\n{getinfo_code}\n{gamelist_code}\n{betgame_code}```")
+    reult_mess = await message.edit(
+        f"```"
+        f"/dme 删除消息 /dme 数量 "
+        f"/re 转发消息 "
+        f"/autochangename 更新时间昵称: \n     /autochangename on 打开 \n     /autochangename off  关闭: "
+        f"/zpr 二次元图片 /zpr 0/1 数量 内容 \n举例: /zpr 0 2 亚丝娜 模糊搜索亚丝娜SFW图片2张（0：SFW  1：NSFW"
+        f"/jupai  回复文字内容 转为jupai"
+        f"/xjj 小姐姐视频"
+        f"/u2 /u2s 发u2糖 \nu2 username 数量 留言 \nu2s username username username…… 数量 留言"
+        f"/prizewheel 朱雀大转盘 /prizewheel 次数"
+        f"/repackcard 回收背包卡片"
+        f"/packlist 查询背包卡片"
+        f"/getinfo 查询个人信息"
+        f"/gamelist 查询当前菠菜对局"
+        f"/betgame 对局下注 /betgame 场次 下注金额 队伍  场次/gamelist 返回每局信息前的数字 队伍0或1 wbg vs we 0就是下注wbg"
+        f"```"
+    )
 
 
     

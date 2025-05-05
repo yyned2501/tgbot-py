@@ -47,7 +47,7 @@ async def start_app():
     scheduler.start()
     logger.info("Mytgbot监听程序启动成功")
     #async with user_app:
-    await user_app.send_message(GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
+    #await user_app.send_message(GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
 
     await idle()
     await async_engine.dispose()

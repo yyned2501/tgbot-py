@@ -1,6 +1,7 @@
 """ Module to automate message deletion. """
 
 import traceback
+import random
 from app import scheduler
 from libs.log import logger
 from libs import others
@@ -10,39 +11,9 @@ from pyrogram.types.messages_and_media import Message
 from datetime import datetime, timedelta, timezone
 
 
-
-
 auto_change_name_init = False
-dizzy = emojize(":dizzy:", language="alias")
-cake = emojize(":cake:", language="alias")
-all_time_emoji_name = [
-    "clock12",
-    "clock1230",
-    "clock1",
-    "clock130",
-    "clock2",
-    "clock230",
-    "clock3",
-    "clock330",
-    "clock4",
-    "clock430",
-    "clock5",
-    "clock530",
-    "clock6",
-    "clock630",
-    "clock7",
-    "clock730",
-    "clock8",
-    "clock830",
-    "clock9",
-    "clock930",
-    "clock10",
-    "clock1030",
-    "clock11",
-    "clock1130",
-]
-time_emoji_symb = [emojize(f":{s}:", language="alias") for s in all_time_emoji_name]
 
+emojis = [chr(i) for i in range(0x1F600, 0x1F637 + 1)]  # 56个表情符号
 async def change_name_auto(client:Client):
     try:
         time_cur = (
@@ -50,17 +21,20 @@ async def change_name_auto(client:Client):
             .astimezone(timezone(timedelta(hours=8)))  # 转换为东八区时间
             .strftime("%H:%M:%S:%p:%a")  # 格式化输出   
         )
-        hour, minu, seco, p, abbwn = time_cur.split(":")
-        shift = 1 if int(minu) > 30 else 0
-        hsym = time_emoji_symb[(int(hour) % 12) * 2 + shift]
-        _last_name = f"{hour}:{minu} {p} UTC+8 {hsym}"
-        await client.update_profile(last_name=_last_name)
+
+        hour, minu, seco, p, abbwn = time_cur.split(":")        
+        # 生成动态后缀
+        random_emoji = random.choice(emojis)
+        _last_name = f"{random_emoji}{hour}:{minu}"
+        await client.update_profile(last_name=_last_name)       
+        # 验证更新结果
         me = await client.get_me()
         if me.last_name != _last_name:
             raise Exception("修改 last_name 失败")
     except Exception as e:
         trac = "\n".join(traceback.format_exception(e))
         await logger.info(f"更新失败! \n{trac}")
+          
 
 
 

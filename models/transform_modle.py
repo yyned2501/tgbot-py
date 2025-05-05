@@ -1,5 +1,6 @@
 import datetime
 import pyrogram
+from pypinyin import lazy_pinyin
 from models.database import Base, TimeBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import mapped_column, DeclarativeBase, Mapped
@@ -142,13 +143,14 @@ class User(TimeBase):
 
    
     @classmethod
-    async def get(cls, session: AsyncSession, tg_user: pyrogram.types.User | None = None, author_signature: str | None = None):
-        if tg_user:
+    async def get(cls, session: AsyncSession, transform_message: pyrogram.types.Message | None = None):
+        if transform_message.from_user:
+            tg_user = transform_message.from_user
             username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
             user_id = tg_user.id
-        else:
-            username = author_signature or "匿名用户"
-            user_id = username  # 没有 TG ID，只能用签名
+        else:            
+            username = transform_message.author_signature or "匿名用户"
+            user_id = generate_user_id_from_username(username)
 
         user = await session.get(cls, user_id)
         if user:
@@ -164,4 +166,15 @@ class User(TimeBase):
         transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
         session.add(transform)
         await session.flush()
+
+##################英文字母或者中文的拼音转ASCLL码###############################
+def generate_user_id_from_username(username: str) -> int:
+    if username.isascii():  # 英文或符号
+        ascii_str = ''.join(str(ord(c)) for c in username if c.isalpha())
+    else:  # 中文
+        pinyin = ''.join(lazy_pinyin(username)).upper()
+        ascii_str = ''.join(str(ord(c)) for c in pinyin)
+    
+    # 截取前 12 位数字
+    return int(ascii_str[:12].ljust(12, '0'))  # 不足补 0
 
