@@ -15,7 +15,7 @@ session/
 .vscode/
 config.py
 reply_message.py
-
+dbflag.txt
 # 测试项目
 test*
 *.session*
