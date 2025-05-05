@@ -1,9 +1,7 @@
 import shutil
 from pathlib import Path
 from datetime import datetime
-from libs import others,transform
-from libs.log import logger
-from filters import custom_filters
+from libs import others
 from config.config import GROUP_ID
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
@@ -60,11 +58,11 @@ async def testmessage(client: Client, message: Message):
     elif msg.author_signature:
         re_mess = f"\nsender_chat id: {chat_id}\nauthor_signature: {msg.author_signature}"
 
-    await others.delete_message(message, 1)
-
     if re_mess:
-        result = await client.send_message(chat_id, re_mess)
+        result = await message.edit(re_mess)
         await others.delete_message(result, 20)
+    else:
+         await others.delete_message(message, 1)
 
 
 """
