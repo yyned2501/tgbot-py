@@ -3,6 +3,7 @@ import json
 import shutil
 import aiohttp
 from pathlib import Path
+from libs import others
 from libs.log import logger
 from aiohttp import ClientTimeout
 from typing import List, Optional
@@ -309,12 +310,14 @@ async def toggle_monitor(client: Client, message: Message):
 
     if cmd_name == "dyjk":
         monitor_enabled = enable
-        await message.reply(f"✅ 监控功能已{status}！")
+        re_mess = await message.reply(f"✅ 监控功能已{status}！")
     elif cmd_name == "dyzf":
         otherchat_trans = enable
-        await message.reply(f"🔄 转发功能已{status}！")
+        re_mess = await message.reply(f"🔄 转发功能已{status}！")
     else:
-        await message.reply("无效命令。支持 `/dyjk` 或 `/dyzf`。")
+        re_mess = await message.reply("无效命令。支持 `/dyjk` 或 `/dyzf`。")
+    if re_mess:
+        await others.delete_message(re_mess,8)
 
 
 @Client.on_message(
