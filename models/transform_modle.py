@@ -150,11 +150,11 @@ class User(TimeBase):
         if transform_message.from_user:
             tg_user = transform_message.from_user
             username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
-            #username = clean_str_safe(username)
+            username = clean_str_safe(username)
             user_id = tg_user.id
         else:            
             username = transform_message.author_signature or "匿名用户"
-            #username = clean_str_safe(username)
+            username = clean_str_safe(username)
             user_id = generate_user_id_from_username(username)
 
         user = await session.get(cls, user_id)
