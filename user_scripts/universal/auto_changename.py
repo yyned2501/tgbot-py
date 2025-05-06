@@ -50,7 +50,7 @@ async def auto_changename(client: Client, message: Message):
             return await message.edit(f"命令格式不对请按一下格式输入 \n/autochangename on/off")
     if message.command[1].lower() == 'on':
         if not scheduler.get_job("autochangename"):
-            scheduler.add_job(change_name_auto,"cron", second=0, id="autochangename")
+            scheduler.add_job(change_name_auto,"cron", second=0, id="autochangename",args=[client])
         await message.edit(f"自动报时昵称已启用")
         await others.delete_message(message,1)
         logger.info(f"自动报时昵称已启用")
