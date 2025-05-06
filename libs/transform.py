@@ -23,7 +23,7 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
             photo = leaderboard_top5_imge,
 
             caption =f"```"
-            f"{user.name} 大佬，感谢您打赏的{bonus} {bonus_name}\n"
+            f"\n{user.name} 大佬，感谢您打赏的{bonus} {bonus_name}\n"
             f"您打赏了小弟{get_count}次，共计{get_bonus} {bonus_name}\n"
             f"您是{config.MY_NAME}哥个人打赏总榜的第 {user_ranking} 名\n"
             f"当前{config.MY_NAME}哥个人打赏总榜TOP5如图上所示\n"

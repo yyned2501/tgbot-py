@@ -1,5 +1,7 @@
 import datetime
 import pyrogram
+import hashlib
+import unicodedata
 from pypinyin import lazy_pinyin
 import unicodedata
 from models.database import Base, TimeBase
@@ -148,11 +150,11 @@ class User(TimeBase):
         if transform_message.from_user:
             tg_user = transform_message.from_user
             username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
-            username = clean_str_force(username)
+            #username = clean_str_safe(username)
             user_id = tg_user.id
         else:            
             username = transform_message.author_signature or "匿名用户"
-            username = clean_str_force(username)
+            #username = clean_str_safe(username)
             user_id = generate_user_id_from_username(username)
 
         user = await session.get(cls, user_id)
@@ -182,12 +184,21 @@ def generate_user_id_from_username(username: str) -> int:
     return int(ascii_str[:12].ljust(12, '0'))  # 不足补 0
 
 ##################UTF8###############################
+
+
 def clean_str_safe(s) -> str:
     if not isinstance(s, str):
         s = str(s)
-    # 强制转码，去除非法 surrogate
-    s = s.encode('utf-16', 'surrogatepass').decode('utf-16', 'ignore')
-    # 去除不可显示字符（如控制字符等）
+    # 编码/解码以清除非法 surrogate
+    try:
+        s = s.encode('utf-16', 'surrogatepass').decode('utf-16', 'ignore')
+    except Exception:
+        s = s.encode('utf-8', 'ignore').decode('utf-8', 'ignore')
+    # 去除控制字符和不可见字符
     s = ''.join(c for c in s if unicodedata.category(c)[0] != 'C')
-    # 限制长度，SQLite 容易因为超长出错
-    return s[:100]
+    # 去除无效的 Unicode 字符（替代符号、未定义、保留等）
+    s = re.sub(r'[\uD800-\uDFFF]', '', s)
+    # 去除不可识别的特殊字符（如某些 emoji 或 Telegram 特有字符）
+    s = ''.join(c for c in s if c.isprintable())
+    # 限制长度 + 去除前后空格
+    return s.strip()[:100]
