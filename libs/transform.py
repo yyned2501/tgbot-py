@@ -19,7 +19,7 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
         leaderboard_top5 = await user.get_bonus_leaderboard_by_website(session, website,3)
         user_ranking = await user.get_user_bonus_rank(session, website)
         leaderboard_top5_imge = await get_leaderboard(leaderboard_top5)
-        await transform_message.reply_photo(
+        re_mess = await transform_message.reply_photo(
             photo = leaderboard_top5_imge,
 
             caption =f"```"
@@ -30,6 +30,7 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
             f"```"
         )        
         os.remove(leaderboard_top5_imge)
+        await others.delete_message(re_mess,30)
 
 
         """
