@@ -150,13 +150,12 @@ class User(TimeBase):
         if transform_message.from_user:
             tg_user = transform_message.from_user
             username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
-            username = clean_str_safe(username)
+            #username = clean_str_safe(username)
             user_id = tg_user.id
         else:            
             username = transform_message.author_signature or "匿名用户"
-            username = clean_str_safe(username)
+            #username = clean_str_safe(username)
             user_id = generate_user_id_from_username(username)
-
         user = await session.get(cls, user_id)
         if user:
             if user.name != username:
@@ -166,26 +165,24 @@ class User(TimeBase):
             session.add(user)
             await session.flush()
         return user
-
+    
     async def add_transform_record(self, session: AsyncSession, website: str, bonus: int):
         transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
         session.add(transform)
         await session.flush()
 
 ##################英文字母或者中文的拼音转ASCLL码###############################
+
+
+
 def generate_user_id_from_username(username: str) -> int:
-    if username.isascii():  # 英文或符号
-        ascii_str = ''.join(str(ord(c)) for c in username if c.isalpha())
-    else:  # 中文
-        pinyin = ''.join(lazy_pinyin(username)).upper()
-        ascii_str = ''.join(str(ord(c)) for c in pinyin)
-    
-    # 截取前 12 位数字
-    return int(ascii_str[:12].ljust(12, '0'))  # 不足补 0
+    #clean_name = clean_str_safe(username)
+    hash_hex = hashlib.sha1(username.encode('utf-8')).hexdigest()[:20]
+    return int(hash_hex, 16)  # 转为整数
 
 ##################UTF8###############################
 
-
+"""
 def clean_str_safe(s) -> str:
     if not isinstance(s, str):
         s = str(s)
@@ -202,3 +199,4 @@ def clean_str_safe(s) -> str:
     s = ''.join(c for c in s if c.isprintable())
     # 限制长度 + 去除前后空格
     return s.strip()[:100]
+"""
