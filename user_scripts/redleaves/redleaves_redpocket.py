@@ -2,7 +2,7 @@ import asyncio
 from libs.log import logger
 from random import randint
 from pyrogram import filters, Client
-from pyrogram.types.messages_and_media import Message
+from pyrogram.types import Message
 from filters import custom_filters
 
 
