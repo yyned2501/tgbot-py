@@ -2,6 +2,7 @@ import asyncio
 from libs.log import logger
 from pyrogram import filters, Client
 from pyrogram.errors import PeerIdInvalid
+from datetime import datetime, time, timedelta
 
 async def delete_message(message_del, sleep_time=35):
     """
@@ -55,3 +56,14 @@ async def get_usertoarray(client:Client, sorted_array):
             tgname = raw_id
         new_array.append([tgname] + row[1:])
     return new_array
+
+
+#################将各个形式的日期转为date格式###################
+def parse_date_input(value):
+    if isinstance(value, datetime):
+        return value
+    elif isinstance(value, str):
+        return datetime.strptime(value, "%Y-%m-%d")
+    elif hasattr(value, "year") and hasattr(value, "month") and hasattr(value, "day"):
+        return datetime.combine(value, time.min)
+    raise ValueError(f"Unsupported date type: {type(value)}")

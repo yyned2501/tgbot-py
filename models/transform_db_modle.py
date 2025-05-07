@@ -1,18 +1,16 @@
-import datetime
+from datetime import datetime
 import pyrogram
 import hashlib
 import unicodedata
-from pypinyin import lazy_pinyin
-import unicodedata
 from models.database import Base, TimeBase
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import mapped_column, DeclarativeBase, Mapped
-from sqlalchemy import ForeignKey, String, Integer, BigInteger,Float,Numeric, CheckConstraint,DateTime,func, desc, select
+from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy import String, Integer, BigInteger,Numeric, DateTime,func, desc, select
 
 class Transform(Base):
     __tablename__ = "transform"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    create_time: Mapped[datetime.datetime] = mapped_column(DateTime, default=func.now())
+    create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     website: Mapped[str] = mapped_column(String(32))
     user_id: Mapped[int] = mapped_column(BigInteger)
     bonus: Mapped[float] = mapped_column(Numeric(12, 2))
@@ -41,7 +39,7 @@ class User(TimeBase):
     
 
 
-    async def get_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str):
+    async def get_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> tuple[int, float]:
         """
         获取当前用户在指定站点的 发送给我的 次数 、魔力总和。
         :param site_name: 站点名称
@@ -91,11 +89,17 @@ class User(TimeBase):
         return bonus_count, bonus_sum
     
 
-    async def get_bonus_leaderboard_by_website(self, session: AsyncSession, site_name: str, top_n: int = 10):
+    async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
 
         """
         sssssss
         """
+        if Direction == 'pay':
+            flag = Transform.bonus < 0
+        else:
+            flag = Transform.bonus > 0
+
+
         result_data = (
             select(
                 Transform.user_id,
@@ -166,7 +170,7 @@ class User(TimeBase):
             await session.flush()
         return user
     
-    async def add_transform_record(self, session: AsyncSession, website: str, bonus: int):
+    async def add_transform_record(self, session: AsyncSession, website: str, bonus: float):
         transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
         session.add(transform)
         await session.flush()
