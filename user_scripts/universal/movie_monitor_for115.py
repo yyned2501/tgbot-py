@@ -310,12 +310,12 @@ async def toggle_monitor(client: Client, message: Message):
 
     if cmd_name == "dyjk":
         monitor_enabled = enable
-        re_mess = await message.reply(f"✅ 监控功能已{status}！")
+        re_mess = await message.edit(f"✅ 监控功能已{status}！")
     elif cmd_name == "dyzf":
         otherchat_trans = enable
-        re_mess = await message.reply(f"🔄 转发功能已{status}！")
+        re_mess = await message.edit(f"🔄 转发功能已{status}！")
     else:
-        re_mess = await message.reply("无效命令。支持 `/dyjk` 或 `/dyzf`。")
+        re_mess = await message.edit("无效命令。支持 `/dyjk` 或 `/dyzf`。")
     if re_mess:
         await others.delete_message(re_mess,8)
 
