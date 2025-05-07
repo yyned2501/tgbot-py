@@ -4,7 +4,7 @@ from decimal import Decimal
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from filters import custom_filters
-from libs.transform import transform
+from libs.transform_dispatch import transform
 from models import async_session_maker
 
 TARGET = [-1002372175195]

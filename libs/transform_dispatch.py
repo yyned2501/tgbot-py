@@ -1,7 +1,7 @@
 import os
 from libs import others
 from config import config
-from models.transform_modle import User
+from models.transform_db_modle import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from pyrogram.types.messages_and_media import Message
 from libs.leaderboard.leaderboard_imge import get_leaderboard
