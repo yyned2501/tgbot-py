@@ -21,6 +21,7 @@ async def redleaves_redpocket(client: Client, message: Message):
 
     redpocket_nuber = message.matches[0].group(1)
     callback_data = f'open_packet_{redpocket_nuber}'
+    callback_data = message.reply_markup.inline_keyboard[0][0].callback_data
     logger.info("redleaves:参与红叶第{redpocket_nuber}号红包")
     try:
         await asyncio.sleep(randint(2, 10))
