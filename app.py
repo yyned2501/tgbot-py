@@ -14,13 +14,6 @@ if proxy_set['proxy_enable'] == True:
 else:
     proxy = None
 
-user_app = Client(
-    "./sessions/user_account",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    proxy=proxy_set['proxy']
-)
-
 async def start_app():    
 
     global user_app,bot_app
