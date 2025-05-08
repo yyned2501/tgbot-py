@@ -2,6 +2,8 @@ import os
 import imgkit
 import asyncio
 from config import config
+import uuid
+
 medal_emojis = {
     1: "🥇",
     2: "🥈",
@@ -83,18 +85,19 @@ async def get_leaderboard(data):
     </body>
     </html>
     """
+    unique_id = uuid.uuid4().hex
+    html_file = f"libs/leaderboard/temp_{unique_id}.html"
+    img_file = f"libs/leaderboard/leaderboard_{unique_id}.png"
 
-    # 保存 HTML 到文件
-    html_file = "libs/leaderboard/temp_leaderboard.html"
     with open(html_file, "w", encoding="utf-8") as f:
         f.write(html_str)
 
-    # 生成图片
-    imgkit.from_file(html_file, 'libs/leaderboard/leaderboard.png', config=wkhtml_config, options={
+    imgkit.from_file(html_file, img_file, config=wkhtml_config, options={
         'encoding': 'UTF-8',
         'format': 'png',
         'width': 512,
         'enable-local-file-access': ''
     })
     os.remove(html_file)
-    return 'libs/leaderboard/leaderboard.png'
+    return img_file
+    

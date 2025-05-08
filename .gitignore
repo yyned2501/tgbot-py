@@ -15,6 +15,7 @@ config.py
 reply_message.py
 dbflag.txt
 # 测试项目
+sessions/
 test*
 *.session*
 *.log
