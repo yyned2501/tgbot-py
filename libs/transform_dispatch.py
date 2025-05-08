@@ -16,7 +16,7 @@ async def transform(session: AsyncSession, transform_message: Message, bonus: in
     pay_count, pay_bonus = await user.pay_bonus_count_sum_for_website(session, website)
 
     if leaderboard:       
-        leaderboard_top5 = await user.get_bonus_leaderboard_by_website(session, website,3)
+        leaderboard_top5 = await user.get_bonus_leaderboard_by_website(session=session, site_name=website, Direction="get", top_n=5)
         user_ranking = await user.get_user_bonus_rank(session, website)
         leaderboard_top5_imge = await get_leaderboard(leaderboard_top5)
         re_mess = await transform_message.reply_photo(

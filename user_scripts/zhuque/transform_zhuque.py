@@ -41,7 +41,7 @@ async def zhuque_transform_pay(client: Client, message: Message):
     async with async_session_maker() as session:
         async with session.begin():
             try:        
-                await transform(session, transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, True)             
+                await transform(session, transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, False)             
             except Exception as e:
                 logger.exception(f"提交失败: 用户消息：{transform_message}, 错误：{e}")
                 await message.reply("转换失败，请稍后再试。")
