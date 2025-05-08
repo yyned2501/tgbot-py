@@ -1,7 +1,7 @@
 from libs.log import logger
 from decimal import Decimal
 from pyrogram import filters, Client
-from pyrogram.types.messages_and_media import Message
+from pyrogram.types import Message
 from filters import custom_filters
 from libs.transform_dispatch import transform
 from models import async_session_maker

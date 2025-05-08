@@ -3,6 +3,7 @@ import asyncio
 from libs.log import logger
 from pyrogram import Client,idle
 from models import create_all,async_engine
+from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, BOT_TOKEN_TEST, PT_GROUP_ID, proxy_set
 #
@@ -50,6 +51,7 @@ async def start_app():
         with open("sessions/dbflag.txt", "w", encoding="utf-8") as f:
             f.write("首次运行数据库初始化记录,勿删。")
     scheduler.start()
+    await zhuque_autofire_firsttimeget()
     logger.info("Mytgbot监听程序启动成功")
     await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
 
