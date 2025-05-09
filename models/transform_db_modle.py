@@ -315,8 +315,8 @@ class User(TimeBase):
 
 def generate_user_id_from_username(username: str) -> int:
     #clean_name = clean_str_safe(username)
-    hash_hex = hashlib.sha1(username.encode('utf-8')).hexdigest()[:20]
-    return int(hash_hex, 16)  # 转为整数
+    hash_hex = hashlib.sha1(username.encode('utf-8')).hexdigest()
+    return int(str(int(hash_hex, 16))[:18]) # 转为整数
 
 ##################UTF8###############################
 
