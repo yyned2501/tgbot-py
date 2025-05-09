@@ -22,7 +22,7 @@ async def start_app():
         "sessions/user_account",
         api_id=API_ID,
         api_hash=API_HASH,
-        proxy=proxy_set['proxy'],
+        proxy=proxy,
         plugins=dict(root="user_scripts"),
         )
     """
