@@ -16,7 +16,7 @@ logger = logging.getLogger('main')
 logger.setLevel(logging.INFO)
 
 # 防止重复添加 handler
-"""
+
 if not logger.handlers:    
     file_handler = RotatingFileHandler("logs/Mytgbot.log", maxBytes=10 * 1024 * 1024, backupCount=10, encoding="utf-8")
     file_handler.setFormatter(formatter)
@@ -31,3 +31,4 @@ if not logger.handlers:
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
+"""
