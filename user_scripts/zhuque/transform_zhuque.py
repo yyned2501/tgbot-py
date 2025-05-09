@@ -4,7 +4,7 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 from filters import custom_filters
 from libs.transform_dispatch import transform
-from models import async_session_maker
+
 
 TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
@@ -20,13 +20,7 @@ BONUS_NAME = "灵石"
 async def zhuque_transform_get(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message
-    async with async_session_maker() as session:
-        async with session.begin():
-            try:
-                await transform(session, transform_message, Decimal(f"{bonus}"), SITE_NAME, BONUS_NAME, True)                
-            except Exception as e:
-                logger.exception(f"提交失败: 用户消息：{transform_message}, 错误：{e}")
-                await message.reply("转换失败，请稍后再试。")
+    await transform(transform_message, Decimal(f"{bonus}"), SITE_NAME, BONUS_NAME, True)
 
 ###################转出灵石给他人##################################
 @Client.on_message(
@@ -38,11 +32,7 @@ async def zhuque_transform_get(client: Client, message: Message):
 async def zhuque_transform_pay(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message.reply_to_message
-    async with async_session_maker() as session:
-        async with session.begin():
-            try:        
-                await transform(session, transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, False)             
-            except Exception as e:
-                logger.exception(f"提交失败: 用户消息：{transform_message}, 错误：{e}")
-                await message.reply("转换失败，请稍后再试。")
+    await transform(transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, False)             
+            
+    
              
