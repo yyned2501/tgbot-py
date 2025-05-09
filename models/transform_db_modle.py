@@ -19,7 +19,6 @@ class Redpocket(Base):
     create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     website: Mapped[str] = mapped_column(String(32))
     gamemode: Mapped[str] = mapped_column(String(32))
-    gamemode1: Mapped[str] = mapped_column(String(32)) 
     user_id: Mapped[int] = mapped_column(BigInteger)   
     bonus: Mapped[float] = mapped_column(Numeric(12, 2)) 
 
