@@ -17,7 +17,7 @@ async def main():
         "sessions/user_account",
         api_id=API_ID,
         api_hash=API_HASH,
-        proxy=proxy_set['proxy']
+        proxy=proxy
     )
 
 
