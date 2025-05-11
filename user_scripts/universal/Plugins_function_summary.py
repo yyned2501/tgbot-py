@@ -82,8 +82,10 @@ async def forward_to_group(client:Client, message: Message):
 async def help_message(client:Client, message: Message):
     reult_mess = await message.edit(
         f"```"
-        f"/dme 删除消息 /dme 数量 "
+        f"\n/dme 删除消息 /dme 数量 "
         f"/re 转发消息 "
+        f"/blockyword add xxx  115电影查询增加不检索关键字"
+        f"/blockyword remove xxx  115电影查询删除不检索关键字"
         f"/autochangename 更新时间昵称: \n     /autochangename on 打开 \n     /autochangename off  关闭: "
         f"/zpr 二次元图片 /zpr 0/1 数量 内容 \n举例: /zpr 0 2 亚丝娜 模糊搜索亚丝娜SFW图片2张（0：SFW  1：NSFW"
         f"/jupai  回复文字内容 转为jupai"

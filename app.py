@@ -1,5 +1,6 @@
 import os
 import asyncio
+import json
 from libs.log import logger
 from pyrogram import Client,idle
 from models import create_all,async_engine
@@ -9,12 +10,15 @@ from config.config import API_HASH, API_ID, BOT_TOKEN_TEST, PT_GROUP_ID, proxy_s
 #
 scheduler = AsyncIOScheduler()
 
+
 if proxy_set['proxy_enable'] == True:
     proxy = proxy_set['proxy']
 else:
     proxy = None
 
-async def start_app():    
+async def start_app():
+    db_flag_path = "sessions/dbflag.json"
+    db_flag_data = None   
 
     global user_app,bot_app
 
@@ -38,11 +42,22 @@ async def start_app():
     logger.info("启动Mytgbot监听程序")
     await user_app.start()
     #await bot_app.start()
-    if not os.path.exists("sessions/dbflag.txt"):
-        logger.info(f"文件不存在，首次运行.初始化数据库")
-        await create_all() 
-        with open("sessions/dbflag.txt", "w", encoding="utf-8") as f:
-            f.write("首次运行数据库初始化记录,勿删。")
+    if os.path.exists(db_flag_path):
+        try:
+            with open(db_flag_path, "r", encoding="utf-8") as f:
+                db_flag_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            logger.warning(f"读取 dbflag.json 失败，将重新初始化数据库：{e}")
+
+
+    if not db_flag_data or db_flag_data.get('db_flag') != True:
+        logger.info("首次运行，初始化数据库...")
+        await create_all()
+        with open(db_flag_path, "w", encoding="utf-8") as f:
+            json.dump({'db_flag': True}, f, ensure_ascii=False, indent=4)
+    else:
+        logger.info("数据库已初始化，跳过初始化步骤。")
+
     scheduler.start()
     await zhuque_autofire_firsttimeget()
     logger.info("Mytgbot监听程序启动成功")
