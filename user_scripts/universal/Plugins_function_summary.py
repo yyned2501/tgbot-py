@@ -1,21 +1,50 @@
 import shutil
+import asyncio
 from pathlib import Path
 from datetime import datetime
 from libs import others
 from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
+from pyrogram.errors import Forbidden
+from pyrogram.errors import FloodWait
 
 mess_path = Path("data/get_message")
 
 @Client.on_message(filters.me & filters.command("re") )
-async def forward_to_group(client:Client, message: Message):
-    """
-    转发消息至当前群
-    """
-    await message.delete() 
-    await message.reply_to_message.forward(message.chat.id)
+async def forward_to_group(client: Client, message: Message):
+    
+    if reply := message.reply_to_message:       
+        try:
+            # 获取重复次数，默认为1
+            re_times = int(message.command[1]) if len(message.command) >= 2 and message.command[1].isdigit() else 1
+        except (IndexError, ValueError):
+            # 捕获IndexError（当命令参数为空）和ValueError（当参数不是数字）并设置re_times为1
+            re_times = 1
+            await message.delete()
 
+   
+        for _ in range(re_times):
+            try:
+                # 如果聊天没有保护内容，执行转发
+                await asyncio.sleep(0.3)
+                if not message.chat.has_protected_content:
+                    await reply.forward(
+                        reply.chat.id, message_thread_id=reply.message_thread_id
+                    )
+                else:
+                    # 否则执行复制操作
+                    await reply.copy(
+                        reply.chat.id,
+                        message_thread_id=message.message_thread_id,
+                    )
+            except (Forbidden, FloodWait, Exception):
+                return
+    else:
+        #await rem.edit("没有回复消息")
+        await others.delete_message(message,5)
+        
+        
 
 
 @Client.on_message(filters.me & filters.command("getmessage"))   
