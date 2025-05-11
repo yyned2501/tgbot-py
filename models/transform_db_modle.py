@@ -32,11 +32,10 @@ class Redpocket(Base):
         """
         查询数据库指定字段当天最新的一笔
         """
-        today = date.today()
+        #today = date.today()
         create_time_stmt = (
             select(cls.create_time)
-            .where(
-                func.date(cls.create_time) == today,
+            .where(                
                 cls.website == website,
                 cls.gamemode == gamemode
             )

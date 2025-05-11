@@ -5,7 +5,7 @@ import re
 from libs import others
 from libs.log import logger
 from pyrogram import filters, Client
-from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF,PT_GROUP_ID
+from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF,PT_GROUP_ID,MY_TGID
 from typing import Optional, Tuple
 from datetime import datetime, timedelta,date
 from models.transform_db_modle import User,Redpocket
@@ -57,10 +57,9 @@ async def zhuque_autofire_firsttimeget():
             try:
                 last_time = await Redpocket.get_today_latest_fire_createtime(session, SITE_NAME, "firegenshin")                        
             except Exception as e:
-                logger.exception(f"提交失败: 用户消息, 错误：{e}")
+                logger.exception(f"提交失败: 用户消息, 错误：{e}")    
     if last_time:
-        print("last_time",last_time,"last_time.date()",last_time.date())
-        if last_time.date() <  date.today():
+        if last_time.date() <  (date.today() - timedelta(days=1)):
             next_time = last_time + timedelta(seconds=10)
         else:
             next_time = last_time + timedelta(days=1)   
