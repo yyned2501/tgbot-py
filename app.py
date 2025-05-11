@@ -67,17 +67,17 @@ async def start_app():
     await zhuque_autofire_firsttimeget()
     logger.info("Mytgbot监听程序启动成功")
     await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
-    print("系统名称:", platform.system())            # 如 Linux / Windows / Darwin
-    print("系统版本:", platform.version())          # 操作系统版本
-    print("系统平台:", platform.platform())          # 综合平台信息
-    print("系统架构:", platform.machine())           # 架构 x86_64 / ARM
-    print("完整信息:", platform.uname())            # 命名元组格式详细信息
+    logger.info(f"系统名称:, {platform.system()}")            # 如 Linux / Windows / Darwin
+    logger.info(f"系统版本:, {platform.version()}")          # 操作系统版本
+    logger.info(f"系统平台:, {platform.platform()}")          # 综合平台信息
+    logger.info(f"系统架构:, {platform.machine()}")           # 架构 x86_64 / ARM
+    logger.info(f"完整信息:, {platform.uname()}")            # 命名元组格式详细信息
     
 
-    print("Python 版本:", sys.version)
-    print("Python 主版本号:", sys.version_info.major)
-    print("Python 完整版本号:", f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-    print('pyrogram', pyrogram.__version__)
+    logger.info(f"Python 版本:, {sys.version}")
+    logger.info(f"Python 主版本号:, {sys.version_info.major}")
+    logger.info(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    logger.info(f"pyrogram, {pyrogram.__version__}")
 
     await idle()
     await async_engine.dispose()
