@@ -20,19 +20,20 @@ async def in_redpockets_filter(_, __, m: Message):
 @Client.on_message(
     filters.chat(TARGET)
     & custom_filters.zhuque_bot
-    & filters.regex(r"内容: (.*)\n灵石: .*\n剩余: .*\n大善人: (.*)")
+    & filters.regex(r"内容: ([\s\S]*?)\n灵石: .*\n剩余: .*\n大善人: (.*)")
 )
 async def get_redpocket_gen(client: Client, message: Message):    
     callback_data = message.reply_markup.inline_keyboard[0][0].callback_data
-    match = message.matches[0]
-    from_user = match.group(2)
+    match = message.matches[0]    
+    redpocket_name = match.group(1)
+    red_from_user = match.group(2)
     retry_times = 0
     while retry_times<1000:
         result_message = await client.request_callback_answer(message.chat.id, message.id,callback_data)      
         match_result_message = re.search(r"已获得 (\d+) 灵石", result_message.message)       
         if match_result_message:
             bonus = match_result_message.group(1)
-            await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"```\n朱雀红包{match}:\n 抢了{retry_times+1}次 抢到 {bonus} 灵石")
+            await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"```\n{red_from_user}发的:\n朱雀红包{redpocket_name}:\n 抢了{retry_times+1}次 成功抢到 {bonus} 灵石")
             async with async_session_maker() as session:
                 async with session.begin():
                     try:
