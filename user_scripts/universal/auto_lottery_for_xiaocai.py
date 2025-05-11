@@ -29,6 +29,7 @@ def is_within_time_ranges():
     filters.chat(LOTTERY_TARGET_GROUP)
     & filters.regex(r"^新的抽奖已经创建[\s\S]+参与关键词：「(.+)」")
     & (custom_filters.choujiang_bot)
+    | (custom_filters.test)
 )
 async def lottery_new_message(client:Client, message:Message):
     lottery_info = {}   
@@ -51,10 +52,10 @@ async def lottery_new_message(client:Client, message:Message):
                 lottery_list[lottery_info['ID']] = {'keyword':lottery_info['keyword'],'boss_name':lottery_info['boss_name'],'boss_ID':lottery_info['boss_ID'],'ptsite':result_key,'prizechat':message.chat.id,'flag':0}
                 await asyncio.sleep(randint(25, 65)) 
                 if lottery_info['ID'] in lottery_list:                                                
-                    logger.info(f"ID: {lottery_info['ID']}的抽奖,随机等待后未结束，故参与抽奖,参与群组:{message.chat.id},抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']}")
+                    logger.info(f"ID: {lottery_info['ID']}的抽奖,随机等待后未结束，故参与抽奖,参与群组:{message.chat.title}({message.chat.id}),抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']}")
                     re_message = await client.send_message(message.chat.id, lottery_list[lottery_info['ID']]['keyword'])
                     lottery_list[lottery_info['ID']]['flag'] = 1
-                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.id},\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
+                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.title}({message.chat.id}),\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
                 else:
                     await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖在随机等待时间内已经结束，故不参与抽奖。 \n\n{message.text}\n\n{message.link}")
                     logger.info(f"ID: {lottery_info['ID']}的抽奖，在随机等待时间内已经结束，故不参与抽奖")
@@ -72,7 +73,9 @@ async def lottery_new_message(client:Client, message:Message):
 #################中奖结果监听#######################
 @Client.on_message(
         filters.regex(r"^参与人数够啦！！开奖[\s\S]+中奖信息\n([\s\S]+)")
-        & (custom_filters.choujiang_bot)   
+        & (custom_filters.choujiang_bot  
+           |custom_filters.test
+        )
     )
 async def lottery_draw_result(client:Client, message:Message):
     finish_key = ""
