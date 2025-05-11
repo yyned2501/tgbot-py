@@ -1,12 +1,17 @@
 import os
-import asyncio
+import sys
 import json
+import asyncio
+import platform
+import pyrogram
 from libs.log import logger
 from pyrogram import Client,idle
 from models import create_all,async_engine
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, BOT_TOKEN_TEST, PT_GROUP_ID, proxy_set
+
+
 #
 scheduler = AsyncIOScheduler()
 
@@ -62,6 +67,17 @@ async def start_app():
     await zhuque_autofire_firsttimeget()
     logger.info("Mytgbot监听程序启动成功")
     await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
+    print("系统名称:", platform.system())            # 如 Linux / Windows / Darwin
+    print("系统版本:", platform.version())          # 操作系统版本
+    print("系统平台:", platform.platform())          # 综合平台信息
+    print("系统架构:", platform.machine())           # 架构 x86_64 / ARM
+    print("完整信息:", platform.uname())            # 命名元组格式详细信息
+    
+
+    print("Python 版本:", sys.version)
+    print("Python 主版本号:", sys.version_info.major)
+    print("Python 完整版本号:", f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    print('pyrogram', pyrogram.__version__)
 
     await idle()
     await async_engine.dispose()
@@ -69,4 +85,8 @@ async def start_app():
     #await bot_app.stop()
     logger.info("关闭Mytgbot监听程序")
 
+   
 
+
+async def system_version_get():
+     print("完整信息:", platform.uname())
