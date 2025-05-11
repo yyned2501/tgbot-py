@@ -66,19 +66,8 @@ async def start_app():
     scheduler.start()
     await zhuque_autofire_firsttimeget()
     logger.info("Mytgbot监听程序启动成功")
-    await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot监听程序启动成功")
-    logger.info(f"系统名称:, {platform.system()}")            # 如 Linux / Windows / Darwin
-    logger.info(f"系统版本:, {platform.version()}")          # 操作系统版本
-    logger.info(f"系统平台:, {platform.platform()}")          # 综合平台信息
-    logger.info(f"系统架构:, {platform.machine()}")           # 架构 x86_64 / ARM
-    logger.info(f"完整信息:, {platform.uname()}")            # 命名元组格式详细信息
-    
-
-    logger.info(f"Python 版本:, {sys.version}")
-    logger.info(f"Python 主版本号:, {sys.version_info.major}")
-    logger.info(f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
-    logger.info(f"pyrogram, {pyrogram.__version__}")
-
+    re_mess1,re_mess2 = await system_version_get()
+    await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"Mytgbot 在 {re_mess1}上登录,\n{re_mess2}")
     await idle()
     await async_engine.dispose()
     await user_app.stop()
@@ -89,4 +78,9 @@ async def start_app():
 
 
 async def system_version_get():
-     print("完整信息:", platform.uname())
+    sys_info = platform.uname()
+    python_info = f"Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    pyrogram_info = f"脚本依赖: pyrogram: {pyrogram.__version__}"
+    re_message1 = f"{sys_info.node} 的 {sys_info.system} 设备"
+    re_message2 = f"{python_info} {pyrogram_info}"
+    return re_message1,re_message2

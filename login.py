@@ -3,6 +3,7 @@ import subprocess
 from libs.log import logger
 from config.config import PT_GROUP_ID
 from pyrogram import Client
+from app import system_version_get
 from config.config import API_HASH, API_ID,BOT_TOKEN_TEST,proxy_set
 
 
@@ -22,7 +23,8 @@ async def main():
 
 
     async with user_app:
-        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], "Mytgbot首次登录成功,登录信息创建成功")
+        re_mess1, re_mess2 = system_version_get()
+        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"Mytgbot 首次在 {re_mess1}上登录,\n{re_mess2}")
         logger.info("Mytgbot首次登录成功，登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
         result = subprocess.run(command, capture_output=True, text=True)
