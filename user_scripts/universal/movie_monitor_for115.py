@@ -1,4 +1,5 @@
 import re
+import os
 import json
 import shutil
 import aiohttp
@@ -13,6 +14,7 @@ from config.config import M115_GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMD
 
 
 media_path = Path("data/get_media")
+blockyword_path = "sessions/blockyword.json"
 monitor_enabled = False
 otherchat_trans = False
 LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
@@ -253,6 +255,12 @@ async def monitor_channels(client: Client, message: Message):
     title = ""
     if not monitor_enabled:
         return
+    if os.path.exists(blockyword_path):
+        with open(blockyword_path, "r", encoding="utf-8") as f:
+            blockyword_list = json.load(f)
+    else:
+        blockyword_list = [] 
+
     
     # 判断是否为电影消息    
     if (message.chat.id == TARGET["CHANNEL_SHARES_115_ID"]
@@ -280,8 +288,11 @@ async def monitor_channels(client: Client, message: Message):
             title = match.group(1).strip()  # 括号前的内容
             year = match.group(2).strip() 
     if title and year:        
-        logger.info(f"检索到群组: [{message.chat.title}] 媒体信息: {title} {year}")
-        await search_and_send_message(client,title, year,message)
+        if any(word in title for word in blockyword_list):
+            logger.info(f"检索到群组: [{message.chat.title}] 媒体信息: {title} {year} 是屏蔽关键字,不开始检索") 
+        else:
+            logger.info(f"检索到群组: [{message.chat.title}] 媒体信息: {title} {year}")
+            await search_and_send_message(client,title, year,message)
 
 
 
@@ -318,6 +329,60 @@ async def toggle_monitor(client: Client, message: Message):
         re_mess = await message.edit("无效命令。支持 `/dyjk` 或 `/dyzf`。")
     if re_mess:
         await others.delete_message(re_mess,8)
+
+
+# ================== 添加、删除屏蔽关键字 ==================
+@Client.on_message(
+        filters.me 
+        & filters.command("blockyword")
+    )
+
+async def blockyword_add_remove(client: Client, message: Message):
+    """115电影删选屏蔽词增加或删除"""  
+
+    if len(message.command) < 3:
+        await message.reply("参数不足。用法：`/blockyword add xxx` 或 `/blockyword remove xxx` ")
+        return
+    cmd_name = message.command[0].lower()
+    action = message.command[1].lower()
+    words = message.command[2].lower()   
+    
+    if os.path.exists(blockyword_path):
+        with open(blockyword_path, "r", encoding="utf-8") as f:
+            blockyword_list = json.load(f)
+    else:
+        blockyword_list = []
+    
+    if action in "add" or "remove":
+        if action == "add":        
+            if words not in blockyword_list:
+                blockyword_list.append(words)
+        elif action == "remove":
+            if words in blockyword_list:
+                blockyword_list.remove(words)        
+        try:
+            with open(blockyword_path, "w", encoding="utf-8") as f:
+                json.dump(blockyword_list, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            logger.error(f"屏蔽次增加或删除失败 {str(e)}")
+            return
+        
+        re_mess=await message.edit(f'屏蔽词{words}{action}成功\n当前当前屏蔽词以下：{blockyword_list}')
+    else:
+        await message.reply("无效参数。请使用 `add` 或 `remove`")
+   
+    if re_mess:
+        await others.delete_message(re_mess,15)
+
+
+
+
+
+
+
+
+
+
 
 
 @Client.on_message(
