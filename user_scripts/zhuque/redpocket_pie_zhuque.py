@@ -1,4 +1,5 @@
 import re
+import asyncio
 from decimal import Decimal
 from libs.log import logger
 from filters import custom_filters
@@ -7,6 +8,7 @@ from models import async_session_maker
 from pyrogram import filters, Client
 from pyrogram.types import Message
 from models.transform_db_modle import User
+from models.redpocket_db_modle import Redpocket
 
 TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
@@ -21,39 +23,36 @@ async def in_redpockets_filter(_, __, m: Message):
 @Client.on_message(
     filters.chat(TARGET)
     & custom_filters.zhuque_bot
-    & filters.regex(r"内容: ([\s\S]*?)\n灵石: .*\n剩余: .*\n大善人: (.*)")
+    & filters.regex(r"内容: ([\s\S]*?)\n灵石: (\d+(?:\.\d+)?)/\d+(?:\.\d+)?\n剩余: .*?\n大善人: (.*)")
 )
 async def get_redpocket_gen(client: Client, message: Message):
-
+    print(message.matches)
     if message.reply_to_message.from_user.id ==  MY_TGID:
         async with async_session_maker() as session:
                 async with session.begin():
-                    try:
-                        user = await User.get(session, message)              
-                        await  user.add_redpocket_record(session, SITE_NAME, "redpocker", Decimal(f"{bonus}"))
+                    try:                                    
+                        await  Redpocket.add_redpocket_record(session, SITE_NAME, "redpocker", Decimal(f"-{message.matches[0].group(2)}"))
                     except Exception as e:
                         logger.exception(f"提交失败: 用户消息, 错误：{e}")
-                        await message.reply("转换失败，请稍后再试。")
        
     callback_data = message.reply_markup.inline_keyboard[0][0].callback_data
     match = message.matches[0]    
     redpocket_name = match.group(1)
-    red_from_user = match.group(2)
+    red_from_user = match.group(3)
     retry_times = 0
-    while retry_times<1000:
-        result_message = await client.request_callback_answer(message.chat.id, message.id,callback_data)      
+    while retry_times<500:
+        result_message = await client.request_callback_answer(message.chat.id, message.id,callback_data) 
+        await asyncio.sleep(0.2)     
         match_result_message = re.search(r"已获得 (\d+) 灵石", result_message.message)       
         if match_result_message:
             bonus = match_result_message.group(1)
             await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"```\n{red_from_user}发的:\n朱雀红包{redpocket_name}:\n 抢了{retry_times+1}次 成功抢到 {bonus} 灵石")
             async with async_session_maker() as session:
                 async with session.begin():
-                    try:
-                        user = await User.get(session, message)              
-                        await  user.add_redpocket_record(session, SITE_NAME, "redpocker", bonus)
+                    try:             
+                        await  Redpocket.add_redpocket_record(session, SITE_NAME, "redpocker", bonus)
                     except Exception as e:
-                        logger.exception(f"提交失败: 用户消息, 错误：{e}")
-                        await message.reply("转换失败，请稍后再试。")
+                        logger.exception(f"提交失败: 用户消息, 错误：{e}")                        
             return
         retry_times += 1
 
@@ -70,11 +69,9 @@ async def zhuque_pie(client:Client, message:Message):
     
     async with async_session_maker() as session:
         async with session.begin():
-            try:
-                user = await User.get(session, message)
-                await  user.add_redpocket_record(session, SITE_NAME, "zhuepie", bonus)
+            try:                
+                await  Redpocket.add_redpocket_record(session, SITE_NAME, "zhuepie", bonus)
             except Exception as e:
                 logger.exception(f"提交失败: 用户消息, 错误：{e}")
-                await message.reply("转换失败，请稍后再试。")
 
 

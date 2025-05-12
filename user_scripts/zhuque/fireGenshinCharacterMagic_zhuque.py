@@ -8,7 +8,7 @@ from pyrogram import filters, Client
 from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF,PT_GROUP_ID,MY_TGID
 from typing import Optional, Tuple
 from datetime import datetime, timedelta,date
-from models.transform_db_modle import User,Redpocket
+from models.redpocket_db_modle import Redpocket
 from pyrogram.types import Message
 from filters import custom_filters
 from models import async_session_maker
@@ -88,8 +88,7 @@ async def zhuque_autofire():
             logger.info(f"释放成功：共得 {total_bonus} 灵石，下次时间：{next_time.isoformat()}")
             async with async_session_maker() as session:
                 async with session.begin():
-                    user = await User.get(session, "me")
-                    await user.add_redpocket_record(session, SITE_NAME, "firegenshin", total_bonus)
+                    await Redpocket.add_redpocket_record(session, SITE_NAME, "firegenshin", total_bonus)
         else:
             next_time = datetime.now() + timedelta(minutes=15)
             logger.warning(f"释放失败或无奖励，15分钟后重试：{next_time.isoformat()}")

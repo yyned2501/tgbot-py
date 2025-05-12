@@ -10,7 +10,7 @@ from config.reply_message import ZQ_REPLY_MESSAGE
 from models.transform_db_modle import User, Raiding
 from models import async_session_maker
 
-TARGET = [-1001833464786, -1002262543959]
+TARGET = [-1001833464786, -1002262543959, -1002522450068]
 SITE_NAME = "zhuque"
 BONUS_NAME = "灵石"
 
@@ -22,21 +22,26 @@ def extract_lingshi_amount(text: str, pattern: str) -> Decimal | None:
 
 @Client.on_message(
     filters.chat(TARGET)
-    & filters.regex(r"(获得|亏损|你被反打劫|扣税) ([\\d\.]+) 灵石$")
-    & custom_filters.zhuque_bot
-    & custom_filters.reply_to_me
+    & filters.regex(r"(获得|亏损|你被反打劫|扣税)\s+([\d.]+)\s+灵石\s*$")
+    & (custom_filters.zhuque_bot
+       | custom_filters.test)
+    & custom_filters.reply_to_me    
 )
 async def zhuque_dajie_Raiding(client: Client, message: Message):
-    raiding_msg = message.reply_to_message
+    raiding_msg = await client.get_messages(message.chat.id, message.reply_to_message.reply_to_message_id)
     raidcount_match = re.search(r"^/dajie[\s\S]*\s(\d+)", raiding_msg.text or "")
     raidcount = int(raidcount_match.group(1)) if raidcount_match else 1
+    print(raidcount_match)
+    print(raidcount)
 
-    gain = extract_lingshi_amount(message.text, r"(获得) ([\\d\.]+) 灵石$")
-    loss = extract_lingshi_amount(message.text, r"(亏损|你被反打劫) ([\\d\.]+) 灵石$")
+    gain = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石$")
+    loss = extract_lingshi_amount(message.text, r"(亏损|你被反打劫) ([\d\.]+) 灵石$")
+    print('gain',gain)
+    print ('loss',loss)
     if "扣税" in message.text:
-        loss = extract_lingshi_amount(message.text, r"(你被反打劫) ([\\d\.]+) 灵石$")
-        gain = extract_lingshi_amount(message.text, r"(获得) ([\\d\.]+) 灵石$")
-
+        loss = extract_lingshi_amount(message.text, r"(你被反打劫) ([\d\.]+) 灵石$")
+        gain = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石$")
+    print(raiding_msg)
     if gain or loss:
         async with async_session_maker() as session, session.begin():
             try:
@@ -48,11 +53,11 @@ async def zhuque_dajie_Raiding(client: Client, message: Message):
 
 @Client.on_message(
     filters.chat(TARGET)
-    & (filters.regex(r"(获得|亏损|你被反打劫|扣税) ([\\d\.]+) 灵石$") | filters.regex(r"赢局总计|操作过于频繁|不能打劫|修为等阶"))
+    & (filters.regex(r"(获得|亏损|你被反打劫|扣税) ([\d\.]+) 灵石$") | filters.regex(r"赢局总计|操作过于频繁|不能打劫|修为等阶"))
     & custom_filters.zhuque_bot
     & custom_filters.command_to_me
 )
-async def zhuque_dajie_be_raided(message: Message):
+async def zhuque_dajie_be_raided(client: Client, message: Message):
     raiding_msg = message.reply_to_message
     text = message.text
     if "操作过于频繁" in text:
