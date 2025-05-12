@@ -12,8 +12,49 @@ from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import String, Integer, BigInteger,Numeric, DateTime,func, desc, select
 from typing import Callable
 
+class Raiding(Base):
+    __tablename__ = "raiding"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
+    website: Mapped[str] = mapped_column(String(32))
+    user_id: Mapped[int] = mapped_column(BigInteger)
+    action: Mapped[str] = mapped_column(String(32))
+    raidcount:Mapped[int] = mapped_column(Integer)       
+    bonus: Mapped[float] = mapped_column(Numeric(12, 2))
+
+    @classmethod
+    async def get_latest_raiding_createtime(
+        cls,
+        session: AsyncSession,
+        website: str,
+        action: str
+    ) -> datetime | None:
+        """
+        查询数据库指定字段最新的一笔
+        """
+        #today = date.today()
+        stmt = (
+            select(cls.create_time, cls.raidcount)
+            .where(                
+                cls.website == website,
+                cls.action == action
+            )
+            .order_by(desc(cls.create_time))
+            .limit(1)
+        )       
+        result_date = (await session.execute(stmt)).one_or_none()
+        if result_date:
+            create_time, raidcount = result_date
+            return create_time, raidcount  
+        else:
+            return None
+
+       
 
 class Redpocket(Base):
+    """
+    红包等
+    """
     __tablename__ = "redpocket"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
@@ -30,10 +71,10 @@ class Redpocket(Base):
         gamemode: str
     ) -> datetime | None:
         """
-        查询数据库指定字段当天最新的一笔
+        查询数据库指定字段最新的一笔
         """
         #today = date.today()
-        create_time_stmt = (
+        stmt = (
             select(cls.create_time)
             .where(                
                 cls.website == website,
@@ -42,7 +83,7 @@ class Redpocket(Base):
             .order_by(desc(cls.create_time))
             .limit(1)
         )       
-        result_date = (await session.execute(create_time_stmt)).scalar_one_or_none()        
+        result_date = (await session.execute(stmt)).scalar_one_or_none()        
         return result_date
     
 
@@ -70,11 +111,11 @@ class User(TimeBase):
         :return: 站点 bonus 的总和，如果不存在则返回 0
         """
 
-        bonus_sum_select = select(func.sum(Transform.bonus)).where(
+        stmt = select(func.sum(Transform.bonus)).where(
             Transform.user_id == self.user_id,
             Transform.website == site_name
         )
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
+        bonus_sum = (await session.execute(stmt)).scalar_one_or_none()
         return bonus_sum if bonus_sum is not None else 0
     
 
@@ -86,24 +127,17 @@ class User(TimeBase):
         :type site_name: str
         :return: 站点 bonus 的总和，如果不存在则返回 0
         :rtype: float        
-        """        
-        bonus_sum_select = select(func.sum(Transform.bonus)).where(
+        """     
+
+        stmt = select(func.sum(Transform.bonus),func.count()).where(
             Transform.user_id == self.user_id,
             Transform.website == site_name,
             Transform.bonus > 0
         )
-        bonus_count_select = select(func.count()).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name,
-            Transform.bonus > 0
-        )
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none() or 0
-        bonus_count = (await session.execute(bonus_count_select)).scalar_one_or_none() or 0
-        
-        return bonus_count, bonus_sum
-
-
-
+        result = await session.execute(stmt)
+        bonus_sum, bonus_count = result.one_or_none() or (0, 0)        
+        return bonus_sum, bonus_count
+    
     async def pay_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> int:
         """
         获取当前用户在指定站点的 我发送的 bonus 总和。
@@ -113,22 +147,15 @@ class User(TimeBase):
         :return: 站点 bonus 的总和，如果不存在则返回 0
         :rtype: int        
         """
+        stmt = select(func.sum(Transform.bonus),func.count()).where(
+            Transform.user_id == self.user_id,
+            Transform.website == site_name,
+            Transform.bonus < 0
+        )
+        result = await session.execute(stmt)
+        bonus_sum, bonus_count = result.one_or_none() or (0, 0)         
+        return bonus_sum, bonus_count      
         
-        bonus_sum_select = select(func.sum(Transform.bonus)).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name,
-            Transform.bonus < 0
-        )
-        bonus_count_select = select(func.count()).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name,
-            Transform.bonus < 0
-        )
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none() or 0
-        bonus_count = (await session.execute(bonus_count_select)).scalar_one_or_none() or 0        
-        return bonus_count, bonus_sum
-    
-
     async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
 
         """
@@ -139,7 +166,7 @@ class User(TimeBase):
         else:
             flag = Transform.bonus > 0
             
-        result_data = (
+        stmt = (
             select(
                 Transform.user_id,
                 User.name,
@@ -155,7 +182,7 @@ class User(TimeBase):
             .order_by(desc("bonus_sum"))
             .limit(top_n)
         )
-        result = await session.execute(result_data)
+        result = await session.execute(stmt)
         rows = result.all()
         return [
             [i + 1, tg_id, name, f"{count:,}", f"{bonus_sum:,.2f}"]
@@ -167,7 +194,7 @@ class User(TimeBase):
         """
         获取当前用户在某网站上的 bonus 总和排名（降序）。
         """
-        bonus_sum_stmt = (
+        stmt = (
             select(
                 Transform.user_id,
                 func.sum(Transform.bonus).label("total_bonus")
@@ -177,7 +204,7 @@ class User(TimeBase):
             .order_by(desc("total_bonus"))
         )
 
-        result = await session.execute(bonus_sum_stmt)
+        result = await session.execute(stmt)
         rows = result.all()
 
         # 遍历查找当前 user_id 的排名
@@ -247,12 +274,12 @@ class User(TimeBase):
         website: 站点名称
         :return: 站点 bonus 的总和，如果不存在则返回 0
         """
-        bonus_sum_select = select(func.sum(Redpocket.bonus)).where(
+        stmt = select(func.sum(Redpocket.bonus)).where(
             Redpocket.user_id == self.user_id,
             Redpocket.website == website,
             Redpocket.gamemode == gamemode
         )
-        bonus_sum = (await session.execute(bonus_sum_select)).scalar_one_or_none()
+        bonus_sum = (await session.execute(stmt)).scalar_one_or_none()
         return bonus_sum if bonus_sum is not None else 0    
 
 
@@ -261,7 +288,7 @@ class User(TimeBase):
         session: AsyncSession,
         website: str,
         gamemode: str,
-        Direction: str,
+        status: str,
         start_date = None,
         end_date = None,
     ) -> tuple[int, float]:
@@ -270,21 +297,19 @@ class User(TimeBase):
         :param website: 站点名称
         :type website: str
         :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: float 
-        
+        :rtype: float         
         获取指定站点与模式下，指定时间范围内的红包总次数与奖金。
         - 如果不传 start_date 和 end_date，则查询全部数据。
-        - 如果只传一个日期，则视为当天。
-             
+        - 如果只传一个日期，则视为当天。             
         """ 
         conditions = [
             Redpocket.website == website,
             Redpocket.gamemode == gamemode,
             Redpocket.user_id == self.user_id,          
         ]
-        if Direction == 'pay':
+        if status == 'pay':
             conditions.append(Redpocket.bonus < 0)
-        elif Direction == 'get':
+        elif status == 'get':
             conditions.append(Redpocket.bonus > 0)
 
         # 时间过滤逻辑
@@ -304,6 +329,21 @@ class User(TimeBase):
         bonus_sum = (await session.execute(bonus_sum_stmt)).scalar_one_or_none() or 0
         bonus_count = (await session.execute(bonus_count_stmt)).scalar_one_or_none() or 0
         return bonus_count, float(bonus_sum)
+    
+
+#########################zhuquerob表调用#######################################
+    async def add_raiding_record(self, session: AsyncSession, website: str, action: str, raidcount:int, bonus: float):
+        """
+        向表内写入数据
+        website 站点
+        action 行为打劫/被打劫
+        user_id 对手id
+        bonus 金额
+        """
+        raiding = Raiding(website=website, user_id=self.user_id, action=action, raidcount=raidcount, bonus=bonus)
+        session.add(raiding)
+        await session.flush()
+
     
     
         
