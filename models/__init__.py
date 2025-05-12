@@ -47,9 +47,8 @@ async_session_maker = async_sessionmaker(bind=async_engine, expire_on_commit=Fal
 
 async def create_all():
     async with async_engine.begin() as conn:
-        """
+        
         if DB_INFO['dbset'] == 'SQLite':
-            await conn.execute(text("PRAGMA journal_mode=WAL;"))
-            await conn.execute(text("PRAGMA synchronous=OFF;"))
-        """
+            await conn.execute(text("PRAGMA journal_mode=WAL;"))            
+        
         await conn.run_sync(Base.metadata.create_all)
