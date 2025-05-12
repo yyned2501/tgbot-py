@@ -1,7 +1,8 @@
 import re
-from config.config import PT_GROUP_ID
+from decimal import Decimal
 from libs.log import logger
 from filters import custom_filters
+from config.config import PT_GROUP_ID,MY_TGID
 from models import async_session_maker
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -22,7 +23,18 @@ async def in_redpockets_filter(_, __, m: Message):
     & custom_filters.zhuque_bot
     & filters.regex(r"内容: ([\s\S]*?)\n灵石: .*\n剩余: .*\n大善人: (.*)")
 )
-async def get_redpocket_gen(client: Client, message: Message):    
+async def get_redpocket_gen(client: Client, message: Message):
+
+    if message.reply_to_message.from_user.id ==  MY_TGID:
+        async with async_session_maker() as session:
+                async with session.begin():
+                    try:
+                        user = await User.get(session, message)              
+                        await  user.add_redpocket_record(session, SITE_NAME, "redpocker", Decimal(f"{bonus}"))
+                    except Exception as e:
+                        logger.exception(f"提交失败: 用户消息, 错误：{e}")
+                        await message.reply("转换失败，请稍后再试。")
+       
     callback_data = message.reply_markup.inline_keyboard[0][0].callback_data
     match = message.matches[0]    
     redpocket_name = match.group(1)
