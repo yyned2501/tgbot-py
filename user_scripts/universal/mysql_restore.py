@@ -68,6 +68,7 @@ async def mysql_restore_check(client: Client, message: Message):
                 f"-p{DB_INFO['password']}",
                 DB_INFO["db_name"]
             ]
+
             try:
                 with gzip.open(selected_file, "rb") as f_in:
                     result = subprocess.run(
@@ -78,7 +79,9 @@ async def mysql_restore_check(client: Client, message: Message):
                     )
 
                 if result.returncode != 0:
-                    raise Exception(result.stderr.decode())
+                    error_msg = result.stderr.decode(errors="replace")  # 防止解码错误
+                    raise Exception(error_msg)
+
                 await edit_mess.edit(f"✅ 数据库{selected_file.name} 还原完成！")
             except subprocess.CalledProcessError as e:
                 await edit_mess.edit(f"❌ 还原失败:{selected_file.name}  {e}")
