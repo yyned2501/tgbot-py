@@ -51,11 +51,10 @@ async def mysql_backup_list(client: Client, message: Message):
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
     global BACKUP_DIR
-    if len(message.command) > 1 and message.command[1].isdigit():        
+    if len(message.command) > 1 and message.command[1].isdigit():
         index = int(message.command[1])
         backup_files = sorted(Path(BACKUP_DIR).glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
         if 1 <= index <= len(backup_files):
-            print("2")
             selected_file = backup_files[index - 1]
             edit_mess = await message.edit(
                 f"\n🔄 开始还原：{selected_file.name} -> 数据库 `{DB_INFO['db_name']}`"
@@ -79,16 +78,16 @@ async def mysql_restore_check(client: Client, message: Message):
                         stderr=subprocess.PIPE
                     )
 
+                # 检查命令返回的输出
                 if result.returncode != 0:
                     raise Exception(result.stderr.decode(errors="replace"))
-
+                
                 await edit_mess.edit(f"✅ 数据库 {selected_file.name} 还原完成！")
-
             except Exception as ex:
                 await edit_mess.edit(f"❌ 其他错误: {selected_file.name}  {ex}")
-
         else:
             await message.edit("❌ 输入的编号无效")
     else:
         await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
+    
     await others.delete_message(message, 60)
