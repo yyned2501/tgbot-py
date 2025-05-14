@@ -19,7 +19,8 @@ from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
 # === 配置部分 ===
-BACKUP_DIR = Path("db_file/mysqlBackup")
+BASE_DIR = Path(__file__).resolve().parent  # 当前脚本所在目录
+BACKUP_DIR = BASE_DIR / "db_file/mysqlBackup"
 RETENTION_DAYS = 8  # 备份保留天数
 
 @Client.on_message(filters.me & filters.command("backuplist"))
