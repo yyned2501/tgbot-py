@@ -6,7 +6,6 @@ from pyrogram import idle
 from libs import mysql_backup
 
 
-
 if __name__ == "__main__":
     asyncio.run(start_app())
     print('Connected..', flush=True)
