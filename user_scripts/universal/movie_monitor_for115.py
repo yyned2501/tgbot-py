@@ -13,8 +13,11 @@ from pyrogram.types.messages_and_media import Message
 from config.config import M115_GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
 
 
-media_path = Path("data/get_media")
-blockyword_path = "sessions/blockyword.json"
+media_path = Path("tempfile/get_media")
+blockyword_path = Path("db_file/dbflag/blockyword.json")
+blockyword_path.parent.mkdir(parents=True, exist_ok=True)  
+
+
 monitor_enabled = False
 otherchat_trans = False
 LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
@@ -377,14 +380,6 @@ async def blockyword_add_remove(client: Client, message: Message):
 
 
 
-
-
-
-
-
-
-
-
 @Client.on_message(
         filters.private 
         & filters.user(M115_GROUP_ID['CMS_BOT_ID'])
@@ -439,5 +434,5 @@ async def getmedia(client: Client, message: Message):
         f.write(json.dumps(result_mess, ensure_ascii=False, indent=4))
 
     await client.send_document(M115_GROUP_ID['MESSAGE_TRASN_CHAT'], file_path)
-    shutil.rmtree("data/get_media", ignore_errors=True)
+    shutil.rmtree(media_path, ignore_errors=True)
     await message.delete()

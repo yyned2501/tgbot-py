@@ -14,7 +14,7 @@ pixiv_img_host = "i.pixiv.re"
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42"
 }
-data_path = Path("data/zpr")
+data_path = Path("tempfile/zpr")
 
 async def get_result(message, r18=0, num=5, size = "regular", tag=""):
     """
@@ -109,7 +109,7 @@ async def zpr(client: Client, message: Message):
         logger.info(f'file_list: {file_list}')
         logger.info(f'photoList: {photoList}')
         if not photoList:
-            shutil.rmtree("data/zpr")
+            shutil.rmtree(data_path)
             return await message.edit(des)
         with contextlib.suppress(Exception):
             await message.edit("....")
@@ -135,5 +135,5 @@ async def zpr(client: Client, message: Message):
     except Exception as e:
         logger.error(f"发生错误：\n`{e}`")
         return await message.edit(f"发生错误：\n`{e}`")    
-    shutil.rmtree("data/zpr")
+    shutil.rmtree(data_path)
     await code_message.delete()

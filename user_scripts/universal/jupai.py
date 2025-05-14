@@ -24,7 +24,6 @@ async def ju_pai(client: Client, message: Message):
             text = ','.join(message.command[1:])            
         else:
             text = None 
-    print(text)
     if not text:
         return await message.edit("arg_error")
     try:
