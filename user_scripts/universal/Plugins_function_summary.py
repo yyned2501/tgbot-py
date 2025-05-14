@@ -8,6 +8,7 @@ from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
+from libs.mysql_backup import mysql_backup
 
 
 mess_path = Path("tempfile/get_media")
@@ -71,13 +72,14 @@ async def getmessage(client:Client, message: Message):
 
 
 
-@Client.on_message(filters.me & filters.command("id"))
+@Client.on_message(filters.me & filters.command("i"))
  
 async def testmessage(client: Client, message: Message):
     """
     用户ID查询
     """
     re_mess = ""
+    await mysql_backup()
 
     msg = message.reply_to_message or message
     chat_id = msg.chat.id    

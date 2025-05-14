@@ -25,8 +25,7 @@ else:
 async def start_app():
     db_flag_path = Path("db_file/dbflag/dbflag.json")
     db_flag_path.parent.mkdir(parents=True, exist_ok=True)    
-    db_flag_data = None   
-
+    db_flag_data = None
     global user_app,bot_app
 
     user_app = Client(
