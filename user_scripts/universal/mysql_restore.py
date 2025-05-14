@@ -62,6 +62,7 @@ async def mysql_restore_check(client: Client, message: Message):
             )
             command = [
                 "mysql",
+                "--binary-mode=1",
                 "-h", DB_INFO["address"],
                 "-P", str(DB_INFO["port"]),
                 "-u", DB_INFO["user"],
@@ -79,14 +80,13 @@ async def mysql_restore_check(client: Client, message: Message):
                     )
 
                 if result.returncode != 0:
-                    error_msg = result.stderr.decode(errors="replace")  # 防止解码错误
-                    raise Exception(error_msg)
+                    raise Exception(result.stderr.decode(errors="replace"))
 
-                await edit_mess.edit(f"✅ 数据库{selected_file.name} 还原完成！")
-            except subprocess.CalledProcessError as e:
-                await edit_mess.edit(f"❌ 还原失败:{selected_file.name}  {e}")
+                await edit_mess.edit(f"✅ 数据库 {selected_file.name} 还原完成！")
+
             except Exception as ex:
-                await edit_mess.edit(f"❌ 其他错误:{selected_file.name}  {ex}")
+                await edit_mess.edit(f"❌ 其他错误: {selected_file.name}  {ex}")
+
         else:
             await message.edit("❌ 输入的编号无效")
     else:
