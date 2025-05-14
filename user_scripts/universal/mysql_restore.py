@@ -20,7 +20,7 @@ from pyrogram.errors import FloodWait
 
 # === 配置部分 ===
 BASE_DIR = Path(__file__).resolve().parent  # 当前脚本所在目录
-BACKUP_DIR = BASE_DIR / "db_file/mysqlBackup"
+BACKUP_DIR = BASE_DIR/"db_file/mysqlBackup"
 RETENTION_DAYS = 8  # 备份保留天数
 
 @Client.on_message(filters.me & filters.command("backuplist"))
@@ -41,7 +41,7 @@ async def mysql_backup_list(client: Client, message: Message):
         re_mess = (
             f"📦 当前数据库备份清单如下：\n\n"
             f"{backup_text}\n\n"
-            f"请输入 `\\dbrestore 序号` 来还原对应备份"
+            f"请输入 `/dbrestore 序号` 来还原对应备份"
         )
     
     edit_mess = await message.edit(re_mess)
@@ -81,5 +81,5 @@ async def mysql_restore_check(client: Client, message: Message):
         else:
             await message.edit("❌ 输入的编号无效")
     else:
-        await message.edit("❌ 格式错误，请使用：`\dbrestore 编号`")
+        await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
     await others.delete_message(message, 20)
