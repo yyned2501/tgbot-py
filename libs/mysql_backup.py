@@ -39,7 +39,7 @@ async def mysql_backup():
                         ],
                         check=True,
                         stdout=f_out
-                    )
+                    )                
                 logger.info(f"数据库:{DB_INFO["db_name"]} 备份完成: {backup_path}")
             except subprocess.CalledProcessError as e:
                 logger.info(f"数据库:{DB_INFO["db_name"]} 备份失败: {e}") 
