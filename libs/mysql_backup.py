@@ -19,28 +19,26 @@ async def mysql_backup():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     if os.name == "posix":
         if DB_INFO["dbset"] == "mySQL":
-            #backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+            # 文件路径改为 .sql
             backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql"
-            backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
-            # === 确保备份目录存在 ===
+            backup_path = BACKUP_DIR / backup_filename
             backup_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # === 执行 mysqldump 并压缩 ===
+            # 执行 mysqldump 并输出到未压缩的 .sql 文件
             try:
-                #with gzip.open(backup_path, "wb") as f_out:
                 with open(backup_path, "w", encoding="utf-8") as f_out:
-                    subprocess.run(
+                    result = subprocess.run(
                         [
                             "mysqldump",
-                            "--no-tablespaces",
+                            "--no-tablespaces",  # 避免无权限错误
                             "-h", DB_INFO["address"],
                             "-P", str(DB_INFO["port"]),
                             "-u", DB_INFO["user"],
                             f"-p{DB_INFO['password']}",
                             DB_INFO["db_name"]
                         ],
-                        check=True,
                         stdout=f_out,
+                        stderr=subprocess.PIPE,
                         text=True  # 自动处理字符串编码
                     )
                     if result.returncode != 0:
@@ -52,10 +50,50 @@ async def mysql_backup():
                 logger.error(f"❌ 备份异常: {e}")
                 backup_path.unlink(missing_ok=True)
 
+            # 删除过期备份
+            now = datetime.now()
+            for file in BACKUP_DIR.glob("*.sql"):
+                mtime = datetime.fromtimestamp(file.stat().st_mtime)
+                if (now - mtime).days > RETENTION_DAYS:
+                    logger.info(f"🗑️ 删除过期备份: {file}")
+                    file.unlink()
+        else:
+            logger.info("当前数据库设置非 mySQL，跳过备份")
+    else:
+        logger.info("非 Linux 系统，跳过备份任务")
+    
+    """
+    if os.name == "posix":
+        if DB_INFO["dbset"] == "mySQL":
+            backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+            backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
+            # === 确保备份目录存在 ===
+            backup_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # === 执行 mysqldump 并压缩 ===
+            try:
+                with gzip.open(backup_path, "wb") as f_out:
+                    subprocess.run(
+                        [
+                            "mysqldump",
+                            "--no-tablespaces",
+                            "-h", DB_INFO["address"],
+                            "-P", str(DB_INFO["port"]),
+                            "-u", DB_INFO["user"],
+                            f"-p{DB_INFO['password']}",
+                            DB_INFO["db_name"]
+                        ],
+                        check=True,
+                        stdout=f_out
+                    )
+                
+                logger.info(f"数据库:{DB_INFO["db_name"]} 备份完成: {backup_path}")
+            except subprocess.CalledProcessError as e:
+                logger.info(f"数据库:{DB_INFO["db_name"]} 备份失败: {e}") 
+
             # === 删除 7 天前的旧备份 ===
             now = datetime.now()
-            #for file in BACKUP_DIR.glob("*.sql.gz"):
-            for file in BACKUP_DIR.glob("*.sql"):
+            for file in BACKUP_DIR.glob("*.sql.gz"):
                 mtime = datetime.fromtimestamp(file.stat().st_mtime)
                 if (now - mtime).days > RETENTION_DAYS:
                     logger.info(f"删除过期备份：{file}")
@@ -67,3 +105,4 @@ async def mysql_backup():
         
 
 #scheduler.add_job(mysql_backup, 'date', run_date="2025-05-14 18:29:00", id='fire1', replace_existing=True)
+"""
