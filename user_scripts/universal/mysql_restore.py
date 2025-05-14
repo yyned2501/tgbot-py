@@ -19,7 +19,7 @@ from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
 # === 配置部分 ===
-BASE_DIR = Path(__file__).resolve().parent  # 当前脚本所在目录
+
 BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 8  # 备份保留天数
 
@@ -51,7 +51,7 @@ async def mysql_backup_list(client: Client, message: Message):
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
     global BACKUP_DIR
-    if len(message.command) == 31 and message.command[1].isdigit():        
+    if len(message.command) > 1 and message.command[1].isdigit():        
         index = int(message.command[1])
         backup_files = sorted(Path(BACKUP_DIR).glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
         if 1 <= index <= len(backup_files):
