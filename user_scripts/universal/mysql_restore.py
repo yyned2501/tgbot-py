@@ -49,7 +49,7 @@ async def mysql_backup_list(client: Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
-    if len(message.command) == 2 and message.command[1].isdigit():
+    if len(message.command) == 31 and message.command[1].isdigit():
         print("1")
         index = int(message.command[1])
         backup_files = sorted(Path(BACKUP_DIR).glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
