@@ -68,12 +68,14 @@ async def mysql_restore_check(client: Client, message: Message):
                             "-h", DB_INFO["address"],
                             "-P", str(DB_INFO["port"]),
                             "-u", DB_INFO["user"],
-                            f"-p{DB_INFO['password']}",
+                            "-p",
+                            DB_INFO['password'],
                             DB_INFO["db_name"]
                         ],
                         stdin=f_in,
                         check=True
                     )
+
                 await edit_mess.edit(f"✅ 数据库{selected_file.name} 还原完成！")
             except subprocess.CalledProcessError as e:
                 await edit_mess.edit(f"❌ 还原失败:{selected_file.name}  {e}")
