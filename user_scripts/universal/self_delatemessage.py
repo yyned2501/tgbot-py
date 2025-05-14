@@ -1,7 +1,7 @@
 import asyncio
 import contextlib
 from pyrogram import filters, Client
-from pyrogram.types.messages_and_media import Message
+from pyrogram.types import Message
 
 """
 删除自己所发的消息

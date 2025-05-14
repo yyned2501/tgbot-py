@@ -31,17 +31,14 @@ async def zhuque_dajie_Raiding(client: Client, message: Message):
     raiding_msg = await client.get_messages(message.chat.id, message.reply_to_message.reply_to_message_id)
     raidcount_match = re.search(r"^/dajie[\s\S]*\s(\d+)", raiding_msg.text or "")
     raidcount = int(raidcount_match.group(1)) if raidcount_match else 1
-    print(raidcount_match)
-    print(raidcount)
+
 
     gain = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石$")
     loss = extract_lingshi_amount(message.text, r"(亏损|你被反打劫) ([\d\.]+) 灵石$")
-    print('gain',gain)
-    print ('loss',loss)
+
     if "扣税" in message.text:
         loss = extract_lingshi_amount(message.text, r"(你被反打劫) ([\d\.]+) 灵石$")
         gain = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石$")
-    print(raiding_msg)
     if gain or loss:
         async with async_session_maker() as session, session.begin():
             try:

@@ -5,7 +5,7 @@ from datetime import datetime
 from libs import others
 from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
-from pyrogram.types.messages_and_media import Message
+from pyrogram.types import Message
 from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
