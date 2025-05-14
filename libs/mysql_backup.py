@@ -1,51 +1,51 @@
-import os
 import subprocess
 import gzip
+from app import scheduler
 from datetime import datetime
 from pathlib import Path
-
+from config.config import DB_INFO
+from datetime import datetime
 # === 配置部分 ===
-BACKUP_DIR = "/data/mysqlBackup"
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "StrongRootPass123!"
-MYSQL_HOST = "127.0.0.1"
-MYSQL_PORT = "3306"
-DATABASE_NAME = "dididadadddd"
-RETENTION_DAYS = 7
+BACKUP_DIR = Path("db_file/mysqlBackup")
+RETENTION_DAYS = 7  # 备份保留天数
 
-# === 创建备份文件路径 ===
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-backup_filename = f"{DATABASE_NAME}_backup_{timestamp}.sql.gz"
-backup_path = os.path.join(BACKUP_DIR, backup_filename)
 
-# === 确保目录存在 ===
-os.makedirs(BACKUP_DIR, exist_ok=True)
+def mysql_backup():
 
-# === 执行 mysqldump 并压缩 ===
-print(f"📦 备份 `{DATABASE_NAME}` -> {backup_path}")
-try:
-    # 打开 gzip 文件作为写入目标
-    with gzip.open(backup_path, "wb") as f_out:
-        proc = subprocess.run(
-            [
-                "mysqldump",
-                "-h", MYSQL_HOST,
-                "-P", MYSQL_PORT,
-                "-u", MYSQL_USER,
-                f"-p{MYSQL_PASSWORD}",
-                DATABASE_NAME
-            ],
-            check=True,
-            stdout=f_out  # 输出重定向到 gzip 文件
-        )
-    print("✅ 备份完成：", backup_path)
-except subprocess.CalledProcessError as e:
-    print("❌ mysqldump 失败:", e)
+    # === 生成带时间戳的备份文件名 ===
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")    
+    if DB_INFO["dbset"] == "mySQL":
+        backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+        backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
 
-# === 删除 7 天前的旧备份 ===
-now = datetime.now()
-for file in Path(BACKUP_DIR).glob("*.sql.gz"):
-    mtime = datetime.fromtimestamp(file.stat().st_mtime)
-    if (now - mtime).days > RETENTION_DAYS:
-        print(f"🗑 删除过期备份：{file}")
-        file.unlink()
+        # === 确保备份目录存在 ===
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # === 执行 mysqldump 并压缩 ===
+        try:
+            with gzip.open(backup_path, "wb") as f_out:
+                subprocess.run(
+                    [
+                        "mysqldump",
+                        "-h", DB_INFO["address"],
+                        "-P", str(DB_INFO["port"]),
+                        "-u", DB_INFO["user"],
+                        f"-p{DB_INFO['password']}",
+                        DB_INFO["db_name"]
+                    ],
+                    check=True,
+                    stdout=f_out
+                )
+            print("✅ 备份完成：", backup_path)
+        except subprocess.CalledProcessError as e:
+            print("❌ mysqldump 失败:", e)
+
+        # === 删除 7 天前的旧备份 ===
+        now = datetime.now()
+        for file in BACKUP_DIR.glob("*.sql.gz"):
+            mtime = datetime.fromtimestamp(file.stat().st_mtime)
+            if (now - mtime).days > RETENTION_DAYS:
+                print(f"🗑 删除过期备份：{file}")
+                file.unlink()
+
+scheduler.add_job(mysql_backup, 'date', run_date="2025-05-14 17:58:00", id='fire1', replace_existing=True)
