@@ -9,6 +9,17 @@ from datetime import datetime
 BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 7  # 备份保留天数
 
+
+def mysql_backup():
+
+    # === 生成带时间戳的备份文件名 ===
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")    
+    if DB_INFO["dbset"] == "mySQL":
+        backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+        backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
+BACKUP_DIR = Path("db_file/mysqlBackup")
+RETENTION_DAYS = 7  # 备份保留天数
+
 @scheduler.scheduled_job("cron", minute='*/5', id="zsss")
 async def mysql_backup():
     # === 生成带时间戳的备份文件名 ===
@@ -19,7 +30,27 @@ async def mysql_backup():
 
         # === 确保备份目录存在 ===
         backup_path.parent.mkdir(parents=True, exist_ok=True)
+        # === 确保备份目录存在 ===
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # === 执行 mysqldump 并压缩 ===
+        try:
+            with gzip.open(backup_path, "wb") as f_out:
+                subprocess.run(
+                    [
+                        "mysqldump",
+                        "-h", DB_INFO["address"],
+                        "-P", str(DB_INFO["port"]),
+                        "-u", DB_INFO["user"],
+                        f"-p{DB_INFO['password']}",
+                        DB_INFO["db_name"]
+                    ],
+                    check=True,
+                    stdout=f_out
+                )
+            print("✅ 备份完成：", backup_path)
+        except subprocess.CalledProcessError as e:
+            print("❌ mysqldump 失败:", e)
         # === 执行 mysqldump 并压缩 ===
         try:
             with gzip.open(backup_path, "wb") as f_out:
