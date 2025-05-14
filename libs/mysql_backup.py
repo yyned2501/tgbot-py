@@ -12,7 +12,7 @@ BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 8  # 备份保留天数
 
 
-@scheduler.scheduled_job("cron", minute='*/5', id="zsss")
+@scheduler.scheduled_job("cron", hour=6, minute=6, id="zsss")
 async def mysql_backup():
     # === 生成带时间戳的备份文件名 ===
     global BACKUP_DIR

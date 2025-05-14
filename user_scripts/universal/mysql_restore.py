@@ -83,4 +83,4 @@ async def mysql_restore_check(client: Client, message: Message):
             await message.edit("❌ 输入的编号无效")
     else:
         await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
-    await others.delete_message(message, 20)
+    await others.delete_message(message, 60)
