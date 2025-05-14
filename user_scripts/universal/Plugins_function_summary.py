@@ -9,8 +9,8 @@ from pyrogram.types.messages_and_media import Message
 from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
-mess_path = Path("data/get_message")
 
+mess_path = Path("tempfile/get_media")
 @Client.on_message(filters.me & filters.command("re") )
 async def forward_to_group(client: Client, message: Message):
     

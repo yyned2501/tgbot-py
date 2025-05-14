@@ -8,6 +8,8 @@ logs/
 data/
 
 # 隐私信息
+db_file/
+tempfile/
 session/
 .venv/
 .vscode/

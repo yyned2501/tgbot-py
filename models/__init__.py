@@ -1,17 +1,17 @@
 
-import os
+
 import asyncio
+from pathlib import Path
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base
 from config.config import DB_INFO
 from models.database import Base
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+
 
 # SQLite配置路径
-db_path = "sessions/tgbot.db"
-db_dir = os.path.dirname(db_path)
-if not os.path.exists(db_dir):
-    os.makedirs(db_dir)
+db_path = Path("db_file/SQLite/tgbot.db")
+db_path.parent.mkdir(parents=True, exist_ok=True)  
 
 # 根据配置选择数据库
 if DB_INFO['dbset'] == 'SQLite':

@@ -5,6 +5,7 @@ import asyncio
 import platform
 import pyrogram
 from libs.log import logger
+from pathlib import Path
 from pyrogram import Client,idle
 from models import create_all,async_engine
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
@@ -22,7 +23,8 @@ else:
     proxy = None
 
 async def start_app():
-    db_flag_path = "sessions/dbflag.json"
+    db_flag_path = Path("db_file/dbflag/dbflag.json")
+    db_flag_path.parent.mkdir(parents=True, exist_ok=True)    
     db_flag_data = None   
 
     global user_app,bot_app
@@ -56,6 +58,7 @@ async def start_app():
 
 
     if not db_flag_data or db_flag_data.get('db_flag') != True:
+        
         logger.info("首次运行，初始化数据库...")
         await create_all()
         with open(db_flag_path, "w", encoding="utf-8") as f:
