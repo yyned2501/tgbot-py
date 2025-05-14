@@ -10,15 +10,6 @@ BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 7  # 备份保留天数
 
 
-def mysql_backup():
-
-    # === 生成带时间戳的备份文件名 ===
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")    
-    if DB_INFO["dbset"] == "mySQL":
-        backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
-        backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
-BACKUP_DIR = Path("db_file/mysqlBackup")
-RETENTION_DAYS = 7  # 备份保留天数
 
 @scheduler.scheduled_job("cron", minute='*/5', id="zsss")
 async def mysql_backup():
@@ -28,8 +19,6 @@ async def mysql_backup():
         backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
         backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
 
-        # === 确保备份目录存在 ===
-        backup_path.parent.mkdir(parents=True, exist_ok=True)
         # === 确保备份目录存在 ===
         backup_path.parent.mkdir(parents=True, exist_ok=True)
 
