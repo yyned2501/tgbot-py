@@ -29,7 +29,7 @@ async def mysql_backup_list(client: Client, message: Message):
     global BACKUP_DIR
     # === 获取所有备份文件（按修改时间倒序） ===
     backup_files = sorted(
-        BACKUP_DIR.glob("*.sql.gz"),
+        BACKUP_DIR.glob("*.sql"),
         key=lambda f: f.stat().st_mtime,
         reverse=True
     )
@@ -51,6 +51,56 @@ async def mysql_backup_list(client: Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
+
+    global BACKUP_DIR
+    if len(message.command) > 1 and message.command[1].isdigit():
+        index = int(message.command[1])
+        # 只找 .sql 文件
+        backup_files = sorted(
+            Path(BACKUP_DIR).glob("*.sql"),
+            key=lambda f: f.stat().st_mtime,
+            reverse=True
+        )
+
+        if 1 <= index <= len(backup_files):
+            selected_file = backup_files[index - 1]
+            edit_mess = await message.edit(
+                f"🔄 开始还原：{selected_file.name} 到数据库 `{DB_INFO['db_name']}`"
+            )
+
+            command = [
+                "mysql",
+                "--binary-mode=1",  # 允许部分特殊字符
+                "-h", DB_INFO["address"],
+                "-P", str(DB_INFO["port"]),
+                "-u", DB_INFO["user"],
+                f"-p{DB_INFO['password']}",
+                DB_INFO["db_name"]
+            ]
+
+            try:
+                with open(selected_file, "rb") as f_in:  # 注意仍使用 rb 以避免编码问题
+                    result = subprocess.run(
+                        command,
+                        stdin=f_in,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+
+                if result.returncode != 0:
+                    raise Exception(result.stderr.decode(errors="replace"))
+
+                await edit_mess.edit(f"✅ 数据库 {selected_file.name} 还原完成！")
+
+            except Exception as ex:
+                await edit_mess.edit(f"❌ 其他错误: {selected_file.name}  {ex}")
+        else:
+            await message.edit("❌ 输入的编号无效")
+    else:
+        await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
+
+    await others.delete_message(message, 60)
+    """
     global BACKUP_DIR
     if len(message.command) > 1 and message.command[1].isdigit():
         index = int(message.command[1])
@@ -101,3 +151,4 @@ async def mysql_restore_check(client: Client, message: Message):
         await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
     
     await others.delete_message(message, 60)
+    """

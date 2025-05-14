@@ -19,14 +19,16 @@ async def mysql_backup():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     if os.name == "posix":
         if DB_INFO["dbset"] == "mySQL":
-            backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+            #backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql.gz"
+            backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql"
             backup_path = BACKUP_DIR / backup_filename  # 拼接完整备份路径
             # === 确保备份目录存在 ===
             backup_path.parent.mkdir(parents=True, exist_ok=True)
 
             # === 执行 mysqldump 并压缩 ===
             try:
-                with gzip.open(backup_path, "wb") as f_out:
+                #with gzip.open(backup_path, "wb") as f_out:
+                with open(backup_path, "w", encoding="utf-8") as f_out:
                     subprocess.run(
                         [
                             "mysqldump",
@@ -38,15 +40,22 @@ async def mysql_backup():
                             DB_INFO["db_name"]
                         ],
                         check=True,
-                        stdout=f_out
-                    )                
-                logger.info(f"数据库:{DB_INFO["db_name"]} 备份完成: {backup_path}")
-            except subprocess.CalledProcessError as e:
-                logger.info(f"数据库:{DB_INFO["db_name"]} 备份失败: {e}") 
+                        stdout=f_out,
+                        text=True  # 自动处理字符串编码
+                    )
+                    if result.returncode != 0:
+                        logger.error(f"数据库备份失败: {result.stderr}")
+                        backup_path.unlink(missing_ok=True)  # 删除损坏文件
+                        return
+                logger.info(f"✅ 数据库备份成功: {backup_path}")
+            except Exception as e:
+                logger.error(f"❌ 备份异常: {e}")
+                backup_path.unlink(missing_ok=True)
 
             # === 删除 7 天前的旧备份 ===
             now = datetime.now()
-            for file in BACKUP_DIR.glob("*.sql.gz"):
+            #for file in BACKUP_DIR.glob("*.sql.gz"):
+            for file in BACKUP_DIR.glob("*.sql"):
                 mtime = datetime.fromtimestamp(file.stat().st_mtime)
                 if (now - mtime).days > RETENTION_DAYS:
                     logger.info(f"删除过期备份：{file}")
