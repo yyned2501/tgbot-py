@@ -49,9 +49,11 @@ async def mysql_backup_list(client: Client, message: Message):
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
     if len(message.command) == 2 and message.command[1].isdigit():
+        print("1")
         index = int(message.command[1])
         backup_files = sorted(Path(BACKUP_DIR).glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
         if 1 <= index <= len(backup_files):
+            print("2")
             selected_file = backup_files[index - 1]
             edit_mess = await message.edit(
                 f"\n🔄 开始还原：{selected_file.name} -> 数据库 `{DB_INFO['db_name']}`"
@@ -70,11 +72,11 @@ async def mysql_restore_check(client: Client, message: Message):
                         stdin=f_in,
                         check=True
                     )
-                await edit_mess.edit("✅ 数据库还原完成！")
+                await edit_mess.edit(f"✅ 数据库{selected_file.name} 还原完成！")
             except subprocess.CalledProcessError as e:
-                await edit_mess.edit(f"❌ 还原失败: {e}")
+                await edit_mess.edit(f"❌ 还原失败:{selected_file.name}  {e}")
             except Exception as ex:
-                await edit_mess.edit(f"❌ 其他错误: {ex}")
+                await edit_mess.edit(f"❌ 其他错误:{selected_file.name}  {ex}")
         else:
             await message.edit("❌ 输入的编号无效")
     else:
