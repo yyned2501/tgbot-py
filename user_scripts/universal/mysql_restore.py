@@ -25,6 +25,7 @@ RETENTION_DAYS = 8  # 备份保留天数
 
 @Client.on_message(filters.me & filters.command("backuplist"))
 async def mysql_backup_list(client: Client, message: Message):
+    global BACKUP_DIR
     # === 获取所有备份文件（按修改时间倒序） ===
     backup_files = sorted(
         BACKUP_DIR.glob("*.sql.gz"),
@@ -49,8 +50,8 @@ async def mysql_backup_list(client: Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
-    if len(message.command) == 31 and message.command[1].isdigit():
-        print("1")
+    global BACKUP_DIR
+    if len(message.command) == 31 and message.command[1].isdigit():        
         index = int(message.command[1])
         backup_files = sorted(Path(BACKUP_DIR).glob("*.sql.gz"), key=lambda f: f.stat().st_mtime, reverse=True)
         if 1 <= index <= len(backup_files):
