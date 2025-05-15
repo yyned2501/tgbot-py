@@ -128,6 +128,7 @@ async def help_message(client:Client, message: Message):
         f"\n/gamelist 查询当前菠菜对局"
         f"\n/betgame 对局下注 /betgame 场次 下注金额 队伍  场次/gamelist 返回每局信息前的数字 队伍0或1 wbg vs we 0就是下注wbg"
         f"```"
+        
     )
 
 
