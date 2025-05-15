@@ -1,6 +1,7 @@
 import os
 import subprocess
 import gzip
+import shutil
 from app import scheduler
 from datetime import datetime
 from pathlib import Path
@@ -12,14 +13,13 @@ BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 8  # 备份保留天数
 
 
-@scheduler.scheduled_job("cron",hour=11, minute=10, id="zsss")
+@scheduler.scheduled_job("cron",hour=11, minute=18, id="zsss")
 async def mysql_backup():
     # === 生成带时间戳的备份文件名 ===
     global BACKUP_DIR
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    if os.name == "posix":
-        if DB_INFO["dbset"] == "mySQL":
-            # 文件路径改为 .sql
+    if os.name != "posix":
+        if DB_INFO["dbset"] == "mySQL":            
             backup_filename = f"{DB_INFO['db_name']}_backup_{timestamp}.sql"
             backup_path = BACKUP_DIR / backup_filename
             backup_path.parent.mkdir(parents=True, exist_ok=True)
@@ -46,9 +46,10 @@ async def mysql_backup():
                         backup_path.unlink(missing_ok=True)  # 删除损坏文件
                         return
                 logger.info(f"✅ 数据库备份成功: {backup_path}")
-                backup_filename_gz = backup_filename + '.gz'
-                with open(backup_filename, 'rb') as f_in:
-                    with gzip.open(backup_filename_gz, 'wb') as f_out:
+
+                backup_path_gz = backup_path + '.gz'
+                with open(backup_path, 'rb') as f_in:
+                    with gzip.open(backup_path_gz, 'wb') as f_out:
                         shutil.copyfileobj(f_in, f_out)    
                     os.remove(backup_filename)
 
