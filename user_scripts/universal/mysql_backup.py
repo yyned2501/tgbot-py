@@ -15,7 +15,7 @@ BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 8  # 备份保留天数
 
 
-@scheduler.scheduled_job("cron",hour=13, minute=2, id="mysql_backup")
+@scheduler.scheduled_job("cron",hour=13, minute=4, id="mysql_backup")
 async def mysql_backup():
     user_app = get_user_bot()
     """
@@ -59,7 +59,7 @@ async def mysql_backup():
                         shutil.copyfileobj(f_in, f_out) 
                 backup_path.unlink()
                 logger.info(f"✅ 数据库备份成功: {backup_path_gz}") 
-                re_mess = await client.send_document(
+                re_mess = await user_app.send_document(
                     chat_id=PT_GROUP_ID['BOT_MESSAGE_CHAT'],
                     document=str(backup_path_gz),
                     caption=f"✅ 数据库备份成功: {backup_filename_gz}"
