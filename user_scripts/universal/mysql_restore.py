@@ -33,7 +33,6 @@ async def mysql_backup_list(client: Client, message: Message):
         key=lambda f: f.stat().st_mtime,
         reverse=True
     )
-
     if not backup_files:
         re_mess = "❌ 当前没有数据库备份文件"
     else:
