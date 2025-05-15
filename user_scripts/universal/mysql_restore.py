@@ -29,7 +29,7 @@ async def mysql_backup_list(client: Client, message: Message):
     global BACKUP_DIR
     # === 获取所有备份文件（按修改时间倒序） ===
     backup_files = sorted(
-        BACKUP_DIR.glob("*.sql"),
+        BACKUP_DIR.glob("*.gz"),
         key=lambda f: f.stat().st_mtime,
         reverse=True
     )
