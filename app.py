@@ -76,7 +76,9 @@ async def start_app():
     #await bot_app.stop()
     logger.info("关闭Mytgbot监听程序")
 
-   
+def get_user_bot():
+    global user_app 
+    return user_app
 
 
 async def system_version_get():
