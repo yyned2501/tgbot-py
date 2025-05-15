@@ -16,7 +16,7 @@ headers = {
 }
 data_path = Path("tempfile/zpr")
 
-async def get_result(message, r18=0, num=5, size = "regular", tag=""):
+async def get_result(message, r18=0, num=3, size = "regular", tag=""):
     """
         # r18: 0为非 R18，1为 R18，2为混合（在库中的分类，不等同于作品本身的 R18 标识）
         # num: 图片的数量
@@ -35,11 +35,13 @@ async def get_result(message, r18=0, num=5, size = "regular", tag=""):
         logger.error(f"连接二次元大门出错。。。")
         return None
     await message.edit(f"..")  
+    print(response)
     try:
         result = response.json()["data"]
     except Exception:
         logger.error(f"解析JSON出错。")
         return None
+    print(result)
     setu_list_photo = []  # 发送
     setu_list_file = []  # 发送
     await message.edit(f"...")
@@ -74,7 +76,7 @@ async def zpr(client: Client, message: Message):
  
     
     arguments = 0               # r18: 0为非 R18，1为 R18，2为混合
-    number = 5                  # 图片数量
+    number = 3                  # 图片数量
     immge_size = 'regular'      #图片的尺寸质量
     target = ""                 #模糊搜索目标
 
@@ -83,20 +85,16 @@ async def zpr(client: Client, message: Message):
     args += [""] * (4 - len(args))  # 填充到4个参数，防止索引报错
     arg1, arg2, arg3, arg4 = args 
 
-   
-    if arg1.isdigit() and 0 <= int(arg1) <= 2:
-        arguments = int(arg1)
+    target = arg1
 
     if arg2.isdigit():
         number = int(arg2)
 
     if commands[0] == 'zp' or (arg3.isalpha() and arg3.lower() == 'l'):
         immge_size = 'original'
-        target = arg4
-    else:
-        immge_size = 'regular'
-        target = arg3 or arg4  # 使用arg3，如果为空则用arg4
 
+    if arg4.isdigit() and 0 <= int(arg4) <= 2:
+        arguments = int(arg4)
     
     code_message = await message.edit(".")
     
@@ -106,8 +104,6 @@ async def zpr(client: Client, message: Message):
 
     try:
         photoList,file_list, des = await get_result(message, arguments, number, immge_size, target)
-        logger.info(f'file_list: {file_list}')
-        logger.info(f'photoList: {photoList}')
         if not photoList:
             shutil.rmtree(data_path)
             return await message.edit(des)
