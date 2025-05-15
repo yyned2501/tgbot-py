@@ -12,7 +12,7 @@ BACKUP_DIR = Path("db_file/mysqlBackup")
 RETENTION_DAYS = 8  # 备份保留天数
 
 
-@scheduler.scheduled_job("cron",hour=6, minute=6, id="zsss")
+@scheduler.scheduled_job("cron",hour=11, minute=8, id="zsss")
 async def mysql_backup():
     # === 生成带时间戳的备份文件名 ===
     global BACKUP_DIR
@@ -46,6 +46,12 @@ async def mysql_backup():
                         backup_path.unlink(missing_ok=True)  # 删除损坏文件
                         return
                 logger.info(f"✅ 数据库备份成功: {backup_path}")
+                backup_filename_gz = backup_filename + '.gz'
+                with open(backup_filename, 'rb') as f_in:
+                    with gzip.open(backup_filename_gz, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)    
+                    os.remove(backup_filename)
+
             except Exception as e:
                 logger.error(f"❌ 备份异常: {e}")
                 backup_path.unlink(missing_ok=True)

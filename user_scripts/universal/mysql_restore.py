@@ -51,7 +51,8 @@ async def mysql_backup_list(client: Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("dbrestore"))
 async def mysql_restore_check(client: Client, message: Message):
-
+    
+    """
     global BACKUP_DIR
     if len(message.command) > 1 and message.command[1].isdigit():
         index = int(message.command[1])
@@ -151,4 +152,4 @@ async def mysql_restore_check(client: Client, message: Message):
         await message.edit("❌ 格式错误，请使用：`/dbrestore 编号`")
     
     await others.delete_message(message, 60)
-    """
+    
