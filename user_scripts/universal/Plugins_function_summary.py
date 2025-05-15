@@ -118,6 +118,8 @@ async def help_message(client:Client, message: Message):
         f"\n/zpr 二次元图片 /zpr 0/1 数量 内容 \n举例: /zpr 0 2 亚丝娜 模糊搜索亚丝娜SFW图片2张（0：SFW  1：NSFW"
         f"\n/jupai  回复文字内容 转为jupai"
         f"\n/xjj 小姐姐视频"
+        f"\n/backuplist 获取当前已有数据库备份清单"
+        f"\n/dbrestore 序号 还原备份(序号根据backuplist获取)"
         f"\n/u2 /u2s 发u2糖 \nu2 username 数量 留言 \nu2s username username username…… 数量 留言"
         f"\n/prizewheel 朱雀大转盘 /prizewheel 次数"
         f"\n/repackcard 回收背包卡片"
