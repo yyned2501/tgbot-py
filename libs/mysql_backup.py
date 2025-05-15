@@ -51,9 +51,7 @@ async def mysql_backup():
 
                 with open(backup_path, 'rb') as f_in:
                     with gzip.open(backup_path_gz, 'wb') as f_out:
-                        shutil.copyfileobj(f_in, f_out)    
-                    os.remove(backup_filename)
-
+                        shutil.copyfileobj(f_in, f_out) 
             except Exception as e:
                 logger.error(f"❌ 备份异常: {e}")
                 backup_path.unlink(missing_ok=True)
