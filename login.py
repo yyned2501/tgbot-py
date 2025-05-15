@@ -23,8 +23,8 @@ async def main():
 
 
     async with user_app:
-        re_mess1, re_mess2 = system_version_get()
-        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"Mytgbot 首次在 {re_mess1}上登录,\n{re_mess2}")
+        re_mess = system_version_get()
+        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"{re_mess} \n注意本次为首次登录")
         logger.info("Mytgbot首次登录成功，登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
         result = subprocess.run(command, capture_output=True, text=True)
