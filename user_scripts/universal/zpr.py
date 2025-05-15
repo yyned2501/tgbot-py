@@ -90,7 +90,7 @@ async def zpr(client: Client, message: Message):
     if arg2.isdigit():
         number = int(arg2)
 
-    if arg3.isalpha() and arg3.lower() == 'l':
+    if commands[0] == 'zp' or (arg3.isalpha() and arg3.lower() == 'l'):
         immge_size = 'original'
         target = arg4
     else:
