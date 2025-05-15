@@ -1,18 +1,13 @@
 import os
-import sys
 import json
-import asyncio
-import platform
-import pyrogram
-from libs.log import logger
 from pathlib import Path
+from libs.log import logger
 from pyrogram import Client,idle
 from models import create_all,async_engine
-from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
+from libs.sys_info import system_version_get
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from config.config import API_HASH, API_ID, BOT_TOKEN_TEST, PT_GROUP_ID, proxy_set
-
-
+from config.config import API_HASH, API_ID, PT_GROUP_ID, proxy_set
+from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
 #
 scheduler = AsyncIOScheduler()
 
@@ -79,12 +74,3 @@ async def start_app():
 def get_user_bot():
     global user_app 
     return user_app
-
-
-async def system_version_get():
-    sys_info = platform.uname()
-    python_info = f"Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-    pyrogram_info = f"脚本依赖: pyrogram: {pyrogram.__version__}"
-    re_message1 = f"{sys_info.node} 的 {sys_info.system} 设备"
-    re_message2 = f"{python_info} {pyrogram_info}"
-    return re_message1,re_message2
