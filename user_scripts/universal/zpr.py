@@ -82,18 +82,18 @@ async def zpr(client: Client, message: Message):
 
     commands = message.command
     args = commands[1:] if len(commands) > 1 else []
-    args += [""] * (4 - len(args))  # 填充到4个参数，防止索引报错
-    arg1, arg2, arg3, arg4 = args 
+    args += [""] * (3 - len(args))  # 填充到4个参数，防止索引报错
+    arg1, arg2, arg3 = args 
 
     target = arg1
 
     if arg2.isdigit():
         number = int(arg2)
 
-    if commands[0] == 'zp' or (arg3.isalpha() and arg3.lower() == 'l'):
+    if commands[0] == 'zp':
         immge_size = 'original'
 
-    if arg4.isdigit() and 0 <= int(arg4) <= 2:
+    if arg3.isdigit() and 0 <= int(arg3) <= 2:
         arguments = int(arg4)
     
     code_message = await message.edit(".")
