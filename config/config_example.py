@@ -15,11 +15,11 @@ ADMIN_ID = [
     1111111111,
     1111111111
 ]   
- #这是我为CMS建了一个群，然后将群里的消息转发给CMSbot，这是群里有权限的ID
+ #这是我为CMS建了一个群，然后将群里的消息转发给CMSbot，将CMSbot的小转发到群里  这里ADMIN_ID 会被转发到CMSbot的成员ID
 
 M115_GROUP_ID = {
-    "CMS_BOT_ID":111111,  #CMS的BOT的 ID（不是API）
-    "CMS_TRANS_CHAT":-1111111  #自检的转发群
+    "CMS_BOT_ID":111111,  #CMS的BOT的 ID（不是API_tokn）
+    "CMS_TRANS_CHAT":-1111111  #自自己的转发群 如果不用转发则随意写
 }
 
 EMBY_API_KEY = "11111111111111"  # EMBY 的 API 密钥 用于检索enby
@@ -31,9 +31,6 @@ TMDB_API_KEY = "1111111111111111"  # TMDB 的 API 密钥
 
 ZHUQUE_COOKIE = "sssss"
 ZHUQUE_X_CSRF = "xxxxxxxd"
-
-
-
 
 ########################运行代理配置########################
 
@@ -70,7 +67,7 @@ PT_GROUP_ID = {
 
 auto_choujiang = True # 是否开启自动抽奖功能
 MY_PTID = 'LuckyDonne'
-#抽奖开启时段
+#抽奖开启时段可以自己加 (xx，ss) 每个时间一定要是 00~23:59 以内 注意扩后后面的“，” 除了最后一个其他的都要“，”
 TIME_RANGES = [
     ("08:00", "12:00"),
     ("14:00", "22:00")
