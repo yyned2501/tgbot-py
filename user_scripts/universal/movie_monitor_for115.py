@@ -199,53 +199,65 @@ async def send_115_links(client:Client, message, title, year):
         logger.warning("未找到 115 链接。")
         
 
-async def search_and_send_message(client:Client, title, year,message):
-        if title:
-            # 使用 TMDB API 匹配电影
-            tmdb_api = TmdbApi()
-            results = await tmdb_api.search_all(title, year)            
-            if results:
-                full_match = next(
-                    (
-                        i for i, item in enumerate(results)
-                        if (item.get("title") == title or item.get("name") == title)
-                        and ((item.get("release_date") or item.get("first_air_date") or "")[:4] == str(year))
-                    ),
-                    None
-                )
-                if full_match is None:
-                    a_only_match = next(
-                        (
-                            i for i, item in enumerate(results)
-                            if item.get("title") == title or item.get("name") == title
-                        ),
-                        None
-                    )
-                    result_index = a_only_match if a_only_match is not None else 0
-                else:
-                    result_index = full_match                                  
-                tmdb_title = results[result_index].get('title') or results[result_index].get('name', '未知标题')                
-                tmdb_year =  results[result_index].get('release_date') or results[result_index].get('first_air_date',"未知时间") 
-                tmdb_id = results[result_index].get('id','未知ID')
-                tmdb_media_type = results[result_index].get('media_type',"未知类型")
-                logger.info(f":TMDB已匹配媒体：[标题: {tmdb_title}, 上映时间: {tmdb_year}, Movie_id: {tmdb_id}, media_type: {tmdb_media_type}]")
-                if tmdb_media_type == 'movie':
-                    # 检查 EMBY 媒体库是否已存在该电影
-                    try:
-                        tmdb_list = await get_movies(title=title, year=year)
-                        if tmdb_list:
-                            if str(tmdb_id) not in tmdb_list:
-                                await send_115_links(client, message, title, year)
-                            else:
-                                logger.info(f"媒体库已存在该电影 | 标题: {title}, TMDB-ID: {tmdb_id}")
-                        else:
-                            await send_115_links(client, message, title, year)
-                    except Exception as e:
-                        logger.error(f"获取电影信息失败: {str(e)}")
-                else:
-                    logger.info(f"媒体类型不为电影 | 标题: {title}, TMDB-ID: {tmdb_id}")
+async def search_and_send_message(client: Client, title, year, complete_series, message):
+    if not title:
+        logger.info(f"❌ TMDB 未匹配到媒体 | Title: {title}, Year: {year}")
+        return
+
+    tmdb_api = TmdbApi()
+    results = await tmdb_api.search_all(title, year)
+
+    if not results:
+        logger.info(f"❌ TMDB 无搜索结果 | Title: {title}, Year: {year}")
+        return
+
+    # 选取匹配项
+    result_index = next(
+        (
+            i for i, item in enumerate(results)
+            if (item.get("title") == title or item.get("name") == title)
+            and ((item.get("release_date") or item.get("first_air_date") or "")[:4] == str(year))
+        ),
+        next(
+            (i for i, item in enumerate(results)
+             if item.get("title") == title or item.get("name") == title),
+            0
+        )
+    )
+
+    # 提取 TMDB 结果
+    media = results[result_index]
+    tmdb_title = media.get('title') or media.get('name', 'Unknown Title')
+    tmdb_year = media.get('release_date') or media.get('first_air_date') or 'Unknown Date'
+    tmdb_id = media.get('id', 'Unknown ID')
+    tmdb_media_type = media.get('media_type', 'Unknown Type')
+
+    logger.info(f"TMDB 匹配成功 | Title: {tmdb_title}, Year: {tmdb_year}, TMDB ID: {tmdb_id}, Type: {tmdb_media_type}")
+
+    # 内部方法封装：检查 Emby 是否已有，未有则推送链接
+    async def check_and_send():
+        try:
+            tmdb_list = await get_movies(title=title, year=year)
+            if tmdb_list and str(tmdb_id) in tmdb_list:
+                logger.info(f"已存在于媒体库 | Title: {title}, TMDB ID: {tmdb_id}")
+            else:
+                await send_115_links(client, message, title, year)
+        except Exception as e:
+            logger.error(f"获取媒体信息失败 | Title: {title}, Error: {e}")
+
+    # 分类型处理
+    if tmdb_media_type == "movie":
+        await check_and_send()
+
+    elif tmdb_media_type == "tv":
+        if complete_series:
+            await check_and_send()
         else:
-            logger.info(f"TMDB未匹配到媒体 | 标题: {title}, 年份: {year}")
+            logger.info(f"TV Series not complete | Title: {title}, TMDB ID: {tmdb_id}")
+
+    else:
+        logger.info(f"Unsupported media type: {tmdb_media_type} | Title: {title}, TMDB ID: {tmdb_id}")
+
 
 
 @Client.on_message(
@@ -264,8 +276,7 @@ async def monitor_channels(client: Client, message: Message):
     else:
         blockyword_list = [] 
 
-    
-    # 判断是否为电影消息    
+ 
     if (message.chat.id == TARGET["CHANNEL_SHARES_115_ID"]
         or message.chat.id == TARGET["GUAGUALE115_ID"]):
         match = None
@@ -273,29 +284,50 @@ async def monitor_channels(client: Client, message: Message):
         match = re.search(r"(.*?)\s*\((\d+)\)", caption)         
         if match:
             title = match.group(1).strip()  # 括号前的内容
-            year = match.group(2).strip()   
+            year = match.group(2).strip() 
+            if "EP" not in caption and "全" in caption:
+                complete_series = True
+            else:
+                complete_series = False
+
               
         
     elif message.chat.id == TARGET["PAN115_SHARE_ID"]:
         
-        match = None
+        size_match = None
+        title_year_match = None
+        complete_series = False
         caption = message.caption or "" 
-             
+        unit_map = {'M': 1, 'G': 1024, 'T': 1024**2}
         if "】" in message.caption:
-            pattern = r"[】](.*?)\s*\((\d+)\)"
+            title_year_pattern = r"[】](.*?)\s*\((\d+)\)"
         else:  # 如果没有【】，从:后匹配
-            pattern = r"[:] (.*?)\s*\((\d+)\)"
+            title_year_pattern = r"[:] (.*?)\s*\((\d+)\)"
 
-        match = re.search(pattern, caption) 
-        if match:
-            title = match.group(1).strip()  # 括号前的内容
-            year = match.group(2).strip() 
+        title_year_match = re.search(title_year_pattern, caption)
+
+
+        size_pattern = r"大\s*小[：:]\s*([\d.]+)\s*([TGM])"
+        size_match = re.search(size_pattern, caption)        
+       
+        if title_year_match:
+            title = title_year_match.group(1).strip()  # 括号前的内容
+            year = title_year_match.group(2).strip()
+
+        if size_match:            
+            size_value = size_match.group(1)  # 如 '1.02'
+            size_unit = size_match.group(2)   # 如 'G'
+            size_mb = float(size_value) * unit_map[size_unit]
+            if size_mb >= 10240 and "第" not in caption:
+                complete_series = True
+            else:
+                complete_series = False
     if title and year:        
         if any(word in title for word in blockyword_list):
             logger.info(f"检索到群组: [{message.chat.title}] 媒体信息: {title} {year} 是屏蔽关键字,不开始检索") 
         else:
             logger.info(f"检索到群组: [{message.chat.title}] 媒体信息: {title} {year}")
-            await search_and_send_message(client,title, year,message)
+            await search_and_send_message(client,title, year,complete_series ,message)
 
 
 
@@ -303,7 +335,7 @@ async def monitor_channels(client: Client, message: Message):
 # ================== 开关命令处理 ==================
 @Client.on_message(
         filters.me 
-        & (filters.command("dyjk")
+        & (filters.command("dyjkk")
            | filters.command("dyzf")
         )           
     )
@@ -322,7 +354,7 @@ async def toggle_monitor(client: Client, message: Message):
     enable = (action == "on")
     status = "启动" if enable else "停止"
 
-    if cmd_name == "dyjk":
+    if cmd_name == "dyjkk":
         monitor_enabled = enable
         re_mess = await message.edit(f"✅ 监控功能已{status}！")
     elif cmd_name == "dyzf":
