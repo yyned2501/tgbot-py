@@ -354,7 +354,7 @@ async def toggle_monitor(client: Client, message: Message):
     enable = (action == "on")
     status = "启动" if enable else "停止"
 
-    if cmd_name == "dyjkk":
+    if cmd_name == "dyjk":
         monitor_enabled = enable
         re_mess = await message.edit(f"✅ 监控功能已{status}！")
     elif cmd_name == "dyzf":
