@@ -62,7 +62,7 @@ async def mysql_backup():
                 re_mess = await user_app.send_document(
                     chat_id=PT_GROUP_ID['BOT_MESSAGE_CHAT'],
                     document=str(backup_path_gz),
-                    caption=f"✅ 数据库备份成功: {backup_filename_gz}"
+                    caption=f"✅ 数据库备份成功: {backup_filename_gz} \n本地备份路径为:{BACKUP_DIR}"
                 )               
             except Exception as e:
                 logger.error(f"❌ 备份异常: {e}")
