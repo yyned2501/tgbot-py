@@ -335,7 +335,7 @@ async def monitor_channels(client: Client, message: Message):
 # ================== 开关命令处理 ==================
 @Client.on_message(
         filters.me 
-        & (filters.command("dyjkk")
+        & (filters.command("dyjk")
            | filters.command("dyzf")
         )           
     )
