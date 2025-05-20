@@ -42,8 +42,7 @@ async def forward_to_group(client: Client, message: Message):
                 return
     else:
         #await rem.edit("没有回复消息")
-        await others.delete_message(message,5)
-        
+        await others.delete_message(message,5)       
         
 
 
@@ -110,25 +109,22 @@ async def forward_to_group(client:Client, message: Message):
 async def help_message(client:Client, message: Message):
     reult_mess = await message.edit(
         f"```"
+        f"\n/id TGID查询"
         f"\n/dme 删除消息 /dme 数量 "
         f"\n/re 转发消息 "
-        f"\n/blockyword add xxx  115电影查询增加不检索关键字"
+        f"\n/blockyword ad dxxx  115电影查询增加不检索关键字"
         f"\n/blockyword remove xxx  115电影查询删除不检索关键字"
-        f"\n/autochangename 更新时间昵称: \n     /autochangename on 打开 \n     /autochangename off  关闭: "
-        f"\n/zpr 二次元图片 /zpr 0/1 数量 内容 \n举例: /zpr 0 2 亚丝娜 模糊搜索亚丝娜SFW图片2张（0：SFW  1：NSFW"
+        f"\n/dyjk on/off  115群电影监控打开/关闭"
+        f"\n/dyzf on/off  CMSbot转发群消息打开/关闭"
+        f"\n/autochangename on/off 更新时间昵称打开/关闭: "
+        f"\n/zpr(zp) 关键字 数量 NSFW/SFW(0 SFW 1 NSFW 2 混合)  二次元图片"
         f"\n/jupai  回复文字内容 转为jupai"
         f"\n/xjj 小姐姐视频"
         f"\n/backuplist 获取当前已有数据库备份清单"
-        f"\n/dbrestore 序号 还原备份(序号根据backuplist获取)"
-        f"\n/u2 /u2s 发u2糖 \nu2 username 数量 留言 \nu2s username username username…… 数量 留言"
-        f"\n/prizewheel 朱雀大转盘 /prizewheel 次数"
-        f"\n/repackcard 回收背包卡片"
-        f"\n/packlist 查询背包卡片"
-        f"\n/getinfo 查询个人信息"
-        f"\n/gamelist 查询当前菠菜对局"
-        f"\n/betgame 对局下注 /betgame 场次 下注金额 队伍  场次/gamelist 返回每局信息前的数字 队伍0或1 wbg vs we 0就是下注wbg"
-        f"```"
-        
+        f"\n/dbrestore 序号 还原备份(序号根据backuplist获取)"       
+        f"\n/prizewheel 朱雀大转盘 /prizewheel 次数"        
+        f"\n/getinfo 朱雀查询个人信息"        
+        f"```"        
     )
 
 
