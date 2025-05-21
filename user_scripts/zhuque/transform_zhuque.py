@@ -32,7 +32,7 @@ async def zhuque_transform_get(client: Client, message: Message):
 async def zhuque_transform_pay(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     transform_message = message.reply_to_message.reply_to_message
-    await transform(transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, False)             
+    await transform(transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME, True)             
             
     
              
