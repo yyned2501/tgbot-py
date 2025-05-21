@@ -3,6 +3,7 @@ import asyncio
 from pathlib import Path
 from datetime import datetime
 from libs import others
+from libs.command_tablepy import generate_command_table_image
 from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -107,26 +108,28 @@ async def forward_to_group(client:Client, message: Message):
 
 @Client.on_message(filters.me & filters.command("helpme"))
 async def help_message(client:Client, message: Message):
-    reult_mess = await message.edit(
-        f"```"
-        f"\n/id TGID查询"
-        f"\n/dme 删除消息 /dme 数量 "
-        f"\n/re 转发消息 "
-        f"\n/blockyword ad dxxx  115电影查询增加不检索关键字"
-        f"\n/blockyword remove xxx  115电影查询删除不检索关键字"
-        f"\n/dyjk on/off  115群电影监控打开/关闭"
-        f"\n/dyzf on/off  CMSbot转发群消息打开/关闭"
-        f"\n/autochangename on/off 更新时间昵称打开/关闭: "
-        f"\n/zpr(zp) 关键字 数量 NSFW/SFW(0 SFW 1 NSFW 2 混合)  二次元图片"
-        f"\n/jupai  回复别人的文字消息  或者直接/jupai 文字"
-        f"\n/xjj 小姐姐视频"
-        f"\n/backuplist 获取当前已有数据库备份清单"
-        f"\n/dbrestore 序号 还原备份(序号根据backuplist获取)"       
-        f"\n/prizewheel 朱雀大转盘 /prizewheel 次数"        
-        f"\n/getinfo 朱雀查询个人信息"        
-        f"```"        
-    )
+    command_data = [
+    ("/id", "被回复的消息的telegram ID查询", "/id", "如果没有回复任何消息则查询自己的"),
+    ("/dme num", "删除当前群组num条自己发消息", "/dme 10", "删除当前群组10条自己发消息"),
+    ("/blockyword add str", "115群监听,增加不监听关键字", "/blockyword add 不良人", "新增不监听关键字 “不良人"),
+    ("/blockyword remove str", "115群监听,删除不监听关键字", "/blockyword remove 不良人", "删除不监听关键字 “不良人"),
+    ("/dyjk on/off", "115群电影监控 打开 / 关闭", "/dyjk on", "监听打开"),
+    ("/dyzf on/off", "CMSbot转发群消息打开/关闭", "/dyzf on", "转发打开"),
+    ("autochangename on/off", "telegram更新时间昵称打开/关闭", "/autochangename on", "打开"),
+    ("/zpr(zp) str num 0/1/2", "p站搜索二次图片(0 SFW 1 NSFW 2 混合)", "/zpr 明日香 2 0", "zpr图片模式/zp文件模式"),
+    ("/jupai", "回复的文字消息或/jupai 文字 ", "/jupai 你好", "将‘你好’ 转为jupai"),
+    ("/xjj", "小姐姐视频", "/xjj", "/"),
+    ("/backuplist", "获取当前已有数据库备份清单", "/backuplist", "/"),
+    ("/dbrestore num", "还原第num号备份(num根据backuplist获取)", "/dbrestore 1", "还原第1个备份"),
+    ("/prizewheel num", "朱雀大转盘", "/prizewheel 10", "朱雀大转盘转10次"),
+    ("/getinfo", "朱雀查询个人信息", "/getinfo", "/")
+] 
+
+    command_imge = await generate_command_table_image(command_data)
+    reult_mess = await message.reply_photo(command_imge)
+    await message.delete()
+   
 
 
-    
+
     
