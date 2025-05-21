@@ -23,7 +23,7 @@ async def main():
 
 
     async with user_app:
-        re_mess = system_version_get()
+        re_mess = await system_version_get()
         await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"{re_mess} \n注意本次为首次登录")
         logger.info("Mytgbot首次登录成功，登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
