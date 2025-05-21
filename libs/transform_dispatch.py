@@ -6,7 +6,7 @@ from models import async_session_maker
 from models.transform_db_modle import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from pyrogram.types.messages_and_media import Message
-from libs.leaderboard.leaderboard_imge import get_leaderboard
+from libs.leaderboard_imge import get_leaderboard
 
 async def transform(transform_message: Message, bonus: int, website: str, bonus_name: str,leaderboard: bool = True):    
     async with async_session_maker() as session:

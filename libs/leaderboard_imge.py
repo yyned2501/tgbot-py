@@ -1,6 +1,7 @@
 import os
 import imgkit
 import asyncio
+from pathlib import Path
 from config import config
 import uuid
 
@@ -86,13 +87,14 @@ async def get_leaderboard(data):
     </html>
     """
     unique_id = uuid.uuid4().hex
-    html_file = f"libs/leaderboard/temp_{unique_id}.html"
-    img_file = f"libs/leaderboard/leaderboard_{unique_id}.png"
-
+    html_file = Path(f"tempfile/temp_{unique_id}.html")
+    img_file = Path(f"tempfile/leaderboard_{unique_id}.png")
+    html_file.parent.mkdir(parents=True, exist_ok=True)
+    
     with open(html_file, "w", encoding="utf-8") as f:
         f.write(html_str)
 
-    imgkit.from_file(html_file, img_file, config=wkhtml_config, options={
+    imgkit.from_file(str(html_file), str(img_file), config=wkhtml_config, options={
         'encoding': 'UTF-8',
         'format': 'png',
         'width': 512,
