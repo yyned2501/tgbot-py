@@ -28,7 +28,7 @@ LOTTERY_LOSE_REPLY_MESSAGE = [
     '黑幕',
     '黑幕'    
 ]
-
+#这个是没有中奖的词条可以自己各种新增 但是不要和我一样啊
 
 
 LOTTERY_Sticker_REPLY_MESSAGE = {
@@ -40,6 +40,7 @@ LOTTERY_Sticker_REPLY_MESSAGE = {
     'thank4':'CAACAgUAAyEGAASEHEl7AAPEZnAAAacdhH02xoFCLOXHInm-mTnGAAJZBAACVGbpV6lLA3veVGh3HgQ',
     'thank5':'CAACAgUAAyEGAASEHEl7AAPKZnAB_zDCcIPkYZQTSq4nlEDKfkQAAioNAALpvxFWLXaoxhdesaoeBA',
 }
+#这个是贴纸 我就准备了这么几张~
 
 
 NO_AOUTOLOTTERY_REPLY_MESSAGE = {
@@ -51,4 +52,4 @@ NO_AOUTOLOTTERY_REPLY_MESSAGE = {
     'negative6':'xxx',
     'negative7':'xxx',  
 }
-#否定别人说你是机器人的话语
+#这个是被人reply_说是机器人时的反驳词条 可以新加 但是注意'negative7'这个序号
