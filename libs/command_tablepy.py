@@ -57,7 +57,8 @@ async def generate_command_table_image(data, title="📘 命令一览表"):
                 padding: 6px;
                 border: 1px solid #999;
             }}
-            td:first-child, th:first-child {{
+            td:first-child, th:first-child,
+            td:nth-child(3), th:nth-child(3) {{
                 white-space: nowrap;
             }}
         </style>
