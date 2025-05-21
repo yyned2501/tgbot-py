@@ -1,5 +1,6 @@
 import os
 import json
+import asyncio
 from pathlib import Path
 from libs.log import logger
 from pyrogram import Client,idle
@@ -16,6 +17,27 @@ if proxy_set['proxy_enable'] == True:
     proxy = proxy_set['proxy']
 else:
     proxy = None
+
+
+async def keep_alive_task():
+    """
+    tg连接保活保活
+    """
+    while True:
+        try:
+            me = await user_app.get_me()
+            logger.debug("连接正常")
+        except Exception as e:
+            logger.error(f"连接异常，将尝试重连: {e}")
+            try:
+                await user_app.stop()
+                await asyncio.sleep(3)
+                await user_app.start()
+                logger.info("已重新连接")
+            except Exception as e2:
+                logger.error(f"重连失败: {e2}")
+        await asyncio.sleep(60)  # 每 60 秒检查一次
+
 
 async def start_app():
     db_flag_path = Path("db_file/dbflag/dbflag.json")
@@ -65,6 +87,7 @@ async def start_app():
     logger.info("Mytgbot监听程序启动成功")
     re_mess = await system_version_get()
     await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], re_mess)
+    asyncio.create_task(keep_alive_task())
     await idle()
     await async_engine.dispose()
     await user_app.stop()
