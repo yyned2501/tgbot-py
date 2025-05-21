@@ -116,7 +116,7 @@ async def help_message(client:Client, message: Message):
     ("/dyjk on/off", "115群电影监控 打开 / 关闭", "/dyjk on", "监听打开"),
     ("/dyzf on/off", "CMSbot转发群消息打开/关闭", "/dyzf on", "转发打开"),
     ("autochangename on/off", "telegram更新时间昵称打开/关闭", "/autochangename on", "打开"),
-    ("/zpr(zp) str num 0/1/2", "p站搜索二次图片(0 SFW 1 NSFW 2 混合)", "/zpr 明日香 2 0", "zpr图片模式/zp文件模式"),
+    ("/zpr(zp) str num 0/1/2", "p站搜索二次图片(0 SFW 1 NSFW 2 混合)", "/zpr 明日香 2 0", "zpr图片模式/zp文件模式 命令后的参数可选"),
     ("/jupai", "回复的文字消息或/jupai 文字 ", "/jupai 你好", "将‘你好’ 转为jupai"),
     ("/xjj", "小姐姐视频", "/xjj", "/"),
     ("/backuplist", "获取当前已有数据库备份清单", "/backuplist", "/"),
