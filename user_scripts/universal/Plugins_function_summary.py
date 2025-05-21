@@ -118,7 +118,7 @@ async def help_message(client:Client, message: Message):
         f"\n/dyzf on/off  CMSbot转发群消息打开/关闭"
         f"\n/autochangename on/off 更新时间昵称打开/关闭: "
         f"\n/zpr(zp) 关键字 数量 NSFW/SFW(0 SFW 1 NSFW 2 混合)  二次元图片"
-        f"\n/jupai  回复文字内容 转为jupai"
+        f"\n/jupai  回复别人的文字消息  或者直接/jupai 文字"
         f"\n/xjj 小姐姐视频"
         f"\n/backuplist 获取当前已有数据库备份清单"
         f"\n/dbrestore 序号 还原备份(序号根据backuplist获取)"       
