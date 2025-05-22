@@ -72,7 +72,6 @@ async def start_app():
         except (json.JSONDecodeError, IOError) as e:
             logger.warning(f"读取 dbflag.json 失败，将重新初始化数据库：{e}")
 
-
     if not db_flag_data or db_flag_data.get('db_flag') != True:
         
         logger.info("首次运行，初始化数据库...")
@@ -87,13 +86,16 @@ async def start_app():
     logger.info("Mytgbot监听程序启动成功")
     re_mess = await system_version_get()
     await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], re_mess)
-    asyncio.create_task(keep_alive_task())
-    await idle()
-    await async_engine.dispose()
-    await user_app.stop()
-    #await bot_app.stop()
-    logger.info("关闭Mytgbot监听程序")
-
+    try:
+        await asyncio.gather(
+            keep_alive_task(),
+            idle()
+        )
+    finally:
+        # 程序退出时进行清理
+        await async_engine.dispose()
+        await user_app.stop()
+        logger.info("关闭 Mytgbot 监听程序")
 def get_user_bot():
     global user_app 
     return user_app
