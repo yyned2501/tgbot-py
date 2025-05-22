@@ -77,7 +77,6 @@ async def start_app():
     await user_app.stop()
     logger.info(f"{project_name} 监听程序关闭完成")
 
-
 def get_user_bot():
     global user_app 
     return user_app
