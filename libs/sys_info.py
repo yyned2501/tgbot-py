@@ -19,4 +19,4 @@ async def system_version_get():
     python_info = f"Python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     pyrogram_info = f"脚本依赖: pyrogram: {pyrogram.__version__}" 
     re_message = f"您的`{project_name}`项目在`{sys_info.node}`的`{sys_info.system}`设备上登录 \n{python_info} {pyrogram_info}"
-    return re_message
+    return project_name, re_message
