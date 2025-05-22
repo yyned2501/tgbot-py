@@ -13,7 +13,7 @@ class CSTFormatter(logging.Formatter):
         return time_utc8.strftime(datefmt or '%Y-%m-%d %H:%M:%S(%Z)')
 formatter = CSTFormatter("[%(levelname)s] %(asctime)s - %(filename)s - %(message)s")
 logger = logging.getLogger('main')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # 防止重复添加 handler
 
