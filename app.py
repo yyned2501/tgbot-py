@@ -20,23 +20,28 @@ else:
 
 
 async def keep_alive_task():
-    """
-    tg连接保活保活
-    """
-    while True:
-        try:
-            me = await user_app.get_me()
-            logger.debug("连接正常")
-        except Exception as e:
-            logger.error(f"连接异常，将尝试重连: {e}")
+    logger.info("[保活任务] 启动")
+    try:
+        while True:
             try:
-                await user_app.stop()
-                await asyncio.sleep(3)
-                await user_app.start()
-                logger.info("已重新连接")
-            except Exception as e2:
-                logger.error(f"重连失败: {e2}")
-        await asyncio.sleep(60)  # 每 60 秒检查一次
+                # 限制 get_me 超时时间
+                me = await asyncio.wait_for(user_app.get_me(), timeout=10)
+                logger.info("[保活任务] 连接正常：%s", me.username)
+            except asyncio.TimeoutError:
+                logger.warning("[保活任务] get_me 超时，准备重连")                
+            except Exception as e:
+                logger.error("[保活任务] 连接异常: %s", e)
+                try:
+                    await user_app.stop()
+                    await asyncio.sleep(3)
+                    await user_app.start()
+                    logger.info("[保活任务] 已重新连接")
+                except Exception as e2:
+                    logger.error("[保活任务] 重连失败: %s", e2)
+            await asyncio.sleep(60)
+    except asyncio.CancelledError:
+        logger.info("[保活任务] 被取消，退出任务")
+
 
 
 async def start_app():
