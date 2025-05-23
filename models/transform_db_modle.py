@@ -20,7 +20,7 @@ class Raiding(Base):
     user_id: Mapped[int] = mapped_column(BigInteger)
     action: Mapped[str] = mapped_column(String(32))
     raidcount:Mapped[int] = mapped_column(Integer)       
-    bonus: Mapped[float] = mapped_column(Numeric(12, 2))
+    bonus: Mapped[float] = mapped_column(Numeric(16, 2))
 
     @classmethod
     async def get_latest_raiding_createtime(
@@ -55,7 +55,7 @@ class Transform(Base):
     create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     website: Mapped[str] = mapped_column(String(32))
     user_id: Mapped[int] = mapped_column(BigInteger)
-    bonus: Mapped[float] = mapped_column(Numeric(12, 2))
+    bonus: Mapped[float] = mapped_column(Numeric(16, 2))
 
 
 class User(TimeBase):
@@ -198,7 +198,7 @@ class User(TimeBase):
         else:
             raise ValueError("不支持的 transform_message 类型")
 
-        username = username[:30]
+        username = username[:32]
         user = await session.get(cls, user_id)
 
         if user:
