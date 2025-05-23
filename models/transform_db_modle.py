@@ -204,7 +204,7 @@ class User(TimeBase):
             if user.name != username:
                 user.name = username
         else:
-            user = cls(user_id=user_id, name=username[:60])
+            user = cls(user_id=user_id, name=username[:32])
             session.add(user)
             await session.flush()
         print("user",username)
