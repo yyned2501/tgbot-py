@@ -198,15 +198,16 @@ class User(TimeBase):
         else:
             raise ValueError("不支持的 transform_message 类型")
 
-
+        temp_username = username[:32]
         user = await session.get(cls, user_id)
+
         if user:
-            if user.name != username[:32]:
-                user.name = username[:32]
+            if user.name != temp_username:
+                user.name = temp_username
         else:
-            user = cls(user_id=user_id, name=username[:32])
-        session.add(user)
-        await session.flush()
+            user = cls(user_id=user_id, name=temp_username)
+            session.add(user)
+            await session.flush()
         print("user",username)
         return user
     
