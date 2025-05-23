@@ -61,7 +61,7 @@ class Transform(Base):
 class User(TimeBase):
     __tablename__ = "user_name"
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    name: Mapped[str] = mapped_column(String(30))
+    name: Mapped[str] = mapped_column(String(32))
 
     async def get_bonus_sum_for_website(self, session: AsyncSession, site_name: str) -> float:
         """
@@ -204,9 +204,10 @@ class User(TimeBase):
             if user.name != username:
                 user.name = username
         else:
-            user = cls(user_id=user_id, name=username)
+            user = cls(user_id=user_id, name=username[:60])
             session.add(user)
             await session.flush()
+        print("user",username)
         return user
     
     
