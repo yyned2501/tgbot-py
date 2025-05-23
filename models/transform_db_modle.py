@@ -198,7 +198,7 @@ class User(TimeBase):
         else:
             raise ValueError("不支持的 transform_message 类型")
 
-        username = username[:32]
+        username = username[:30]
         user = await session.get(cls, user_id)
 
         if user:
