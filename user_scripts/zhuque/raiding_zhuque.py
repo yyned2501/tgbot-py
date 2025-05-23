@@ -167,13 +167,16 @@ async def zhuque_fanda_switch(client: Client, message: Message):
         if args == "on":
             if action == "win":        
                 fanda_switch = 1
-                await message.edit(f"“赢”自动反打启动")
+                reply = await message.edit(f"“赢”自动反打启动")
             elif action == "lose":
                 fanda_switch = 2
-                await message.edit(f"“输”自动反打启动")
+                reply = await message.edit(f"“输”自动反打启动")
             elif action == "all":
                 fanda_switch = 3 
-                await message.edit(f"“all”自动反打启动")          
+                reply = await message.edit(f"“all”自动反打启动")          
         else:
             fanda_switch = 0
+            reply = await message.edit(f"自动反打关闭")
+
+        await others.delete_message(reply, 20)
 
