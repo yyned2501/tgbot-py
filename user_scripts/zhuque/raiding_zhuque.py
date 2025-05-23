@@ -101,19 +101,22 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
 
     if win_amt and (auto_fanda_switch == 1 or auto_fanda_switch == 3):
         if win_amt >= 3000 and cd_ready:
-            await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByWin']}")
+            reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByWin']}")
         elif not cd_ready:
-            await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
+            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
         else:
-            await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"])     
+            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"]) 
+        await others.delete_message(reply, 20)    
 
     elif lose_amt and (auto_fanda_switch == 2 or auto_fanda_switch == 3):
         if lose_amt >= 3000 and cd_ready:
-            await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByLose']}")
+            reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByLose']}")
         elif not cd_ready:
-            await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
+            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
         else:
-            await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"])
+            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"])
+
+        await others.delete_message(reply, 20)
 
         if lose_amt >= 20000:
             await raiding_msg.reply_to_message.delete()
