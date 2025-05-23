@@ -7,6 +7,7 @@ from libs.log import logger
 from pyrogram import Client,idle
 from models import create_all,async_engine
 from libs.sys_info import system_version_get
+from models.alter_tables import alter_columns
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, PT_GROUP_ID, proxy_set
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
@@ -50,19 +51,36 @@ async def start_app():
     project_name, re_mess = await system_version_get()
     
     logger.info(f"开始尝试启动 {project_name} 监听程序")
+
     try:
         await user_app.start()
     except Exception as e:
         logger.critical("user_app 启动失败: %s", e)
         return
-     
-    if not db_flag_path.exists():
+    if os.path.exists(db_flag_path):
+        try:
+            with open(db_flag_path, "r", encoding="utf-8") as f:
+                db_flag_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            logger.warning(f"读取 dbflag.json 失败，将重新初始化数据库：{e}")
+
+    if not db_flag_data or db_flag_data.get('db_flag') != True:
         logger.info("首次运行，初始化数据库...")
         await create_all()
         with open(db_flag_path, "w", encoding="utf-8") as f:
-            json.dump({'db_flag': True}, f, indent=4, ensure_ascii=False)
+            json.dump({"db_flag": True, "alter_tables": False}, f, indent=4, ensure_ascii=False)
     else:
         logger.info("数据库已初始化，跳过初始化。")
+
+    if db_flag_data.get("alter_tables") == True:
+        await alter_columns()
+
+        with open(db_flag_path, "w", encoding="utf-8") as f:
+            json.dump({"db_flag": True, "alter_tables": False}, f, indent=4, ensure_ascii=False)
+
+
+
+
 
     # 启动任务调度和保活任务
     scheduler.start()
