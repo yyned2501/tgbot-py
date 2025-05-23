@@ -39,15 +39,9 @@ async def zhuque_dajie_Raiding(client: Client, message: Message):
     if "扣税" in message.text:
         loss = extract_lingshi_amount(message.text, r"(你被反打劫) ([\d\.]+) 灵石\s*$")
         gain = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石\s*$")
-    print("1",gain,loss)
     if gain or loss:
-        async with async_session_maker() as session, session.begin():
-            try:
-                user = await User.get(session, raiding_msg)
-                bonus = gain if gain else -loss
-                await user.add_raiding_record(session, SITE_NAME, "raiding", raidcount, bonus)
-            except Exception as e:
-                logger.exception(f"提交失败: 用户消息, 错误：{e}")
+        bonus = gain if gain else -loss
+        await record_raiding("raided", bonus, raidcount, raiding_msg)   
 
 @Client.on_message(
     filters.chat(TARGET)
@@ -58,6 +52,9 @@ async def zhuque_dajie_Raiding(client: Client, message: Message):
        | custom_filters.test)
 )
 async def zhuque_dajie_be_raided(client: Client, message: Message):
+    """
+    被打劫、被info监听
+    """
     global fanda_switch
     raiding_msg = message.reply_to_message
     text = message.text
@@ -84,7 +81,10 @@ async def zhuque_dajie_be_raided(client: Client, message: Message):
         raidcount = int(raidcount_match.group(1)) if raidcount_match else 1
         await zhuque_dajie_fanda(fanda_switch, raidcount, message)
 
-async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Message):    
+async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Message): 
+    """
+    自动反打程序
+    """
     raiding_msg = message.reply_to_message
     win_amt = extract_lingshi_amount(message.text, r"(亏损|你被反打劫) ([\d\.]+) 灵石\s*$")
     lose_amt = extract_lingshi_amount(message.text, r"(获得) ([\d\.]+) 灵石\s*$")
@@ -99,7 +99,6 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
 
     cd_ready = await dajie_cdtime_Calculate()
 
-    print("cd_ready",cd_ready,"win_amt",win_amt,"lose_amt",lose_amt)
     if win_amt and (auto_fanda_switch == 1 or auto_fanda_switch == 3):
         if win_amt >= 3000 and cd_ready:
             await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByWin']}")
@@ -122,6 +121,9 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
         
 
 async def record_raiding(action: str, amount: Decimal, count: int, message: Message):
+    """
+    打劫金额写入数据库
+    """
     async with async_session_maker() as session, session.begin():
         try:
             user = await User.get(session, message)
@@ -130,6 +132,9 @@ async def record_raiding(action: str, amount: Decimal, count: int, message: Mess
             logger.exception(f"提交失败: 用户消息, 错误：{e}")
 
 async def dajie_cdtime_Calculate() -> bool:
+    """
+    打劫CD时间计算
+    """
     now = datetime.now()
     try:
         async with async_session_maker() as session, session.begin():
@@ -144,6 +149,9 @@ async def dajie_cdtime_Calculate() -> bool:
 
 @Client.on_message(filters.me & filters.command("fanda"))
 async def zhuque_fanda_switch(client: Client, message: Message):
+    """
+    自动反打开关监听
+    """
     global fanda_switch
     if len(message.command) < 3:
         await message.reply("参数不足。用法：`/fanda lose/win/all on/off`")
