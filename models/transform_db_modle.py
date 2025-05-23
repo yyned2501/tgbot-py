@@ -201,12 +201,12 @@ class User(TimeBase):
 
         user = await session.get(cls, user_id)
         if user:
-            if user.name != username:
-                user.name = username
+            if user.name != username[:32]:
+                user.name = username[:32]
         else:
             user = cls(user_id=user_id, name=username[:32])
-            session.add(user)
-            await session.flush()
+        session.add(user)
+        await session.flush()
         print("user",username)
         return user
     
