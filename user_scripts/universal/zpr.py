@@ -94,7 +94,7 @@ async def zpr(client: Client, message: Message):
         immge_size = 'original'
 
     if arg3.isdigit() and 0 <= int(arg3) <= 2:
-        arguments = int(arg4)
+        arguments = int(arg3)
     
     code_message = await message.edit(".")
     
