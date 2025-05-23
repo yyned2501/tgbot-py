@@ -122,7 +122,8 @@ async def help_message(client:Client, message: Message):
     ("/backuplist", "获取当前已有数据库备份清单", "/backuplist", "/"),
     ("/dbrestore num", "还原第num号备份(num根据backuplist获取)", "/dbrestore 1", "还原第1个备份"),
     ("/prizewheel num", "朱雀大转盘", "/prizewheel 10", "朱雀大转盘转10次"),
-    ("/getinfo", "朱雀查询个人信息", "/getinfo", "/")
+    ("/getinfo", "朱雀查询个人信息", "/getinfo", "/"),
+    ("/fanda lose/win/all on/off", "朱雀打劫被打劫自动反击", "/fanda lose on", "被打劫输时自动反击启动")
 ] 
 
     command_imge = await generate_command_table_image(command_data)
