@@ -18,7 +18,7 @@ blockyword_path = Path("db_file/dbflag/blockyword.json")
 blockyword_path.parent.mkdir(parents=True, exist_ok=True)  
 
 
-monitor_enabled = True
+monitor_enabled = False
 otherchat_trans = False
 LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
 TARGET = {
