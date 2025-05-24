@@ -12,6 +12,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, PT_GROUP_ID, proxy_set
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
 #
+db_flag_data =None
 scheduler = AsyncIOScheduler()
 user_app_terminated = False
 
