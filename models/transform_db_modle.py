@@ -114,8 +114,8 @@ class User(TimeBase):
             Transform.bonus < 0
         )
         result = await session.execute(stmt)
-        bonus_sum, bonus_count = result.one_or_none() or (0, 0)         
-        return bonus_sum, bonus_count      
+        bonus_sum, bonus_count = result.one_or_none() or (0, 0)
+        return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}" 
         
     async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
 
@@ -136,7 +136,7 @@ class User(TimeBase):
             )
             .join(User, Transform.user_id == User.user_id)
             .where(
-                Transform.bonus > 0,
+                flag,
                 Transform.website == site_name
             )
             .group_by(Transform.user_id, User.name)
@@ -146,7 +146,7 @@ class User(TimeBase):
         result = await session.execute(stmt)
         rows = result.all()
         return [
-            [i + 1, tg_id, name, f"{count:,}", f"{bonus_sum:,.2f}"]
+            [i + 1, tg_id, name, f"{count:,}", f"{abs(bonus_sum):,.2f}"]
             for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
         ]
         
@@ -207,8 +207,7 @@ class User(TimeBase):
         else:
             user = cls(user_id=user_id, name=username)
             session.add(user)
-            await session.flush()
-        print("user",username)
+            await session.flush()        
         return user
     
     
