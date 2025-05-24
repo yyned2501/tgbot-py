@@ -12,7 +12,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, PT_GROUP_ID, proxy_set
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
 #
-db_flag_data =None
+
 scheduler = AsyncIOScheduler()
 user_app_terminated = False
 
@@ -49,8 +49,7 @@ async def start_app():
         plugins=dict(root="user_scripts"),
     )
     """   
-    project_name, re_mess = await system_version_get()
-    
+    project_name, re_mess = await system_version_get()    
     logger.info(f"开始尝试启动 {project_name} 监听程序")
 
     try:
@@ -58,6 +57,7 @@ async def start_app():
     except Exception as e:
         logger.critical("user_app 启动失败: %s", e)
         return
+    db_flag_data = None
     if os.path.exists(db_flag_path):
         try:
             with open(db_flag_path, "r", encoding="utf-8") as f:
@@ -73,7 +73,7 @@ async def start_app():
     else:
         logger.info("数据库已初始化，跳过初始化。")
 
-    if db_flag_data.get("alter_tables") == True:
+    if db_flag_data and db_flag_data.get("alter_tables") == True:
         await alter_columns()
 
         with open(db_flag_path, "w", encoding="utf-8") as f:
