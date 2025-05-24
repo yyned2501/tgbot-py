@@ -93,6 +93,10 @@ async def testmessage(client: Client, message: Message):
          await others.delete_message(message, 1)
 
 
+
+
+
+
 """
 @Client.on_message(
         filters.private 
