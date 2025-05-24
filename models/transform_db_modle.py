@@ -115,6 +115,8 @@ class User(TimeBase):
         )
         result = await session.execute(stmt)
         bonus_sum, bonus_count = result.one_or_none() or (0, 0)
+        bonus_sum = bonus_sum or 0
+        bonus_count = bonus_count or 0
         return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}" 
         
     async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
@@ -146,10 +148,10 @@ class User(TimeBase):
         result = await session.execute(stmt)
         rows = result.all()
         return [
-            [i + 1, tg_id, name, f"{count:,}", f"{abs(bonus_sum):,.2f}"]
+            [i + 1, tg_id, name, f"{(count or 0):,}", f"{abs(bonus_sum or 0):,.2f}"]
             for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
         ]
-        
+                
     
     async def get_user_bonus_rank(self, session: AsyncSession, website: str) -> int:
         """
