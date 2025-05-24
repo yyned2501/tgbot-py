@@ -99,24 +99,26 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
 
     cd_ready = await dajie_cdtime_Calculate()
 
-    if win_amt and (auto_fanda_switch == 1 or auto_fanda_switch == 3):
-        if win_amt >= 3000 and cd_ready:
-            reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByWin']}")
-        elif not cd_ready:
-            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
+    if win_amt or lose_amt:
+        is_win = bool(win_amt)
+        amount = win_amt if is_win else lose_amt
+        message_key = "robbedByWin" if is_win else "robbedByLose"
+        fanda_off_key = "robbedwinfandaoff" if is_win else "robbedlosfandaoff"
+        fanda_switch_valid = (
+            (auto_fanda_switch in (1, 3)) if is_win else (auto_fanda_switch in (2, 3))
+        )
+        if fanda_switch_valid:
+            if amount >= 3000 and cd_ready:
+                reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE[message_key]}")
+            elif not cd_ready:
+                reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
+            else:
+                reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"])
         else:
-            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"]) 
-        await others.delete_message(reply, 20)    
-
-    elif lose_amt and (auto_fanda_switch == 2 or auto_fanda_switch == 3):
-        if lose_amt >= 3000 and cd_ready:
-            reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE['robbedByLose']}")
-        elif not cd_ready:
-            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
-        else:
-            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedBynosidepot"])
+            reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE[fanda_off_key])
 
         await others.delete_message(reply, 20)
+
 
         if lose_amt >= 20000:
             await raiding_msg.reply_to_message.delete()
