@@ -158,7 +158,7 @@ class User(TimeBase):
         获取当前用户在某网站上的 bonus 总和排名（降序）。
         """
 
-        if Direction == 'pay':
+        if Direction == "pay":
             flag = Transform.bonus < 0
         else:
             flag = Transform.bonus > 0
@@ -169,7 +169,10 @@ class User(TimeBase):
                 Transform.user_id,
                 func.sum(Transform.bonus).label("total_bonus")
             )
-            .where(Transform.website == website)
+            .where(
+                flag,
+                Transform.website == website
+            )
             .group_by(Transform.user_id)
             .order_by(desc("total_bonus"))
         )
