@@ -1,5 +1,6 @@
 import re
 from decimal import Decimal
+from random import random
 from datetime import datetime, timedelta
 from pyrogram import filters, Client
 from pyrogram.types import Message
@@ -14,6 +15,7 @@ TARGET = [-1001833464786, -1002262543959, -1002522450068]
 SITE_NAME = "zhuque"
 BONUS_NAME = "灵石"
 fanda_switch = 0
+fanxian_switch = True
 def extract_lingshi_amount(text: str, pattern: str) -> Decimal | None:
     match = re.search(pattern, text)
     if match:
@@ -55,7 +57,7 @@ async def zhuque_dajie_be_raided(client: Client, message: Message):
     """
     被打劫、被info监听
     """
-    global fanda_switch
+    global fanda_switch,fanxian_switch
     raiding_msg = message.reply_to_message
     text = message.text
     if "操作过于频繁" in text:
@@ -108,7 +110,7 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
             (auto_fanda_switch in (1, 3)) if is_win else (auto_fanda_switch in (2, 3))
         )
         if fanda_switch_valid:
-            if amount >= 3000 and cd_ready:
+            if amount >= 3000 and cd_ready:                
                 reply = await raiding_msg.reply(f"/dajie {raidcount} {ZQ_REPLY_MESSAGE[message_key]}")
             elif not cd_ready:
                 reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE["robbedByLoseCD"])
@@ -117,11 +119,21 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
         else:
             reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE[fanda_off_key])
 
+
+        if fanxian_switch:
+            if is_win:
+                if random() < 1:
+                    Odds = random()
+                    await raiding_msg.reply(f"+{int(float(win_amt) * 0.9 * Odds)}")
+                    fanxian_reply = await raiding_msg.reply(f"您触发了一次输后返现，表示对您的止损。倍率为{Odds * 100:.2f} %")
+                    await others.delete_message(fanxian_reply, 20)
+
         await others.delete_message(reply, 20)
+        
 
-
-        if lose_amt >= 20000:
-            await raiding_msg.reply_to_message.delete()
+        if not is_win:
+            if float(lose_amt) >= 20000:
+                await raiding_msg.reply_to_message.delete()
 
         
 

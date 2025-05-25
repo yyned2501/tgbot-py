@@ -41,9 +41,8 @@ async def forward_to_group(client: Client, message: Message):
                     )
             except (Forbidden, FloodWait, Exception):
                 return
-    else:
-        #await rem.edit("没有回复消息")
-        await others.delete_message(message,5)       
+    
+    await others.delete_message(message,5)       
         
 
 
