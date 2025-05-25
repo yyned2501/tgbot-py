@@ -97,7 +97,7 @@ class User(TimeBase):
         )
         result = await session.execute(stmt)
         bonus_sum, bonus_count = result.one_or_none() or (0, 0)        
-        return bonus_sum, bonus_count
+        return bonus_count, bonus_sum
     
     async def pay_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> int:
         """
