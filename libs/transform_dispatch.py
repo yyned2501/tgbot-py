@@ -40,7 +40,7 @@ async def transform(transform_message: Message, bonus: int, website: str, bonus_
             pay_count, pay_bonus = await user.pay_bonus_count_sum_for_website(session, website)
             re_mess = await transform_message.reply(
                 f"\n<{user.name}> 大佬,这是小弟孝敬您的 {abs(bonus):,} {bonus_name},请笑纳"
-                f"\n小弟共孝敬了您{pay_count}次,共{pay_bonus} {bonus_name}"
+                f"\n小弟共孝敬了您{pay_count}次,共{pay_bonus} {bonus_name}\n"
                 f"您是小弟个人孝敬总榜的第 {user_pay_ranking} 名\n"
             )
         
