@@ -124,10 +124,12 @@ class User(TimeBase):
         """
         sssssss
         """
-        if Direction == 'pay':
+        if Direction == "pay":
             flag = Transform.bonus < 0
+            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
         else:
             flag = Transform.bonus > 0
+            sort_expr = desc(func.sum(Transform.bonus))
             
         stmt = (
             select(
@@ -142,7 +144,7 @@ class User(TimeBase):
                 Transform.website == site_name
             )
             .group_by(Transform.user_id, User.name)
-            .order_by(desc("bonus_sum"))
+            .order_by(sort_expr)
             .limit(top_n)
         )
         result = await session.execute(stmt)
@@ -160,9 +162,10 @@ class User(TimeBase):
 
         if Direction == "pay":
             flag = Transform.bonus < 0
+            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
         else:
             flag = Transform.bonus > 0
-
+            sort_expr = desc(func.sum(Transform.bonus))
 
         stmt = (
             select(
@@ -174,7 +177,7 @@ class User(TimeBase):
                 Transform.website == website
             )
             .group_by(Transform.user_id)
-            .order_by(desc("total_bonus"))
+            .order_by(sort_expr)
         )
 
         result = await session.execute(stmt)
