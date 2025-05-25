@@ -153,10 +153,17 @@ class User(TimeBase):
         ]
                 
     
-    async def get_user_bonus_rank(self, session: AsyncSession, website: str) -> int:
+    async def get_user_bonus_rank(self, session: AsyncSession, website: str, Direction: str="get") -> int:
         """
         获取当前用户在某网站上的 bonus 总和排名（降序）。
         """
+
+        if Direction == 'pay':
+            flag = Transform.bonus < 0
+        else:
+            flag = Transform.bonus > 0
+
+
         stmt = (
             select(
                 Transform.user_id,
