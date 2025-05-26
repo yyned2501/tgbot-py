@@ -110,9 +110,7 @@ async def zhuque_ThePrizeWheel(client: Client, message: Message):
 
         if message.chat.id not in {MY_TGID, PT_GROUP_ID["BOT_MESSAGE_CHAT"]}:
             await others.delete_message(message, 1)
-            await waiting.forward(PT_GROUP_ID["BOT_MESSAGE_CHAT"])           
-            await others.delete_message(waiting, 15)
-
+            
     except Exception as e:
         logger.exception("抽奖命令错误")
         await message.reply(

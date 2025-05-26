@@ -1,11 +1,12 @@
 import os
 from libs import others
+from pathlib import Path
 from config import config
 from libs.log import logger
 from models import async_session_maker
+from pyrogram.types import Message
 from models.transform_db_modle import User
 from sqlalchemy.ext.asyncio import AsyncSession
-from pyrogram.types.messages_and_media import Message
 from libs.leaderboard_imge import get_leaderboard
 
 async def transform(transform_message: Message, bonus: int, website: str, bonus_name: str,leaderboard: bool = True):    
@@ -34,7 +35,7 @@ async def transform(transform_message: Message, bonus: int, website: str, bonus_
                 f"当前{config.MY_NAME}哥个人打赏总榜TOP5如图上所示\n"
                 f"```"
             )
-            os.remove(leaderboard_top5_imge)
+            Path(leaderboard_top5_imge).unlink()            
         else:
             user_pay_ranking = await user.get_user_bonus_rank(session, website, "pay")
             pay_count, pay_bonus = await user.pay_bonus_count_sum_for_website(session, website)

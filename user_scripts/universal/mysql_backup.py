@@ -3,7 +3,7 @@ import gzip
 import shutil
 import subprocess
 from pathlib import Path
-from app import scheduler,get_user_app
+from app import scheduler,get_user_app,get_bot_app
 from libs.log import logger
 from datetime import datetime
 from pyrogram import Client
@@ -18,6 +18,7 @@ RETENTION_DAYS = 8  # 备份保留天数
 @scheduler.scheduled_job("cron",hour=6, minute=6, id="mysql_backup")
 async def mysql_backup():
     user_app = get_user_app()
+    bot_app = get_bot_app()
     """
     自动mysql备份
     """
@@ -49,7 +50,7 @@ async def mysql_backup():
                     )
                     if result.returncode != 0:
                         logger.error(f"数据库备份失败: {result.stderr}")                        
-                        re_mess = await user_app.send_document(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"数据库备份失败: {result.stderr}")  
+                        re_mess = await bot_app.send_document(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"数据库备份失败: {result.stderr}")  
                         backup_path.unlink(missing_ok=True)  # 删除损坏文件
                         return                               
                 backup_filename_gz = backup_filename + '.gz'
@@ -59,7 +60,7 @@ async def mysql_backup():
                         shutil.copyfileobj(f_in, f_out) 
                 backup_path.unlink()
                 logger.info(f"✅ 数据库备份成功: {backup_path_gz}") 
-                re_mess = await user_app.send_document(
+                re_mess = await bot_app.send_document(
                     chat_id=PT_GROUP_ID['BOT_MESSAGE_CHAT'],
                     document=str(backup_path_gz),
                     caption=f"✅ 数据库备份成功: {backup_filename_gz} \n本地备份路径为:{BACKUP_DIR}"
@@ -74,7 +75,7 @@ async def mysql_backup():
                 mtime = datetime.fromtimestamp(file.stat().st_mtime)
                 if (now - mtime).days > RETENTION_DAYS:
                     logger.info(f"🗑️ 删除过期备份: {file}")
-                    re_mess = await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"🗑️ 删除过期备份: {file}")
+                    re_mess = await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"🗑️ 删除过期备份: {file}")
                     file.unlink()
         else:
             logger.info("当前数据库设置非 mySQL，跳过备份")

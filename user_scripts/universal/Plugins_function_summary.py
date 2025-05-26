@@ -3,6 +3,7 @@ import asyncio
 from pathlib import Path
 from datetime import datetime
 from libs import others
+from app import scheduler,get_user_app,get_bot_app
 from libs.command_tablepy import generate_command_table_image
 from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
@@ -11,7 +12,7 @@ from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
 
-mess_path = Path("tempfile/get_media")
+mess_path = Path("temp_file/get_media")
 
 
 @Client.on_message(filters.me & filters.command("re"))
@@ -50,29 +51,28 @@ async def forward_to_group(client: Client, message: Message):
     await others.delete_message(message, 5)
 
 
-@Client.on_message(filters.me & filters.command("getmessage"))
-async def getmessage(client: Client, message: Message):
+@Client.on_message(filters.me & filters.command("getmsg"))
+async def get_message(client: Client, message: Message):
     """
     获取消息信息
     """
-
+    bot_app = get_bot_app()
     mess_path.mkdir(parents=True, exist_ok=True)
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
     if message.reply_to_message.text:
         file_name = f"{message.reply_to_message.text[:6]}_{current_time}.txt"
     else:
         file_name = f"{current_time}.txt"
-
     file_path = mess_path / file_name
-    with open(file_path, "w") as f:
-        f.write(f"{message.reply_to_message}")
-    await client.send_document(PT_GROUP_ID["BOT_MESSAGE_CHAT"], file_path)
-    shutil.rmtree("data/get_message")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(str(message.reply_to_message))
+    await bot_app.send_document(PT_GROUP_ID["BOT_MESSAGE_CHAT"], file_path)
+    Path(file_path).unlink()
     await message.delete()
 
 
 @Client.on_message(filters.me & filters.command("id"))
-async def testmessage(client: Client, message: Message):
+async def get_id(client: Client, message: Message):
     """
     用户ID查询
     """
@@ -100,11 +100,11 @@ async def testmessage(client: Client, message: Message):
         & filters.user(777000)
     )
 async def forward_to_group(client:Client, message: Message):
-    
+    bot_app = get_bot_app()
     # 监听Telegram(777000)
         
     logger.info(f"Telegram(777000): {message.text}")
-    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],message.text)
+    await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],message.text)
 """
 
 # @Client.on_message(filters.me & filters.command("helpme"))

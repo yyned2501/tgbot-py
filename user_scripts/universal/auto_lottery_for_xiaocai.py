@@ -2,6 +2,7 @@
 import re
 import asyncio
 from filters import custom_filters
+from app import scheduler,get_bot_app
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_REPLY_MESSAGE,LOTTERY_LOSE_REPLY_MESSAGE
@@ -33,6 +34,7 @@ def is_within_time_ranges():
     )
 )
 async def lottery_new_message(client:Client, message:Message):
+    bot_app = get_bot_app()
     lottery_info = {}   
     pattern = {"ID": r"抽奖 ID：(.+)",
                "boss_name": r"创建者：(\w+)",
@@ -56,19 +58,19 @@ async def lottery_new_message(client:Client, message:Message):
                     logger.info(f"ID: {lottery_info['ID']}的抽奖,随机等待后未结束，故参与抽奖,参与群组:{message.chat.title}({message.chat.id}),抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']}")
                     re_message = await client.send_message(message.chat.id, lottery_list[lottery_info['ID']]['keyword'])
                     lottery_list[lottery_info['ID']]['flag'] = 1
-                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.title}({message.chat.id}),\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
+                    await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"ID: {lottery_info['ID']}的抽奖 \n参与群组:{message.chat.title}({message.chat.id}),\n抽奖关键字:{lottery_list[lottery_info['ID']]['keyword']} \n成功参与抽奖 \n 抽奖链接：{message.link}")
                 else:
-                    await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖在随机等待时间内已经结束，故不参与抽奖。 \n\n{message.text}\n\n{message.link}")
+                    await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖在随机等待时间内已经结束，故不参与抽奖。 \n\n{message.text}\n\n{message.link}")
                     logger.info(f"ID: {lottery_info['ID']}的抽奖，在随机等待时间内已经结束，故不参与抽奖")
             else:
-                await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖奖品不符合设定范围故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+                await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"该抽奖奖品不符合设定范围故不参与抽奖 \n\n{message.text}\n\n{message.link}")
                 logger.info(f"抽奖ID: {lottery_info['ID']} 其奖品不符合设定范围故不参与抽奖 ")
             
         else:
-            await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"不在设定自动抽奖时间内,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+            await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"不在设定自动抽奖时间内,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
             logger.info(f"抽奖ID: {lottery_info['ID']} 不在设定自动抽奖时间内,故不参与抽奖。")
     else:
-        await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"自动抽奖使能开关未打开,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
+        await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"自动抽奖使能开关未打开,故不参与抽奖 \n\n{message.text}\n\n{message.link}")
         logger.info(f"抽奖ID: {lottery_info['ID']} 自动抽奖使能开关未打开,故不参与抽奖。")
 
 #################中奖结果监听#######################
