@@ -68,9 +68,10 @@ async def start_app():
         logger.critical("user_app 启动失败: %s", e)
         return
     try:
-        from bot_scripts import setup
+        from bot_scripts.setup import setup_commands
+
         await bot_app.start()
-        await setup.setup_commands()
+        await setup_commands()
     except Exception as e:
         logger.critical("bot_app 启动失败: %s", e)
         return
