@@ -81,6 +81,5 @@ async def zhuque_getInfo(client: Client, message: Message):
     )
     if message.chat.id not in {MY_TGID, PT_GROUP_ID["BOT_MESSAGE_CHAT"]}:
         await others.delete_message(message, 1)
-        await send_result.forward(PT_GROUP_ID["BOT_MESSAGE_CHAT"])           
-        await others.delete_message(send_result, 15)        
+
 
