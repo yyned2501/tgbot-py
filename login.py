@@ -36,7 +36,7 @@ async def main():
     async with bot_app:
         _, re_mess = await system_version_get()
         await bot_app.send_message(PT_GROUP_ID["BOT_MESSAGE_CHAT"], f"{re_mess} \n注意本次为首次登录")
-        logger.info("Mytgbot首次登录成功，登录信息创建成功")
+        logger.info("Mytgbot首次登录成功,登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode == 0:
