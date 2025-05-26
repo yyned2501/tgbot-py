@@ -2,7 +2,7 @@
 
 API_ID = 11111
 API_HASH = '1111111'
-BOT_TOKEN_TEST = "转发bot的API暂时未写"
+BOT_TOKEN = "转发bot的API暂时未写"
 MY_NAME = 'dddd'    #  tg昵称榜单显示作用
 NY_USERNAME = 'ssssss'   # tg 用户名
 MY_TGID = 123344 # 自己的telegram id

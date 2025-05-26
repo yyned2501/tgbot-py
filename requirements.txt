@@ -1,11 +1,11 @@
 kurigram
-tgcrypto
+tgcrypto; sys_platform != 'win32'
 APScheduler
 aiohttp
 jinja2
 beautifulsoup4
 pytz
-uvloop
+uvloop; sys_platform != 'win32'
 openai
 cryptography
 emoji
