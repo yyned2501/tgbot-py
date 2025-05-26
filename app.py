@@ -39,7 +39,7 @@ async def start_app():
         proxy=proxy,
         plugins=dict(root="user_scripts"),
     )
-    user_app = Client(
+    bot_app = Client(
         "bot_account",
         api_id=API_ID,
         api_hash=API_HASH,
