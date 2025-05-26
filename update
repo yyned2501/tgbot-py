@@ -41,4 +41,5 @@ if [ "$old_commit" != "$new_commit" ]; then
     
 else
     echo "✅ 当前已是最新版本：$old_version"
+    exit 1
 fi
