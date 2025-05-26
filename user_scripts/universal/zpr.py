@@ -14,7 +14,7 @@ pixiv_img_host = "i.pixiv.re"
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42"
 }
-data_path = Path("tempfile/zpr")
+data_path = Path("temp_file/zpr")
 
 async def get_result(message, r18=0, num=3, size = "regular", tag=""):
     """

@@ -11,7 +11,7 @@ from pyrogram.errors import Forbidden
 from pyrogram.errors import FloodWait
 
 
-mess_path = Path("tempfile/get_media")
+mess_path = Path("temp_file/get_media")
 
 
 @Client.on_message(filters.me & filters.command("re"))
