@@ -11,6 +11,7 @@ from config.config import API_HASH, API_ID, BOT_TOKEN, PT_GROUP_ID, proxy_set
 from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import (
     zhuque_autofire_firsttimeget,
 )
+from bot_scripts import setup
 
 scheduler = AsyncIOScheduler()
 user_app_terminated = False
@@ -63,9 +64,14 @@ async def start_app():
 
     try:
         await user_app.start()
-        await bot_app.start()
     except Exception as e:
         logger.critical("user_app 启动失败: %s", e)
+        return
+    try:
+        await bot_app.start()
+        await setup.setup_commands()
+    except Exception as e:
+        logger.critical("bot_app 启动失败: %s", e)
         return
     db_flag_data = None
     if os.path.exists(db_flag_path):
