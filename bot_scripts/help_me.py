@@ -1,9 +1,10 @@
 from libs.command_tablepy import generate_command_table_image
 from pyrogram import filters, Client
 from pyrogram.types import Message
+from config.config import MY_TGID
 
 
-@Client.on_message(filters.me & filters.command("helpme"))
+@Client.on_message(filters.chat(MY_TGID) & filters.command("helpme"))
 async def help_message(client: Client, message: Message):
     command_data = [
         (
