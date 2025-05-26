@@ -98,5 +98,5 @@ async def generate_command_table_image(data, title="📘 命令一览表"):
         'width': 800,
         'enable-local-file-access': ''
     })
-    os.remove(html_file)
+    Path(html_file).unlink()    
     return img_file

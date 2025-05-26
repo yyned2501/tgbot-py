@@ -100,6 +100,6 @@ async def get_leaderboard(data):
         'width': 512,
         'enable-local-file-access': ''
     })
-    os.remove(html_file)
+    Path(html_file).unlink()    
     return img_file
     
