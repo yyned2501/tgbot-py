@@ -9,6 +9,7 @@ data/
 
 # 隐私信息
 db_file/
+temp_file/
 tempfile/
 session/
 .venv/
