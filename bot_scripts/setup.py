@@ -33,6 +33,9 @@ async def setup_commands():
     await bot_app.delete_bot_commands()
 
     # 添加新命令
+    for cmd, scopes in BOT_COMMANDS:
+        for scope in scopes:
+            scopes_dict[scope.name].append(cmd)
     logger.info("正在设置命令...")
     for scope, commands in scopes_dict.items():
         try:
