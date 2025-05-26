@@ -9,6 +9,7 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 from models.transform_db_modle import User
 from models.redpocket_db_modle import Redpocket
+from app import scheduler,get_user_app,get_bot_app
 
 TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
@@ -26,7 +27,7 @@ async def in_redpockets_filter(_, __, m: Message):
     & filters.regex(r"内容: ([\s\S]*?)\n灵石: (\d+(?:\.\d+)?)/\d+(?:\.\d+)?\n剩余: .*?\n大善人: (.*)")
 )
 async def get_redpocket_gen(client: Client, message: Message):
-    print(message.matches)
+    bot_app = get_bot_app()    
     if message.reply_to_message.from_user.id ==  MY_TGID:
         async with async_session_maker() as session:
                 async with session.begin():
@@ -46,7 +47,7 @@ async def get_redpocket_gen(client: Client, message: Message):
         match_result_message = re.search(r"已获得 (\d+) 灵石", result_message.message)       
         if match_result_message:
             bonus = match_result_message.group(1)
-            await client.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"```\n{red_from_user}发的:\n朱雀红包{redpocket_name}:\n 抢了{retry_times+1}次 成功抢到 {bonus} 灵石")
+            await bot_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'],f"```\n{red_from_user}发的:\n朱雀红包{redpocket_name}:\n 抢了{retry_times+1}次 成功抢到 {bonus} 灵石")
             async with async_session_maker() as session:
                 async with session.begin():
                     try:             

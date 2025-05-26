@@ -1,10 +1,11 @@
 import asyncio
 from libs.log import logger
+from pyrogram.types import Message
 from pyrogram import filters, Client
 from pyrogram.errors import PeerIdInvalid
 from datetime import datetime, time, timedelta
 
-async def delete_message(message_del, sleep_time=35):
+async def delete_message(message_del: Message, sleep_time=35):
     """
      删除tg消息
     """

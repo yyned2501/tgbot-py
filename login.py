@@ -18,18 +18,25 @@ async def main():
     workdir_path = Path("sessions")
     workdir_path.mkdir(parents=True, exist_ok=True)
     user_app = Client(
-        "sessions/user_account", api_id=API_ID, api_hash=API_HASH, proxy=proxy
+        "user_account",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        workdir=str(workdir_path.resolve()),
+        proxy=proxy,
+        plugins=dict(root="user_scripts"),
     )
     bot_app = Client(
-        "sessions/bot_account",
+        "bot_account",
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
+        workdir=str(workdir_path.resolve()),
         proxy=proxy,
+        plugins=dict(root="bot_scripts"),
     )
     async with bot_app:
         _, re_mess = await system_version_get()
-        await bot_app.send_message(MY_TGID, f"{re_mess} \n注意本次为首次登录")
+        await bot_app.send_message(PT_GROUP_ID["BOT_MESSAGE_CHAT"], f"{re_mess} \n注意本次为首次登录")
         logger.info("Mytgbot首次登录成功，登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
         result = subprocess.run(command, capture_output=True, text=True)
