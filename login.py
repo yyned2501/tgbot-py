@@ -2,7 +2,6 @@ import asyncio
 import subprocess
 from pathlib import Path
 from libs.log import logger
-from config.config import MY_TGID
 from pyrogram import Client
 from config.config import PT_GROUP_ID
 from app import system_version_get
