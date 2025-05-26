@@ -24,7 +24,8 @@ async def main():
         bot_token=BOT_TOKEN,
         proxy=proxy,
     )
-    id = await user_app.me.id
+    async with user_app:
+        id = user_app.me.id
     async with bot_app:
         re_mess = await system_version_get()
         await bot_app.send_message(id, f"{re_mess} \n注意本次为首次登录")
