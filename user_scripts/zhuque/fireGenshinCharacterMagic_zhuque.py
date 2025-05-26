@@ -59,8 +59,8 @@ async def zhuque_autofire_firsttimeget():
             except Exception as e:
                 logger.exception(f"提交失败: 用户消息, 错误：{e}")    
     if last_time:
-        if last_time.date() <  (date.today() - timedelta(days=1)):
-            next_time = last_time + timedelta(seconds=10)
+        if (date.today() - last_time.date() > timedelta(days=1)):
+            next_time = datetime.now() + timedelta(seconds=10)
         else:
             next_time = last_time + timedelta(days=1)   
     else:

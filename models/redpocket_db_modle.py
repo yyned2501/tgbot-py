@@ -16,7 +16,7 @@ class Redpocket(Base):
     create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     website: Mapped[str] = mapped_column(String(32))
     gamemode: Mapped[str] = mapped_column(String(32))
-    bonus: Mapped[float] = mapped_column(Numeric(12, 2)) 
+    bonus: Mapped[float] = mapped_column(Numeric(16, 2)) 
 
 
     @classmethod

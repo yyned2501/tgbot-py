@@ -5,6 +5,7 @@ from pathlib import Path
 from sqlalchemy import text
 from config.config import DB_INFO
 from models.database import Base
+from urllib.parse import quote_plus
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
@@ -17,8 +18,7 @@ db_path.parent.mkdir(parents=True, exist_ok=True)
 if DB_INFO['dbset'] == 'SQLite':
     DATABASE_URL = f"sqlite+aiosqlite:///{db_path}"
 
-elif DB_INFO['dbset'] == 'mySQL':
-    from urllib.parse import quote_plus
+elif DB_INFO['dbset'] == 'mySQL':    
     password = quote_plus(DB_INFO['password'])
     DATABASE_URL = (
         f"mysql+aiomysql://{DB_INFO['user']}:{password}"

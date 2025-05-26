@@ -24,6 +24,7 @@ LINK_PATTERN = re.compile(r"https://115cdn\.com/s/[^\s]+")  # 匹配 115 链接
 TARGET = {
     
     "CHANNEL_SHARES_115_ID":-1002188663986,
+    #"PAN115_SHARE_ID":-4200814739,
     "PAN115_SHARE_ID":-1002343015438,
     "GUAGUALE115_ID": -1002245898899
 }
@@ -59,8 +60,10 @@ class TmdbApi:
             result["media_type"] = "movie"
         for result in tv_results:
             result["media_type"] = "tv"
+        result_all  = movie_results + tv_results
+        logger.info(f"tmdb 查询结果 {result_all}")
 
-        return movie_results + tv_results
+        return result_all
     
     async def search_movies(self, title: str, year: str = None) -> List[dict]:
         """异步查询电影"""
@@ -134,7 +137,7 @@ class TmdbApi:
         return False
     
 
-async def get_movies(title: str, year: Optional[str] = None, tmdb_id: Optional[int] = None):
+async def get_movies(title: str, year: Optional[str] = None, media_type: Optional[str] = None, tmdb_id: Optional[int] = None):
     """
     根据标题和年份，检查电影是否在Emby中存在，存在则返回列表
     :param title: 标题
@@ -143,10 +146,17 @@ async def get_movies(title: str, year: Optional[str] = None, tmdb_id: Optional[i
     :param host: 媒体服务器的主机地址
     :param apikey: API 密钥
     :return: 含title、year属性的字典列表
-    """      
+    """ 
+    if media_type.lower() == "movie":
+        media_type = "media_type"
+    elif media_type.lower == "tv":
+        media_type = "Series"
+    else:
+        media_type = None
+
     url = f"{EMBY_SERVER}emby/Items"
     params = {
-        "IncludeItemTypes": "Movie",
+        "IncludeItemTypes": f"{media_type}",
         "Fields": "ProviderIds,OriginalTitle,ProductionYear,Path,UserDataPlayCount,UserDataLastPlayedDate,ParentId",
         "StartIndex": 0,
         "Recursive": "true",
@@ -160,9 +170,11 @@ async def get_movies(title: str, year: Optional[str] = None, tmdb_id: Optional[i
         # 使用 aiohttp 异步请求
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as response:
-                res = await response.json()                
+                res = await response.json() 
+                print("res",res)               
                 if res:
                     res_items = res.get("Items")
+                    print("，res_items",res_items)
                     if res_items:
                         tmdb_values = []
                         tmdb_values = [item['ProviderIds'].get('Tmdb') for item in res_items if 'Tmdb' in item['ProviderIds']]                        
@@ -224,6 +236,10 @@ async def search_and_send_message(client: Client, title, year, complete_series, 
             0
         )
     )
+            
+
+
+
 
     # 提取 TMDB 结果
     media = results[result_index]
@@ -237,7 +253,9 @@ async def search_and_send_message(client: Client, title, year, complete_series, 
     # 内部方法封装：检查 Emby 是否已有，未有则推送链接
     async def check_and_send():
         try:
-            tmdb_list = await get_movies(title=title, year=year)
+            print(title,year)
+            tmdb_list = await get_movies(title=title, year=year, media_type=tmdb_media_type)
+            print("tmdb_list",tmdb_list)
             if tmdb_list and str(tmdb_id) in tmdb_list:
                 logger.info(f"已存在于媒体库 | Title: {title}, TMDB ID: {tmdb_id}")
             else:
