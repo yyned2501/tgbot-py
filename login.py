@@ -2,35 +2,34 @@ import asyncio
 import subprocess
 from pathlib import Path
 from libs.log import logger
+from config.config import MY_TGID
 from pyrogram import Client
 from config.config import PT_GROUP_ID
 from app import system_version_get
-from config.config import API_HASH, API_ID,BOT_TOKEN_TEST,proxy_set
+from config.config import API_HASH, API_ID, BOT_TOKEN, proxy_set
 
 
-
-if proxy_set['proxy_enable'] == True:
-    proxy = proxy_set['proxy']
+if proxy_set["proxy_enable"] == True:
+    proxy = proxy_set["proxy"]
 else:
     proxy = None
-async def main():
 
+async def main():
     workdir_path = Path("sessions")
     workdir_path.mkdir(parents=True, exist_ok=True)
-    global user_app,bot_app 
     user_app = Client(
-        "user_account", 
+        "sessions/user_account", api_id=API_ID, api_hash=API_HASH, proxy=proxy
+    )
+    bot_app = Client(
+        "sessions/bot_account",
         api_id=API_ID,
         api_hash=API_HASH,
-        workdir=str(workdir_path.resolve()), 
+        bot_token=BOT_TOKEN,
         proxy=proxy,
-        plugins=dict(root="user_scripts"),
     )
-
-
-    async with user_app:
-        re_mess = await system_version_get()
-        await user_app.send_message(PT_GROUP_ID['BOT_MESSAGE_CHAT'], f"{re_mess} \n注意本次为首次登录")
+    async with bot_app:
+        _, re_mess = await system_version_get()
+        await bot_app.send_message(MY_TGID, f"{re_mess} \n注意本次为首次登录")
         logger.info("Mytgbot首次登录成功，登录信息创建成功")
         command = ["supervisorctl", "start", "main"]
         result = subprocess.run(command, capture_output=True, text=True)
