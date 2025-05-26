@@ -3,7 +3,7 @@ import asyncio
 from pathlib import Path
 from datetime import datetime
 from libs import others
-from app import scheduler,get_user_app,get_bot_app
+from app import scheduler,get_bot_app
 from libs.command_tablepy import generate_command_table_image
 from config.config import PT_GROUP_ID
 from pyrogram import filters, Client
