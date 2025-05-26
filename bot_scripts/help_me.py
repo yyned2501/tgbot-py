@@ -1,7 +1,8 @@
-from libs.command_tablepy import generate_command_table_image
-from pyrogram import filters, Client
+from pathlib import Path
 from pyrogram.types import Message
+from pyrogram import filters, Client
 from config.config import MY_TGID
+from libs.command_tablepy import generate_command_table_image
 
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("helpme"))
@@ -66,3 +67,4 @@ async def help_message(client: Client, message: Message):
 
     command_imge = await generate_command_table_image(command_data)
     await message.reply_photo(command_imge)
+    Path(command_imge).unlink()
