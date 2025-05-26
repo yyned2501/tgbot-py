@@ -1,0 +1,6 @@
+if [ $(git rev-list --count --right-only HEAD...origin/"$GIT_BRANCH") -gt 0 ]; then
+    git reset --hard origin/"$GIT_BRANCH"
+    git pull origin "$GIT_BRANCH"
+    pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
+    supervisorctl restart main
+fi

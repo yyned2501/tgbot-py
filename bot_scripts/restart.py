@@ -9,5 +9,5 @@ from libs.log import logger
 async def restart_tg_bot(client: Client, message: Message):
     logger.info("Restarting the bot...")
     await message.reply("重启机器人中，请稍候...")
-    command = ["docker", "restart", " $(hostname)"]
+    command = ["bash", "update"]
     subprocess.run(command)
