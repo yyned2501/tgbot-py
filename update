@@ -7,8 +7,13 @@ git fetch origin "$GIT_BRANCH" || {
     exit 1
 }
 
-old_commit=$(git rev-parse HEAD)  # 记录当前提交ID
-new_commit=$(git rev-parse origin/"$GIT_BRANCH")  # 获取远程提交ID
+# 获取当前和远程的提交ID
+old_commit=$(git rev-parse HEAD)
+new_commit=$(git rev-parse origin/"$GIT_BRANCH")
+
+# 获取提交简要信息（版本摘要）
+old_version=$(git log -1 --pretty=format:"%h - %s" "$old_commit")
+new_version=$(git log -1 --pretty=format:"%h - %s" "$new_commit")
 
 # 执行强制覆盖
 git reset --hard "origin/$GIT_BRANCH" || {
@@ -16,9 +21,11 @@ git reset --hard "origin/$GIT_BRANCH" || {
     exit 1
 }
 
-# 判断是否需要更新依赖
+# 对比并判断是否需要更新依赖
 if [ "$old_commit" != "$new_commit" ]; then
-    echo "✅ 检测到新版本 ($old_commit → $new_commit)"
+    echo "✅ 检测到新版本："
+    echo "   本地版本：$old_version"
+    echo "   远程版本：$new_version"
     
     # 安装依赖
     pip install -r requirements.txt \
@@ -28,13 +35,6 @@ if [ "$old_commit" != "$new_commit" ]; then
         echo "❌ 依赖安装失败"
         exit 1
     }
-    
-    # 重启服务
-    supervisorctl restart main || {
-        echo "❌ 服务重启失败"
-        exit 1
-    }
-    echo "🔄 服务已重启"
 else
-    echo "✅ 当前已是最新版本"
+    echo "✅ 当前已是最新版本：$old_version"
 fi
