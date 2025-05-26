@@ -36,6 +36,7 @@ async def setup_commands():
     logger.info("正在设置命令...")
     for scope, commands in scopes_dict.items():
         try:
+            logger.info(f"设置命令: {scope}, {commands}")
             await bot_app.set_bot_commands(commands, scope=CommandScope[scope].value)
         except Exception as e:
             logger.error(f"设置命令失败: {e}")
