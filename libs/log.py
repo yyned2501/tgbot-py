@@ -2,6 +2,7 @@ import io
 import sys
 import pytz
 import logging
+from pathlib import Path
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
@@ -16,9 +17,15 @@ logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
 # 防止重复添加 handler
+# 创建 logs 目录
+log_path = Path("logs")
+log_path.mkdir(parents=True, exist_ok=True)
+
+# 设置日志文件路径
+log_file = log_path / "Mytgbot.log"
 
 if not logger.handlers:    
-    file_handler = RotatingFileHandler("logs/Mytgbot.log", maxBytes=10 * 1024 * 1024, backupCount=10, encoding="utf-8")
+    file_handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=10, encoding="utf-8")
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)    
     utf8_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
