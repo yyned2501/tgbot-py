@@ -1,8 +1,10 @@
 import asyncio
 import subprocess
+from pathlib import Path
 from libs.log import logger
 from config.config import MY_TGID
 from pyrogram import Client
+from config.config import PT_GROUP_ID
 from app import system_version_get
 from config.config import API_HASH, API_ID, BOT_TOKEN, proxy_set
 
@@ -12,8 +14,9 @@ if proxy_set["proxy_enable"] == True:
 else:
     proxy = None
 
-
 async def main():
+    workdir_path = Path("sessions")
+    workdir_path.mkdir(parents=True, exist_ok=True)
     user_app = Client(
         "sessions/user_account", api_id=API_ID, api_hash=API_HASH, proxy=proxy
     )
