@@ -2,7 +2,7 @@
 set -e  # 任何命令执行失败立即终止脚本
 
 # 强制覆盖式拉取最新代码
-git fetch origin "$GIT_BRANCH" || {
+git fetch origin "$GIT_BRANCH" >/dev/null 2>&1 || {
     echo "❌ 获取远程分支失败"
     exit 1
 }
