@@ -22,12 +22,7 @@ git reset --hard "origin/$GIT_BRANCH" || {
 }
 
 # 对比并判断是否需要更新依赖
-if [ "$old_commit" != "$new_commit" ]; then
-    echo "✅ 检测到新版本："
-    echo "   本地版本：$old_version"
-    echo "   远程版本：$new_version"
-    echo "   开始更新……"
-    
+if [ "$old_commit" != "$new_commit" ]; then    
     # 安装依赖
     pip install -r requirements.txt \
         -i http://mirrors.aliyun.com/pypi/simple/ \
@@ -36,6 +31,10 @@ if [ "$old_commit" != "$new_commit" ]; then
         echo "❌ 依赖安装失败"
         exit 1
     }
+    echo "✅ 检测到新版本："
+    echo "   本地版本：$old_version"
+    echo "   远程版本：$new_version"
+    echo "   开始更新……"
     echo "   更新完成开始重启"
     exit 0
     
