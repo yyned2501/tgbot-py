@@ -22,7 +22,7 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
     (
-        BotCommand("restart", "重启机器人"),
+        BotCommand("update", "更新机器人"),
         [CommandScope.PRIVATE_CHATS],
     ),
 ]
