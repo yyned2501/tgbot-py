@@ -20,7 +20,7 @@ class Raiding(Base):
     user_id: Mapped[int] = mapped_column(BigInteger)
     action: Mapped[str] = mapped_column(String(32))
     raidcount:Mapped[int] = mapped_column(Integer)       
-    bonus: Mapped[float] = mapped_column(Numeric(12, 2))
+    bonus: Mapped[float] = mapped_column(Numeric(16, 2))
 
     @classmethod
     async def get_latest_raiding_createtime(
@@ -55,13 +55,13 @@ class Transform(Base):
     create_time: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     website: Mapped[str] = mapped_column(String(32))
     user_id: Mapped[int] = mapped_column(BigInteger)
-    bonus: Mapped[float] = mapped_column(Numeric(12, 2))
+    bonus: Mapped[float] = mapped_column(Numeric(16, 2))
 
 
 class User(TimeBase):
     __tablename__ = "user_name"
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    name: Mapped[str] = mapped_column(String(30))
+    name: Mapped[str] = mapped_column(String(32))
 
     async def get_bonus_sum_for_website(self, session: AsyncSession, site_name: str) -> float:
         """
@@ -97,7 +97,7 @@ class User(TimeBase):
         )
         result = await session.execute(stmt)
         bonus_sum, bonus_count = result.one_or_none() or (0, 0)        
-        return bonus_sum, bonus_count
+        return bonus_count, bonus_sum
     
     async def pay_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> int:
         """
@@ -114,18 +114,22 @@ class User(TimeBase):
             Transform.bonus < 0
         )
         result = await session.execute(stmt)
-        bonus_sum, bonus_count = result.one_or_none() or (0, 0)         
-        return bonus_sum, bonus_count      
+        bonus_sum, bonus_count = result.one_or_none() or (0, 0)
+        bonus_sum = bonus_sum or 0
+        bonus_count = bonus_count or 0
+        return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}" 
         
     async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
 
         """
         sssssss
         """
-        if Direction == 'pay':
+        if Direction == "pay":
             flag = Transform.bonus < 0
+            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
         else:
             flag = Transform.bonus > 0
+            sort_expr = desc(func.sum(Transform.bonus))
             
         stmt = (
             select(
@@ -136,33 +140,44 @@ class User(TimeBase):
             )
             .join(User, Transform.user_id == User.user_id)
             .where(
-                Transform.bonus > 0,
+                flag,
                 Transform.website == site_name
             )
             .group_by(Transform.user_id, User.name)
-            .order_by(desc("bonus_sum"))
+            .order_by(sort_expr)
             .limit(top_n)
         )
         result = await session.execute(stmt)
         rows = result.all()
         return [
-            [i + 1, tg_id, name, f"{count:,}", f"{bonus_sum:,.2f}"]
+            [i + 1, tg_id, name, f"{(count or 0):,}", f"{abs(bonus_sum or 0):,.2f}"]
             for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
         ]
-        
+                
     
-    async def get_user_bonus_rank(self, session: AsyncSession, website: str) -> int:
+    async def get_user_bonus_rank(self, session: AsyncSession, website: str, Direction: str="get") -> int:
         """
         获取当前用户在某网站上的 bonus 总和排名（降序）。
         """
+
+        if Direction == "pay":
+            flag = Transform.bonus < 0
+            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
+        else:
+            flag = Transform.bonus > 0
+            sort_expr = desc(func.sum(Transform.bonus))
+
         stmt = (
             select(
                 Transform.user_id,
                 func.sum(Transform.bonus).label("total_bonus")
             )
-            .where(Transform.website == website)
+            .where(
+                flag,
+                Transform.website == website
+            )
             .group_by(Transform.user_id)
-            .order_by(desc("total_bonus"))
+            .order_by(sort_expr)
         )
 
         result = await session.execute(stmt)
@@ -198,15 +213,16 @@ class User(TimeBase):
         else:
             raise ValueError("不支持的 transform_message 类型")
 
-
+        username = username[:32]
         user = await session.get(cls, user_id)
+
         if user:
             if user.name != username:
                 user.name = username
         else:
             user = cls(user_id=user_id, name=username)
             session.add(user)
-            await session.flush()
+            await session.flush()        
         return user
     
     
