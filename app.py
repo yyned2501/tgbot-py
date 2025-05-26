@@ -63,6 +63,7 @@ async def start_app():
 
     try:
         await user_app.start()
+        await bot_app.start()
     except Exception as e:
         logger.critical("user_app 启动失败: %s", e)
         return
