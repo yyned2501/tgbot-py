@@ -34,7 +34,7 @@ if [ "$old_commit" != "$new_commit" ]; then
         --trusted-host=mirrors.aliyun.com \
         --upgrade || {
         echo "❌ 依赖安装失败"
-        exit 1
+        
     }
     echo "   更新完成开始重启"
     
