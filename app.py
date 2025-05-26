@@ -104,7 +104,7 @@ async def start_app():
     logger.info(f"{project_name} 监听程序启动成功")
 
     # 发送版本信息
-    await user_app.send_message(PT_GROUP_ID["BOT_MESSAGE_CHAT"], re_mess)
+    await bot_app.send_message(PT_GROUP_ID["BOT_MESSAGE_CHAT"], re_mess)
     await idle()  # 等待直到退出
     logger.info(f"开始关闭 {project_name} 监听程序...")
     await async_engine.dispose()
