@@ -3,7 +3,7 @@ import gzip
 import shutil
 import subprocess
 from pathlib import Path
-from app import scheduler,get_user_bot
+from app import scheduler,get_user_app
 from libs.log import logger
 from datetime import datetime
 from pyrogram import Client
@@ -17,7 +17,7 @@ RETENTION_DAYS = 8  # 备份保留天数
 
 @scheduler.scheduled_job("cron",hour=6, minute=6, id="mysql_backup")
 async def mysql_backup():
-    user_app = get_user_bot()
+    user_app = get_user_app()
     """
     自动mysql备份
     """
