@@ -12,7 +12,7 @@ async def restart_tg_bot(client: Client, message: Message):
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode == 0:
         await reply_message.edit(f"{result.stdout}")        
-        await asyncio.sleep(3)
+        await asyncio.sleep(1)
         result = subprocess.run(["supervisorctl", "restart", "main"], capture_output=True, text=True)
 
 
