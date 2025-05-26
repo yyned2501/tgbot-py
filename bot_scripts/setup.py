@@ -21,6 +21,10 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         BotCommand("helpme", "查看帮助信息"),
         [CommandScope.PRIVATE_CHATS],
     ),
+    (
+        BotCommand("restart", "重启机器人"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
 ]
 
 
