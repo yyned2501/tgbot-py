@@ -13,7 +13,7 @@ from pyrogram.types.messages_and_media import Message
 from config.config import M115_GROUP_ID, ADMIN_ID, EMBY_API_KEY, EMBY_SERVER,TMDB_API_KEY,proxy_set
 
 
-media_path = Path("tempfile/get_media")
+media_path = Path("temp_file/get_media")
 blockyword_path = Path("db_file/dbflag/blockyword.json")
 blockyword_path.parent.mkdir(parents=True, exist_ok=True)  
 

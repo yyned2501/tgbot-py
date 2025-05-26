@@ -87,8 +87,8 @@ async def get_leaderboard(data):
     </html>
     """
     unique_id = uuid.uuid4().hex
-    html_file = Path(f"tempfile/temp_{unique_id}.html")
-    img_file = Path(f"tempfile/leaderboard_{unique_id}.png")
+    html_file = Path(f"temp_file/temp_{unique_id}.html")
+    img_file = Path(f"temp_file/leaderboard_{unique_id}.png")
     html_file.parent.mkdir(parents=True, exist_ok=True)
     
     with open(html_file, "w", encoding="utf-8") as f:

@@ -85,8 +85,8 @@ async def generate_command_table_image(data, title="📘 命令一览表"):
     # 写入临时 HTML 文件
     #  
     unique_id = uuid.uuid4().hex
-    html_file = Path(f"tempfile/command_temp_{unique_id}.html")
-    img_file = Path(f"tempfile/command_table_{unique_id}.png")
+    html_file = Path(f"temp_file/command_temp_{unique_id}.html")
+    img_file = Path(f"temp_file/command_table_{unique_id}.png")
     html_file.parent.mkdir(parents=True, exist_ok=True)
     
     with open(html_file, "w", encoding="utf-8") as f:
