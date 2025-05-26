@@ -13,6 +13,7 @@ async def restart_tg_bot(client: Client, message: Message):
     if result.returncode == 0:
         logger.info("未检测到更新")
         await reply_message.edit("未检测到更新")
+        await logger.info(f"{result.stdout}")
     else:
         logger.info(result.stdout)
         logger.error(result.stderr)
