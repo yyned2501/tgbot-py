@@ -65,5 +65,4 @@ async def help_message(client: Client, message: Message):
     ]
 
     command_imge = await generate_command_table_image(command_data)
-    reult_mess = await message.reply_photo(command_imge)
-    await message.delete()
+    await message.reply_photo(command_imge)
