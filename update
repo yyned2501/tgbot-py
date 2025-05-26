@@ -1,6 +1,40 @@
-if [ $(git rev-list --count --right-only HEAD...origin/"$GIT_BRANCH") -gt 0 ]; then
-    git reset --hard origin/"$GIT_BRANCH"
-    git pull origin "$GIT_BRANCH"
-    pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
-    supervisorctl restart main
+#!/bin/bash
+set -e  # 任何命令执行失败立即终止脚本
+
+# 强制覆盖式拉取最新代码
+git fetch origin "$GIT_BRANCH" || {
+    echo "❌ 获取远程分支失败"
+    exit 1
+}
+
+old_commit=$(git rev-parse HEAD)  # 记录当前提交ID
+new_commit=$(git rev-parse origin/"$GIT_BRANCH")  # 获取远程提交ID
+
+# 执行强制覆盖
+git reset --hard "origin/$GIT_BRANCH" || {
+    echo "❌ 强制覆盖本地分支失败"
+    exit 1
+}
+
+# 判断是否需要更新依赖
+if [ "$old_commit" != "$new_commit" ]; then
+    echo "✅ 检测到新版本 ($old_commit → $new_commit)"
+    
+    # 安装依赖
+    pip install -r requirements.txt \
+        -i http://mirrors.aliyun.com/pypi/simple/ \
+        --trusted-host=mirrors.aliyun.com \
+        --upgrade || {
+        echo "❌ 依赖安装失败"
+        exit 1
+    }
+    
+    # 重启服务
+    supervisorctl restart main || {
+        echo "❌ 服务重启失败"
+        exit 1
+    }
+    echo "🔄 服务已重启"
+else
+    echo "✅ 当前已是最新版本"
 fi
