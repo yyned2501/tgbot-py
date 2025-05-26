@@ -14,7 +14,20 @@ async def restart_tg_bot(client: Client, message: Message):
         logger.info("未检测到更新")
         logger.info(f"{result.stdout}")
         await reply_message.edit("未检测到更新")
-        
+
+    else:
+        logger.info(result.stdout)
+        logger.error(result.stderr)
+
+
+@Client.on_message(filters.chat(MY_TGID) & filters.command("pwd"))
+async def pwd_tg_bot(client: Client, message: Message):
+    command = ["pwd"]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode == 0:
+        logger.info(f"{result.stdout}")
+        await message.reply(f"{result.stdout}")
+
     else:
         logger.info(result.stdout)
         logger.error(result.stderr)
