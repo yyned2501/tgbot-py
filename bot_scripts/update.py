@@ -7,11 +7,10 @@ from libs.log import logger
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("update"))
 async def restart_tg_bot(client: Client, message: Message):
-    reply_message = await message.reply("检测更新中......")
+    reply_message = await message.reply("检测更新中...")
     command = ["bash", "update"]
     result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode == 0:
-        await reply_message.edit(f"开始更新") 
+    if result.returncode == 0:        
         await reply_message.edit(f"{result.stdout}")        
         await asyncio.sleep(2)
         result = subprocess.run(["supervisorctl", "restart", "main"], capture_output=True, text=True)
