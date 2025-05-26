@@ -12,6 +12,7 @@ async def restart_tg_bot(client: Client, message: Message):
     result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode == 0:
         await reply_message.edit(f"{result.stdout}")
+        
     else:
         await reply_message.edit(result.stdout)
         logger.error(result.stderr)
