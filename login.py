@@ -18,14 +18,21 @@ async def main():
     workdir_path = Path("sessions")
     workdir_path.mkdir(parents=True, exist_ok=True)
     user_app = Client(
-        "sessions/user_account", api_id=API_ID, api_hash=API_HASH, proxy=proxy
+        "user_account",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        workdir=str(workdir_path.resolve()),
+        proxy=proxy,
+        plugins=dict(root="user_scripts"),
     )
     bot_app = Client(
-        "sessions/bot_account",
+        "bot_account",
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=BOT_TOKEN,
+        workdir=str(workdir_path.resolve()),
         proxy=proxy,
+        plugins=dict(root="bot_scripts"),
     )
     async with bot_app:
         _, re_mess = await system_version_get()
