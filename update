@@ -15,14 +15,14 @@ new_commit=$(git rev-parse origin/"$GIT_BRANCH")
 old_version=$(git log -1 --pretty=format:"%h - %s" "$old_commit")
 new_version=$(git log -1 --pretty=format:"%h - %s" "$new_commit")
 
-# 执行强制覆盖
-git reset --hard "origin/$GIT_BRANCH" || {
-    echo "❌ 强制覆盖本地分支失败"
-    exit 1
-}
 
 # 对比并判断是否需要更新依赖
-if [ "$old_commit" != "$new_commit" ]; then    
+if [ "$old_commit" != "$new_commit" ]; then 
+
+    git reset --hard "origin/$GIT_BRANCH" >/dev/null 2>&1 || {
+        echo "❌ 强制覆盖本地分支失败"
+        exit 1
+    }
     
     echo "✅ 检测到新版本："
     echo "   更新前版本：$old_version"
