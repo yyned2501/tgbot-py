@@ -119,7 +119,9 @@ def p123_save_share_link(client: P123Client, link: str, /, parent_id: int = 0) -
         raise
 
 
-@Client.on_message(filters.chat(MY_TGID) & filters.regex(r"https://www\.123.*?(?=\n)"))
+@Client.on_message(
+    filters.chat(MY_TGID) & filters.regex(r"https://www\.123.*?(?=\r?\n|$)")
+)
 async def trans_123_link(client: Client, message: Message):
     match = message.matches[0]
     url = match.group(0)
