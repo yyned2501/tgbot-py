@@ -21,3 +21,4 @@ sqlalchemy
 aiosqlite
 aiomysql
 pypinyin
+python-123-client
