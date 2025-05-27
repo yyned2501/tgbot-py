@@ -8,7 +8,7 @@ from filters import custom_filters
 from libs.transform_dispatch import transform
 
 
-TARGET = [-1002014253433, 1001173590111]
+TARGET = [-1002014253433, -1001173590111]
 SITE_NAME = "springsunday"
 BONUS_NAME = "茉莉"
 

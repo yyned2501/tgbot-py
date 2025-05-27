@@ -63,6 +63,12 @@ async def help_message(client: Client, message: Message):
             "/fanda lose on",
             "被打劫输时自动反击启动",
         ),
+        (
+            "/fanxian on/off",
+            "被打劫时对方输，1%的情况下给与一定比例的返现",
+            "/fanxian on",
+            "返现功能启启动",
+        ),
     ]
 
     command_imge = await generate_command_table_image(command_data)
