@@ -15,7 +15,7 @@ TARGET = [-1001833464786, -1002262543959, -1002522450068]
 SITE_NAME = "zhuque"
 BONUS_NAME = "灵石"
 fanda_switch = 0
-fanxian_switch = True
+fanxian_switch = False
 def extract_lingshi_amount(text: str, pattern: str) -> Decimal | None:
     match = re.search(pattern, text)
     if match:
@@ -194,3 +194,28 @@ async def zhuque_fanda_switch(client: Client, message: Message):
 
         await others.delete_message(reply, 20)
 
+
+@Client.on_message(filters.me & filters.command("fanxian"))
+async def zhuque_dajiefanxian_switch(client: Client, message: Message):
+    """
+    自动反打开关监听
+    """
+    global fanda_switch
+    if len(message.command) < 2:
+        await message.reply("参数不足。用法：`/fanxian on/off`")
+        return
+    cmd_name = message.command[0].lower()
+    action = message.command[1].lower()
+    if action not in ("on", "off"):
+        await message.reply("无效参数。请使用 `on` 或 `off`")
+        return
+    enable = (action == "on")
+    status = "启动" if enable else "停止"
+
+    if cmd_name == "fanxian":
+        fanxian_switch = enable
+        re_mess = await message.edit(f"✅ 监控功能已{status}！")   
+    else:
+        re_mess = await message.edit("无效命令。支持 `/fanxian")
+    if re_mess:
+        await others.delete_message(re_mess,8)
