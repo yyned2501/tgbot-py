@@ -59,14 +59,14 @@ PT_GROUP_ID = {
     "HYSTAFF_ID":-11111111,
     "DOLBY_ID":-11111111,
     "AUDIENCES_ID":-1111111,
-    "BOT_MESSAGE_CHAT":-1111111,
+    "BOT_MESSAGE_CHAT":MY_TGID,
 }
 
 
 ###################################auto_lotttery配置#############################
 
 auto_choujiang = True # 是否开启自动抽奖功能
-MY_PTID = 'LuckyDonne'
+MY_PTID = 'xxxxx'
 #抽奖开启时段可以自己加 (xx，ss) 每个时间一定要是 00~23:59 以内 注意扩后后面的“，” 除了最后一个其他的都要“，”
 TIME_RANGES = [
     ("08:00", "12:00"),

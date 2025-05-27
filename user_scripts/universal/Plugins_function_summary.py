@@ -18,6 +18,7 @@ mess_path = Path("temp_file/get_media")
 @Client.on_message(filters.me & filters.command("re"))
 async def forward_to_group(client: Client, message: Message):
 
+    await message.delete()
     if reply := message.reply_to_message:
         try:
             # 获取重复次数，默认为1
@@ -48,7 +49,7 @@ async def forward_to_group(client: Client, message: Message):
             except (Forbidden, FloodWait, Exception):
                 return
 
-    await others.delete_message(message, 5)
+    
 
 
 @Client.on_message(filters.me & filters.command("getmsg"))
