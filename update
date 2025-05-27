@@ -24,10 +24,7 @@ if [ "$old_commit" != "$new_commit" ]; then
         exit 1
     }
     
-    echo "✅ 检测到新版本："
-    echo "   更新前版本：$old_version"
-    echo "   更新后版本：$new_version" 
-    echo "   更新完成开始重启..."   
+    echo "✅ 更新到新版本：$new_version"
     
     # 安装依赖（静默模式，隐藏输出）
     pip install -r requirements.txt \
@@ -37,7 +34,8 @@ if [ "$old_commit" != "$new_commit" ]; then
         echo "❌ 依赖安装失败"
         exit 1
     }  
-
+    echo "✅ 依赖安装成功"
+    echo "⏱️ 等待重启..." 
     
 else
     echo "✅ 当前已是最新版本：$old_version"
