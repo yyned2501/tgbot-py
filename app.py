@@ -49,16 +49,7 @@ async def start_app():
         proxy=proxy,
         plugins=dict(root="bot_scripts"),
     )
-    """
-    bot_app = Client(
-        "bot_account",  # session 名称，只是文件名，不带路径
-        api_id=API_ID,
-        api_hash=API_HASH,
-        workdir=str(workdir_path.resolve()),  # 绝对路径字符串
-        proxy=proxy,
-        plugins=dict(root="user_scripts"),
-    )
-    """
+
     project_name, re_mess = await system_version_get()
     logger.info(f"开始尝试启动 {project_name} 监听程序")
 
