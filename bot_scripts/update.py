@@ -1,33 +1,35 @@
-import asyncio
 import subprocess
 from pyrogram import filters, Client
 from pyrogram.types import Message
 from config.config import MY_TGID
 from libs.log import logger
 
+
+# 监听来自指定TG用户的 /update 命令
 @Client.on_message(filters.chat(MY_TGID) & filters.command("update"))
 async def restart_tg_bot(client: Client, message: Message):
+    # 回复用户，提示正在检测更新
     reply_message = await message.reply("检测更新中...")
-    command = ["bash", "update"]
-    result = subprocess.run(command, capture_output=True, text=True)
-    if result.returncode == 0:        
-        await reply_message.edit(f"{result.stdout}")        
-        await asyncio.sleep(3)
-        result = subprocess.run(["supervisorctl", "restart", "main"], capture_output=True, text=True)
 
-    else:
-        await reply_message.edit(result.stdout)
-        logger.error(result.stderr)
+    try:
+        # 执行 bash update 脚本，捕获输出
+        result = subprocess.run(["bash", "update"], capture_output=True, text=True)
+    except Exception as e:
+        # 捕获异常并记录日志
+        await reply_message.edit(f"执行更新脚本时出错: {e}")
+        logger.error(f"执行更新脚本时出错: {e}")
+        return
 
-
-@Client.on_message(filters.chat(MY_TGID) & filters.command("pwd"))
-async def pwd_tg_bot(client: Client, message: Message):
-    command = ["pwd"]
-    result = subprocess.run(command, capture_output=True, text=True)
     if result.returncode == 0:
-        logger.info(f"{result.stdout}")
-        await message.reply(f"{result.stdout}")
-
+        # 更新成功，输出脚本标准输出内容
+        await reply_message.edit(result.stdout)
+        try:
+            # 重启 supervisor 管理的 main 服务
+            subprocess.run(["supervisorctl", "restart", "main"])
+        except Exception as e:
+            await message.reply(f"重启服务时出错: {e}")
+            logger.error(f"重启服务时出错: {e}")
     else:
-        logger.info(result.stdout)
-        logger.error(result.stderr)
+        # 更新失败，输出脚本标准输出内容，并记录标准错误
+        await reply_message.edit(result.stdout)
+        logger.error(f"更新失败: {result.stderr}")

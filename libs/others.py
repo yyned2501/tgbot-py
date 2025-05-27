@@ -5,15 +5,27 @@ from pyrogram import filters, Client
 from pyrogram.errors import PeerIdInvalid
 from datetime import datetime, time, timedelta
 
-async def delete_message(message_del: Message, sleep_time=35):
+
+async def delete_message(message_del: Message, sleep_time: float = 35) -> asyncio.Task:
     """
-     删除tg消息
+    删除 Telegram 消息，非阻塞方式在指定时间后执行删除，返回任务对象。
+
+    Args:
+        message_del: 要删除的 Telegram 消息对象
+        sleep_time: 延迟时间（秒），默认 35 秒
+
+    Returns:
+        asyncio.Task: 可用于取消或跟踪删除任务
     """
-    await asyncio.sleep(sleep_time)
-    await message_del.delete()
+
+    async def delayed_delete():
+        await asyncio.sleep(sleep_time)
+        await message_del.delete()
+
+    return asyncio.create_task(delayed_delete())
 
 
-async def get_user_info(client:Client,tgid):
+async def get_user_info(client: Client, tgid):
     """
     根据 TGID 查询用户信息
     返回: (user_entity, result)
@@ -25,10 +37,14 @@ async def get_user_info(client:Client,tgid):
     for attempt in (1, 2):
         try:
             user_entity = await client.get_users(tgid)
-            logger.info(f"{'二次' if attempt == 2 else '一次'}查询成功: ID: {tgid}, userinfo: {user_entity}")
+            logger.info(
+                f"{'二次' if attempt == 2 else '一次'}查询成功: ID: {tgid}, userinfo: {user_entity}"
+            )
             return user_entity, 1
         except PeerIdInvalid:
-            logger.info(f"{'二次' if attempt == 2 else '一次'}查询账户不存在: ID: {tgid}")
+            logger.info(
+                f"{'二次' if attempt == 2 else '一次'}查询账户不存在: ID: {tgid}"
+            )
             continue
         except Exception as e:
             logger.error(f"查询出现异常: ID: {tgid}, error: {e}")
@@ -36,7 +52,7 @@ async def get_user_info(client:Client,tgid):
     return PeerIdInvalid, 2
 
 
-async def get_usertoarray(client:Client, sorted_array):
+async def get_usertoarray(client: Client, sorted_array):
     """
     查询数组内所有 ID 的用户名
     """
