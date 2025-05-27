@@ -122,7 +122,7 @@ async def zhuque_dajie_fanda(auto_fanda_switch: int, raidcount: int, message: Me
 
         if fanxian_switch:
             if is_win:
-                if random() < 1:
+                if random() < 0.1:
                     Odds = random()
                     await raiding_msg.reply(f"+{int(float(win_amt) * 0.9 * Odds)}")
                     fanxian_reply = await raiding_msg.reply(f"您触发了一次输后返现，表示对您的止损。倍率为{Odds * 100:.2f} %")
@@ -214,7 +214,7 @@ async def zhuque_dajiefanxian_switch(client: Client, message: Message):
 
     if cmd_name == "fanxian":
         fanxian_switch = enable
-        re_mess = await message.edit(f"✅ 监控功能已{status}！")   
+        re_mess = await message.edit(f"打劫返现功能已 {status}！")   
     else:
         re_mess = await message.edit("无效命令。支持 `/fanxian")
     if re_mess:
