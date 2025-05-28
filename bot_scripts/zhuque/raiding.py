@@ -45,6 +45,6 @@ async def zhuque_dajiefanxian_switch(client: Client, message: Message):
         return
     enable = action == "on"
     status = "启动" if enable else "停止"
-    state_manager.set_section("ZHUQUE",{"fanxian": enable})
+    state_manager.set_section("ZHUQUE",{"fanxian": action})
     
     await message.reply(f"打劫返现功能已 {status}！")
