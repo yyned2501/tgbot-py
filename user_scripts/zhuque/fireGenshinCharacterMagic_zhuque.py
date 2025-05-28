@@ -1,17 +1,10 @@
 import aiohttp
 import asyncio
-import json
-import re
-from libs import others
 from libs.log import logger
-from pyrogram import filters, Client
-from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF, PT_GROUP_ID, MY_TGID
+from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF
 from typing import Optional, Tuple
 from datetime import datetime, timedelta, date
 from models.redpocket_db_modle import Redpocket
-from pyrogram.types import Message
-from filters import custom_filters
-from models import async_session_maker
 
 
 TARGET = [-1001833464786, -1002262543959]
@@ -53,15 +46,12 @@ async def fireGenshinCharacterMagic() -> Optional[Tuple[str, float]]:
 async def zhuque_autofire_firsttimeget():
     from app import scheduler
 
-    # now = await others.get_nowtime('now')
-    async with async_session_maker() as session:
-        async with session.begin():
-            try:
-                last_time = await Redpocket.get_today_latest_fire_createtime(
-                    SITE_NAME, "firegenshin"
-                )
-            except Exception as e:
-                logger.exception(f"提交失败: 用户消息, 错误：{e}")
+    try:
+        last_time = await Redpocket.get_today_latest_fire_createtime(
+            SITE_NAME, "firegenshin"
+        )
+    except Exception as e:
+        logger.exception(f"提交失败: 用户消息, 错误：{e}")
     if last_time:
         if date.today() - last_time.date() > timedelta(days=1):
             next_time = datetime.now() + timedelta(seconds=10)
@@ -92,11 +82,7 @@ async def zhuque_autofire():
             logger.info(
                 f"释放成功：共得 {total_bonus} 灵石，下次时间：{next_time.isoformat()}"
             )
-            async with async_session_maker() as session:
-                async with session.begin():
-                    await Redpocket.add_redpocket_record(
-                        SITE_NAME, "firegenshin", total_bonus
-                    )
+            await Redpocket.add_redpocket_record(SITE_NAME, "firegenshin", total_bonus)
         else:
             next_time = datetime.now() + timedelta(minutes=15)
             logger.warning(f"释放失败或无奖励，15分钟后重试：{next_time.isoformat()}")

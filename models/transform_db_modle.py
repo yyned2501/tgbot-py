@@ -243,8 +243,7 @@ class User(TimeBase):
             else:
                 user = cls(user_id=user_id, name=username)
                 session.add(user)
-                await session.flush()
-            return user
+        return user
 
     async def add_transform_record(self, website: str, bonus: float):
         """
@@ -257,7 +256,6 @@ class User(TimeBase):
         async with async_session_maker() as session, session.begin():
             transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
             session.add(transform)
-            await session.flush()
 
     #########################zhuquerob表调用#######################################
 

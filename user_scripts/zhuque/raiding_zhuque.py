@@ -9,7 +9,6 @@ from libs.log import logger
 from filters import custom_filters
 from config.reply_message import ZQ_REPLY_MESSAGE
 from models.transform_db_modle import User, Raiding
-from models import async_session_maker
 
 TARGET = [-1001833464786, -1002262543959, -1002522450068]
 SITE_NAME = "zhuque"
@@ -165,11 +164,10 @@ async def dajie_cdtime_Calculate() -> bool:
     """
     now = datetime.now()
     try:
-        async with async_session_maker() as session, session.begin():
-            last_time, raid_cd = await Raiding.get_latest_raiding_createtime(
-                session, SITE_NAME, "raiding"
-            )
-            return (now - last_time) >= timedelta(minutes=float(raid_cd))
+        last_time, raid_cd = await Raiding.get_latest_raiding_createtime(
+            SITE_NAME, "raiding"
+        )
+        return (now - last_time) >= timedelta(minutes=float(raid_cd))
     except Exception as e:
         logger.exception(f"冷却时间检查失败: {e}")
         return False
