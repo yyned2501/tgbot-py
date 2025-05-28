@@ -21,18 +21,16 @@ async def zhuque_fanda_switch(client: Client, message: Message):
         if args == "on":
             if action == "win":
                 state_manager.set("zhuque_fanda", 1)
-                reply = await message.edit(f"“赢”自动反打启动")
+                await message.reply(f"“赢”自动反打启动")
             elif action == "lose":
                 state_manager.set("zhuque_fanda", 2)
-                reply = await message.edit(f"“输”自动反打启动")
+                await message.reply(f"“输”自动反打启动")
             elif action == "all":
                 state_manager.set("zhuque_fanda", 3)
-                reply = await message.edit(f"“all”自动反打启动")
+                await message.reply(f"“all”自动反打启动")
         else:
             state_manager.set("zhuque_fanda", 0)
-            reply = await message.edit(f"自动反打关闭")
-
-        await others.delete_message(reply, 20)
+            await message.reply(f"自动反打关闭")
 
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("fanxian"))
@@ -50,6 +48,4 @@ async def zhuque_dajiefanxian_switch(client: Client, message: Message):
     enable = action == "on"
     status = "启动" if enable else "停止"
     state_manager.set("zhuque_fanxian", enable)
-    re_mess = await message.edit(f"打劫返现功能已 {status}！")
-    if re_mess:
-        await others.delete_message(re_mess, 8)
+    await message.reply(f"打劫返现功能已 {status}！")
