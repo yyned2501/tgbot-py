@@ -25,6 +25,14 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         BotCommand("update", "更新机器人"),
         [CommandScope.PRIVATE_CHATS],
     ),
+    (
+        BotCommand("fanda", "朱雀自动反打开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("fanxian", "朱雀自动打劫返现开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
 ]
 
 
