@@ -8,29 +8,27 @@ from libs.state import state_manager
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("fanda"))
 async def zhuque_fanda_switch(client: Client, message: Message):
+
     """
     自动反打开关监听
+    用法：/fanda lose | win | all | off
     """
-    if len(message.command) < 3:
-        await message.reply("参数不足。用法：`/fanda lose/win/all on/off`")
+    if len(message.command) < 2:
+        await message.reply("❌ 参数不足。\n用法：`/fanda lose|win|all|off`")
         return
     action = message.command[1].lower()
-    args = message.command[2].lower()
+    valid_modes = {"lose", "win", "all", "off"}
 
-    if action in "lose" or "win" or "all":
-        if args == "on":
-            if action == "win":
-                state_manager.set("zhuque_fanda", 1)
-                await message.reply(f"“赢”自动反打启动")
-            elif action == "lose":
-                state_manager.set("zhuque_fanda", 2)
-                await message.reply(f"“输”自动反打启动")
-            elif action == "all":
-                state_manager.set("zhuque_fanda", 3)
-                await message.reply(f"“all”自动反打启动")
-        else:
-            state_manager.set("zhuque_fanda", 0)
-            await message.reply(f"自动反打关闭")
+    if action not in valid_modes:
+        await message.reply("❌ 参数非法。\n有效选项：`lose` `win` `all` `off`")
+        return
+    state_manager.set_section("ZHUQUE", {"fanda": action})
+    if action == "off":
+        await message.reply("🛑 自动反打已关闭")
+    else:
+        await message.reply(f"✅ 自动反打模式 `{action}` 已开启")
+        
+
 
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("fanxian"))
@@ -47,5 +45,6 @@ async def zhuque_dajiefanxian_switch(client: Client, message: Message):
         return
     enable = action == "on"
     status = "启动" if enable else "停止"
-    state_manager.set("zhuque_fanxian", enable)
+    state_manager.set_section("ZHUQUE",{"fanxian": enable})
+    
     await message.reply(f"打劫返现功能已 {status}！")

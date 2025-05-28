@@ -17,6 +17,7 @@ session/
 config.py
 reply_message.py
 dbflag.txt
+state.toml
 # 测试项目
 sessions/
 test*

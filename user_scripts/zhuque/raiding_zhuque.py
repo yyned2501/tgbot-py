@@ -93,7 +93,8 @@ async def zhuque_dajie_fanda(raidcount: int, message: Message):
     """
     自动反打程序
     """
-    auto_fanda_switch = state_manager.get("zhuque_fanda", 0)
+    
+    auto_fanda_switch = state_manager.get_item("ZHUQUE","fanda",0)
     raiding_msg = message.reply_to_message
     win_amt = extract_lingshi_amount(
         message.text, r"(亏损|你被反打劫) ([\d\.]+) 灵石\s*$"
@@ -118,7 +119,7 @@ async def zhuque_dajie_fanda(raidcount: int, message: Message):
         message_key = "robbedByWin" if is_win else "robbedByLose"
         fanda_off_key = "robbedwinfandaoff" if is_win else "robbedlosfandaoff"
         fanda_switch_valid = (
-            (auto_fanda_switch in (1, 3)) if is_win else (auto_fanda_switch in (2, 3))
+            (auto_fanda_switch in ("lose", "all")) if is_win else (auto_fanda_switch in ("win", "all"))
         )
         if fanda_switch_valid:
             if amount >= 3000 and cd_ready:
@@ -132,7 +133,7 @@ async def zhuque_dajie_fanda(raidcount: int, message: Message):
         else:
             reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE[fanda_off_key])
 
-        if state_manager.get("zhuque_fanxian", False) and is_win:
+        if state_manager.get_item("ZHUQUE","fanxian",False) and is_win:
             if random() < 0.1:
                 Odds = random()
                 await raiding_msg.reply(f"+{int(float(win_amt) * 0.9 * Odds)}")
