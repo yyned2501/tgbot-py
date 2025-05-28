@@ -259,7 +259,7 @@ class User(TimeBase):
             session.add(transform)
             await session.flush()
 
-#########################zhuquerob表调用#######################################
+    #########################zhuquerob表调用#######################################
 
     async def add_raiding_record(
         self, website: str, action: str, raidcount: int, bonus: float
@@ -282,7 +282,6 @@ class User(TimeBase):
                 bonus=bonus,
             )
             session.add(raiding)
-            await session.flush()
 
 
 ##################英文字母或者中文的转sha码###############################

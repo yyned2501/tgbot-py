@@ -152,12 +152,11 @@ async def record_raiding(action: str, amount: Decimal, count: int, message: Mess
     """
     打劫金额写入数据库
     """
-    async with async_session_maker() as session, session.begin():
-        try:
-            user = await User.get(message)
-            await user.add_raiding_record(SITE_NAME, action, count, amount)
-        except Exception as e:
-            logger.exception(f"提交失败: 用户消息, 错误：{e}")
+    try:
+        user = await User.get(message)
+        await user.add_raiding_record(SITE_NAME, action, count, amount)
+    except Exception as e:
+        logger.exception(f"提交失败: 用户消息, 错误：{e}")
 
 
 async def dajie_cdtime_Calculate() -> bool:
