@@ -33,6 +33,10 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         BotCommand("fanxian", "朱雀自动打劫返现开关"),
         [CommandScope.PRIVATE_CHATS],
     ),
+    (
+        BotCommand("state", "查看当前状态参数"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
 ]
 
 
