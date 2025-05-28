@@ -3,10 +3,11 @@ import re
 import asyncio
 from filters import custom_filters
 from app import scheduler,get_bot_app
+from libs.state import state_manager
 from pyrogram import filters, Client
 from pyrogram.types.messages_and_media import Message
 from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_REPLY_MESSAGE,LOTTERY_LOSE_REPLY_MESSAGE
-from config.config import PT_GROUP_ID,MY_TGID,auto_choujiang,LOTTERY_TARGET_GROUP,MY_PTID,PRIZE_LIST, TIME_RANGES
+from config.config import PT_GROUP_ID,MY_TGID,auto_choujiang,LOTTERY_TARGET_GROUP,PRIZE_LIST, TIME_RANGES
 from random import randint,random
 from datetime import datetime, timedelta,time
 from libs import others
@@ -81,6 +82,8 @@ async def lottery_new_message(client:Client, message:Message):
         )
     )
 async def lottery_draw_result(client:Client, message:Message):
+    MY_PTID =state_manager.get_item("LOTTERY","MY_PTID","")
+
     finish_key = ""
     winner = message.matches[0].group(1)
     logger.info(f"lottery_list befor = {lottery_list} ")
