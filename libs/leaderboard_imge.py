@@ -69,7 +69,7 @@ async def get_leaderboard(data):
     </head>
     <body>
         <table>
-            <caption>🌟🏅🎉 {config.MY_NAME}哥的个人打赏榜 🎉🏅🌟</caption>
+            <caption>🌟🏅🎉 {config.MY_NAME}的个人打赏榜 🎉🏅🌟</caption>
             <thead>
                 <tr>
                     <th>排名</th>
