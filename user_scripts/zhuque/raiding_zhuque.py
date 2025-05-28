@@ -133,7 +133,7 @@ async def zhuque_dajie_fanda(raidcount: int, message: Message):
         else:
             reply = await raiding_msg.reply(ZQ_REPLY_MESSAGE[fanda_off_key])
 
-        if state_manager.get_item("ZHUQUE","fanxian",False) and is_win:
+        if state_manager.get_item("ZHUQUE","fanxian","off") == "on" and is_win:
             if random() < 0.1:
                 Odds = random()
                 await raiding_msg.reply(f"+{int(float(win_amt) * 0.9 * Odds)}")
