@@ -54,7 +54,7 @@ async def lottery_ptuser(client: Client, message: Message):
     await message.reply(f"领奖用PT用户名已设定为：{action}")
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("lotterytime"))
-async def lottery_ptuser(client: Client, message: Message):    
+async def lottery_time(client: Client, message: Message):    
 
     """
     小菜抽奖领奖用PT站点用户名
