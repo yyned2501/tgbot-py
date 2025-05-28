@@ -1,16 +1,22 @@
-
-import pyrogram
 import hashlib
-import unicodedata
-from libs import others
-from config.config import MY_TGID,MY_NAME
+from config.config import MY_TGID, MY_NAME
 from models.database import Base, TimeBase
-from datetime import datetime, timedelta, date
+from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from pyrogram.types import Message
 from sqlalchemy.orm import mapped_column, Mapped
-from sqlalchemy import String, Integer, BigInteger,Numeric, DateTime,func, desc, select
-from typing import Callable
+from sqlalchemy import (
+    String,
+    Integer,
+    BigInteger,
+    Numeric,
+    DateTime,
+    func,
+    desc,
+    select,
+)
+from models import async_session_maker
+
 
 class Raiding(Base):
     __tablename__ = "raiding"
@@ -19,36 +25,31 @@ class Raiding(Base):
     website: Mapped[str] = mapped_column(String(32))
     user_id: Mapped[int] = mapped_column(BigInteger)
     action: Mapped[str] = mapped_column(String(32))
-    raidcount:Mapped[int] = mapped_column(Integer)       
+    raidcount: Mapped[int] = mapped_column(Integer)
     bonus: Mapped[float] = mapped_column(Numeric(16, 2))
 
     @classmethod
     async def get_latest_raiding_createtime(
-        cls,
-        session: AsyncSession,
-        website: str,
-        action: str
+        cls, session: AsyncSession, website: str, action: str
     ) -> datetime | None:
         """
         查询数据库指定字段最新的一笔
         """
-        #today = date.today()
+        # today = date.today()
         stmt = (
             select(cls.create_time, cls.raidcount)
-            .where(                
-                cls.website == website,
-                cls.action == action
-            )
+            .where(cls.website == website, cls.action == action)
             .order_by(desc(cls.create_time))
             .limit(1)
-        )       
+        )
         result_date = (await session.execute(stmt)).one_or_none()
         if result_date:
             create_time, raidcount = result_date
-            return create_time, raidcount  
+            return create_time, raidcount
         else:
             return None
-    
+
+
 class Transform(Base):
     __tablename__ = "transform"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -63,200 +64,235 @@ class User(TimeBase):
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(32))
 
-    async def get_bonus_sum_for_website(self, session: AsyncSession, site_name: str) -> float:
+    async def get_bonus_sum_for_website(self, site_name: str) -> float:
         """
         获取当前用户在指定站点的 bonus 总和。
 
-        :param session: SQLAlchemy 异步会话
-        :param site_name: 站点名称
-        :return: 站点 bonus 的总和，如果不存在则返回 0
-        """
+        参数:
+            site_name (str): 站点名称
 
-        stmt = select(func.sum(Transform.bonus)).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name
-        )
-        bonus_sum = (await session.execute(stmt)).scalar_one_or_none()
-        return bonus_sum if bonus_sum is not None else 0
-    
-
-
-    async def get_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> tuple[int, float]:
+        返回:
+            float: bonus 总和
         """
-        获取当前用户在指定站点的 发送给我的 次数 、魔力总和。
-        :param site_name: 站点名称
-        :type site_name: str
-        :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: float        
-        """     
-
-        stmt = select(func.sum(Transform.bonus),func.count()).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name,
-            Transform.bonus > 0
-        )
-        result = await session.execute(stmt)
-        bonus_sum, bonus_count = result.one_or_none() or (0, 0)        
-        return bonus_count, bonus_sum
-    
-    async def pay_bonus_count_sum_for_website(self, session: AsyncSession, site_name: str) -> int:
-        """
-        获取当前用户在指定站点的 我发送的 bonus 总和。
-
-        :param site_name: 站点名称
-        :type site_name: str
-        :return: 站点 bonus 的总和，如果不存在则返回 0
-        :rtype: int        
-        """
-        stmt = select(func.sum(Transform.bonus),func.count()).where(
-            Transform.user_id == self.user_id,
-            Transform.website == site_name,
-            Transform.bonus < 0
-        )
-        result = await session.execute(stmt)
-        bonus_sum, bonus_count = result.one_or_none() or (0, 0)
-        bonus_sum = bonus_sum or 0
-        bonus_count = bonus_count or 0
-        return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}" 
-        
-    async def get_bonus_leaderboard_by_website(self,session: AsyncSession, site_name: str, Direction: str, top_n: int = 10):
-
-        """
-        sssssss
-        """
-        if Direction == "pay":
-            flag = Transform.bonus < 0
-            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
-        else:
-            flag = Transform.bonus > 0
-            sort_expr = desc(func.sum(Transform.bonus))
-            
-        stmt = (
-            select(
-                Transform.user_id,
-                User.name,
-                func.count().label("bonus_count"),
-                func.sum(Transform.bonus).label("bonus_sum")
+        async with async_session_maker() as session, session.begin():
+            stmt = select(func.sum(Transform.bonus)).where(
+                Transform.user_id == self.user_id, Transform.website == site_name
             )
-            .join(User, Transform.user_id == User.user_id)
-            .where(
-                flag,
-                Transform.website == site_name
+            bonus_sum = (await session.execute(stmt)).scalar_one_or_none()
+            return bonus_sum if bonus_sum is not None else 0
+
+    async def get_bonus_count_sum_for_website(
+        self, site_name: str
+    ) -> tuple[int, float]:
+        """
+        获取当前用户在指定站点的 发送给我的次数、魔力总和。
+
+        参数:
+            site_name (str): 站点名称
+
+        返回:
+            tuple[int, float]: (次数, 魔力总和)
+        """
+        async with async_session_maker() as session, session.begin():
+            stmt = select(func.sum(Transform.bonus), func.count()).where(
+                Transform.user_id == self.user_id,
+                Transform.website == site_name,
+                Transform.bonus > 0,
             )
-            .group_by(Transform.user_id, User.name)
-            .order_by(sort_expr)
-            .limit(top_n)
-        )
-        result = await session.execute(stmt)
-        rows = result.all()
-        return [
-            [i + 1, tg_id, name, f"{(count or 0):,}", f"{abs(bonus_sum or 0):,.2f}"]
-            for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
-        ]
-                
-    
-    async def get_user_bonus_rank(self, session: AsyncSession, website: str, Direction: str="get") -> int:
+            result = await session.execute(stmt)
+            bonus_sum, bonus_count = result.one_or_none() or (0, 0)
+            return bonus_count, bonus_sum
+
+    async def pay_bonus_count_sum_for_website(self, site_name: str) -> tuple[str, str]:
+        """
+        获取当前用户在指定站点的我发送的 bonus 总和。
+
+        参数:
+            site_name (str): 站点名称
+
+        返回:
+            tuple[str, str]: (发送次数, 发送总额字符串)
+        """
+        async with async_session_maker() as session, session.begin():
+            stmt = select(func.sum(Transform.bonus), func.count()).where(
+                Transform.user_id == self.user_id,
+                Transform.website == site_name,
+                Transform.bonus < 0,
+            )
+            result = await session.execute(stmt)
+            bonus_sum, bonus_count = result.one_or_none() or (0, 0)
+            bonus_sum = bonus_sum or 0
+            bonus_count = bonus_count or 0
+            return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}"
+
+    async def get_bonus_leaderboard_by_website(
+        self, site_name: str, Direction: str, top_n: int = 10
+    ):
+        """
+        获取排行榜
+
+        参数:
+            site_name (str): 站点名称
+            Direction (str): 排行榜方向，"pay"为发放榜，其他为接收榜
+            top_n (int): 排名前N名，默认10
+
+        返回:
+            list: 排行榜数据
+        """
+        async with async_session_maker() as session, session.begin():
+            if Direction == "pay":
+                flag = Transform.bonus < 0
+                sort_expr = desc(func.abs(func.sum(Transform.bonus)))
+            else:
+                flag = Transform.bonus > 0
+                sort_expr = desc(func.sum(Transform.bonus))
+
+            stmt = (
+                select(
+                    Transform.user_id,
+                    User.name,
+                    func.count().label("bonus_count"),
+                    func.sum(Transform.bonus).label("bonus_sum"),
+                )
+                .join(User, Transform.user_id == User.user_id)
+                .where(flag, Transform.website == site_name)
+                .group_by(Transform.user_id, User.name)
+                .order_by(sort_expr)
+                .limit(top_n)
+            )
+            result = await session.execute(stmt)
+            rows = result.all()
+            return [
+                [i + 1, tg_id, name, f"{(count or 0):,}", f"{abs(bonus_sum or 0):,.2f}"]
+                for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
+            ]
+
+    async def get_user_bonus_rank(self, website: str, Direction: str = "get") -> int:
         """
         获取当前用户在某网站上的 bonus 总和排名（降序）。
+
+        参数:
+            website (str): 站点名称
+            Direction (str): 排名方向，"pay"为发放榜，其他为接收榜
+
+        返回:
+            int: 排名（未找到返回-1）
         """
+        async with async_session_maker() as session, session.begin():
+            if Direction == "pay":
+                flag = Transform.bonus < 0
+                sort_expr = desc(func.abs(func.sum(Transform.bonus)))
+            else:
+                flag = Transform.bonus > 0
+                sort_expr = desc(func.sum(Transform.bonus))
 
-        if Direction == "pay":
-            flag = Transform.bonus < 0
-            sort_expr = desc(func.abs(func.sum(Transform.bonus)))
-        else:
-            flag = Transform.bonus > 0
-            sort_expr = desc(func.sum(Transform.bonus))
-
-        stmt = (
-            select(
-                Transform.user_id,
-                func.sum(Transform.bonus).label("total_bonus")
+            stmt = (
+                select(
+                    Transform.user_id, func.sum(Transform.bonus).label("total_bonus")
+                )
+                .where(flag, Transform.website == website)
+                .group_by(Transform.user_id)
+                .order_by(sort_expr)
             )
-            .where(
-                flag,
-                Transform.website == website
-            )
-            .group_by(Transform.user_id)
-            .order_by(sort_expr)
-        )
 
-        result = await session.execute(stmt)
-        rows = result.all()
+            result = await session.execute(stmt)
+            rows = result.all()
 
-        # 遍历查找当前 user_id 的排名
-        for rank, (uid, _) in enumerate(rows, start=1):
-            if uid == self.user_id:
-                return rank
-        return -1  # 没找到
+            # 遍历查找当前 user_id 的排名
+            for rank, (uid, _) in enumerate(rows, start=1):
+                if uid == self.user_id:
+                    return rank
+            return -1  # 没找到
 
-
-   
     @classmethod
-    async def get(
-        cls,
-        session: AsyncSession,
-        transform_message: Message | str | None = None
-    ):
-        if isinstance(transform_message, Message) and transform_message.from_user:
-            tg_user = transform_message.from_user
-            username = " ".join(filter(None, [tg_user.first_name, tg_user.last_name]))
-            user_id = tg_user.id
+    async def get(cls, transform_message: Message | str | None = None):
+        """
+        获取或创建用户对象
 
-        elif transform_message == "me":
-            username = MY_NAME
-            user_id = MY_TGID
+        参数:
+            transform_message (Message | str | None): Telegram消息对象、"me"字符串或None
 
-        elif isinstance(transform_message, Message):  # 匿名或频道消息
-            username = transform_message.author_signature or "匿名用户"
-            user_id = generate_user_id_from_username(username)
+        返回:
+            User: 用户对象
+        """
+        async with async_session_maker() as session, session.begin():
+            if isinstance(transform_message, Message) and transform_message.from_user:
+                tg_user = transform_message.from_user
+                username = " ".join(
+                    filter(None, [tg_user.first_name, tg_user.last_name])
+                )
+                user_id = tg_user.id
 
-        else:
-            raise ValueError("不支持的 transform_message 类型")
+            elif transform_message == "me":
+                username = MY_NAME
+                user_id = MY_TGID
 
-        username = username[:32]
-        user = await session.get(cls, user_id)
+            elif isinstance(transform_message, Message):  # 匿名或频道消息
+                username = transform_message.author_signature or "匿名用户"
+                user_id = generate_user_id_from_username(username)
 
-        if user:
-            if user.name != username:
-                user.name = username
-        else:
-            user = cls(user_id=user_id, name=username)
-            session.add(user)
-            await session.flush()        
-        return user
-    
-    
-    async def add_transform_record(self, session: AsyncSession, website: str, bonus: float):
-        transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
-        session.add(transform)
-        await session.flush()
-        
+            else:
+                raise ValueError("不支持的 transform_message 类型")
 
+            username = username[:32]
+            user = await session.get(cls, user_id)
+
+            if user:
+                if user.name != username:
+                    user.name = username
+            else:
+                user = cls(user_id=user_id, name=username)
+                session.add(user)
+                await session.flush()
+            return user
+
+    async def add_transform_record(self, website: str, bonus: float):
+        """
+        新增一条bonus记录
+
+        参数:
+            website (str): 站点名称
+            bonus (float): bonus数额
+        """
+        async with async_session_maker() as session, session.begin():
+            transform = Transform(website=website, user_id=self.user_id, bonus=bonus)
+            session.add(transform)
+            await session.flush()
 
 #########################zhuquerob表调用#######################################
-    async def add_raiding_record(self, session: AsyncSession, website: str, action: str, raidcount:int, bonus: float):
-        """
-        向表内写入数据
-        website 站点
-        action 行为打劫/被打劫
-        user_id 对手id
-        bonus 金额
-        """
-        raiding = Raiding(website=website, user_id=self.user_id, action=action, raidcount=raidcount, bonus=bonus)
-        session.add(raiding)
-        await session.flush()
 
-    
-    
-        
-        
+    async def add_raiding_record(
+        self, website: str, action: str, raidcount: int, bonus: float
+    ):
+        """
+        向表内写入一条打劫记录
+
+        参数:
+            website (str): 站点名称
+            action (str): 行为（打劫/被打劫）
+            raidcount (int): 次数
+            bonus (float): 金额
+        """
+        async with async_session_maker() as session, session.begin():
+            raiding = Raiding(
+                website=website,
+                user_id=self.user_id,
+                action=action,
+                raidcount=raidcount,
+                bonus=bonus,
+            )
+            session.add(raiding)
+            await session.flush()
+
 
 ##################英文字母或者中文的转sha码###############################
 
+
 def generate_user_id_from_username(username: str) -> int:
-    #clean_name = clean_str_safe(username)
-    hash_hex = hashlib.sha1(username.encode('utf-8')).hexdigest()
-    return int(str(int(hash_hex, 16))[:18]) # 转为整数
+    # clean_name = clean_str_safe(username)
+    hash_hex = hashlib.sha1(username.encode("utf-8")).hexdigest()
+    return int(str(int(hash_hex, 16))[:18])  # 转为整数
+
 
 ##################UTF8###############################
 
@@ -272,7 +308,7 @@ def clean_str_safe(s) -> str:
     # 去除控制字符和不可见字符
     s = ''.join(c for c in s if unicodedata.category(c)[0] != 'C')
     # 去除无效的 Unicode 字符（替代符号、未定义、保留等）
-    s = re.sub(r'[\uD800-\uDFFF]', '', s)
+    s = re.sub(r'[\ud800-\udfff]', '', s)
     # 去除不可识别的特殊字符（如某些 emoji 或 Telegram 特有字符）
     s = ''.join(c for c in s if c.isprintable())
     # 限制长度 + 去除前后空格
