@@ -1,13 +1,16 @@
 import re
 import asyncio
 from decimal import Decimal
+
+from pyrogram import filters, Client
+from pyrogram.types import Message
+
+from app import get_bot_app
 from libs.log import logger
 from filters import custom_filters
 from config.config import PT_GROUP_ID, MY_TGID
-from pyrogram import filters, Client
-from pyrogram.types import Message
 from models.redpocket_db_modle import Redpocket
-from app import get_bot_app
+
 
 TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
@@ -56,7 +59,7 @@ async def get_redpocket_gen(client: Client, message: Message):
                 f"```\n{red_from_user}发的:\n朱雀红包{redpocket_name}:\n 抢了{retry_times+1}次 成功抢到 {bonus} 灵石",
             )
             try:
-                await Redpocket.add_redpocket_record(SITE_NAME, "redpocker", bonus)
+                await Redpocket.add_redpocket_record(SITE_NAME, "redpocket", bonus)
             except Exception as e:
                 logger.exception(f"提交失败: 用户消息, 错误：{e}")
             return
@@ -72,6 +75,6 @@ async def get_redpocket_gen(client: Client, message: Message):
 async def zhuque_pie(client: Client, message: Message):
     bonus = message.matches[0].group(1)
     try:
-        await Redpocket.add_redpocket_record(SITE_NAME, "zhuepie", bonus)
+        await Redpocket.add_redpocket_record(SITE_NAME, "pie", bonus)
     except Exception as e:
         logger.exception(f"提交失败: 用户消息, 错误：{e}")
