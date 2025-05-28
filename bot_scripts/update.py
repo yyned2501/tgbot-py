@@ -9,7 +9,7 @@ from libs.log import logger
 @Client.on_message(filters.chat(MY_TGID) & filters.command("update"))
 async def restart_tg_bot(client: Client, message: Message):
     # 回复用户，提示正在检测更新
-    reply_message = await message.reply("检测更新中...")
+    reply_message = await message.reply("开始更新...")
 
     try:
         # 执行 bash update 脚本，捕获输出
