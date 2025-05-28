@@ -1,23 +1,26 @@
 
 import re
 import asyncio
-from filters import custom_filters
-from app import scheduler,get_bot_app
-from libs.state import state_manager
-from pyrogram import filters, Client
-from pyrogram.types.messages_and_media import Message
-from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_REPLY_MESSAGE,LOTTERY_LOSE_REPLY_MESSAGE
-from config.config import PT_GROUP_ID,MY_TGID,auto_choujiang,LOTTERY_TARGET_GROUP,PRIZE_LIST, TIME_RANGES
-from random import randint,random
-from datetime import datetime, timedelta,time
-from libs import others
 from libs.log import logger
+from app import get_bot_app
+from libs.state import state_manager
+from random import randint,random
+from datetime import datetime, time
+from filters import custom_filters
+from pyrogram.types  import Message
+from pyrogram import filters, Client
+from config.config import PT_GROUP_ID,MY_TGID,LOTTERY_TARGET_GROUP,PRIZE_LIST
+from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_REPLY_MESSAGE,LOTTERY_LOSE_REPLY_MESSAGE
+
+
+
 
 lottery_list = {}
-
+auto_choujiang = state_manager.get_item("LOTTERY","auto_choujiang","")
 ################# 判断当前时间是否在 cron 时间范围内 #######################
 def is_within_time_ranges():
     now = datetime.now().time()
+    TIME_RANGES = state_manager.get_item("LOTTERY","lotterytime","[('08:00','11:00'),('13:00','17:00')]")
     for start_str, end_str in TIME_RANGES:
         start = time.fromisoformat(start_str)
         end = time.fromisoformat(end_str)
@@ -47,9 +50,9 @@ async def lottery_new_message(client:Client, message:Message):
     for key, pat in pattern.items():
         match = re.search(pat, message.text)
         lottery_info[key] = match.group(1) if match else ""
-    result_key = await prize_check(lottery_info["prize"])
+    result_key = await prize_check(lottery_info["prize"])    
 
-    if auto_choujiang:
+    if auto_choujiang == "on":
         if is_within_time_ranges():
             if result_key:
                 logger.info(f"自动抽奖已经打开,时间符合,群组符合，奖品符合，开始自动抽奖 抽奖ID: {lottery_info['ID']}")
@@ -82,7 +85,7 @@ async def lottery_new_message(client:Client, message:Message):
         )
     )
 async def lottery_draw_result(client:Client, message:Message):
-    MY_PTID =state_manager.get_item("LOTTERY","MY_PTID","")
+    MY_PTID = state_manager.get_item("LOTTERY","myptuser","")
 
     finish_key = ""
     winner = message.matches[0].group(1)

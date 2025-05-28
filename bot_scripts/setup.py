@@ -34,6 +34,18 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
     (
+        BotCommand("lotterysw", "小菜自动参与抽奖开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("lotteryuser", "魔力类中奖领奖用PT站点用户名"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("lotterytime", "小菜自动参与抽奖时间段"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
         BotCommand("state", "查看当前状态参数"),
         [CommandScope.PRIVATE_CHATS],
     ),
