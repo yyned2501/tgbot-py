@@ -1,8 +1,6 @@
 import hashlib
-from config.config import MY_TGID, MY_NAME
-from models.database import Base, TimeBase
 from datetime import datetime
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from pyrogram.types import Message
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import (
@@ -15,7 +13,10 @@ from sqlalchemy import (
     desc,
     select,
 )
+
 from models import async_session_maker
+from config.config import MY_TGID, MY_NAME
+from models.database import Base, TimeBase
 
 
 class Raiding(Base):
@@ -30,24 +31,32 @@ class Raiding(Base):
 
     @classmethod
     async def get_latest_raiding_createtime(
-        cls, session: AsyncSession, website: str, action: str
+        cls, website: str, action: str
     ) -> datetime | None:
         """
-        查询数据库指定字段最新的一笔
+        查询数据库中指定网站和操作类型的最新一条记录的创建时间和 raidcount。
+
+        参数:
+            website (str): 需要查询的站点标识。
+            action (str): 需要查询的操作类型。
+
+        返回:
+            tuple[datetime, Any] | None: 返回包含最新记录的创建时间和 raidcount 的元组，
+            如果未找到记录则返回 None。
         """
-        # today = date.today()
-        stmt = (
-            select(cls.create_time, cls.raidcount)
-            .where(cls.website == website, cls.action == action)
-            .order_by(desc(cls.create_time))
-            .limit(1)
-        )
-        result_date = (await session.execute(stmt)).one_or_none()
-        if result_date:
-            create_time, raidcount = result_date
-            return create_time, raidcount
-        else:
-            return None
+        async with async_session_maker() as session, session.begin():
+            stmt = (
+                select(cls.create_time, cls.raidcount)
+                .where(cls.website == website, cls.action == action)
+                .order_by(desc(cls.create_time))
+                .limit(1)
+            )
+            result_date = (await session.execute(stmt)).one_or_none()
+            if result_date:
+                create_time, raidcount = result_date
+                return create_time, raidcount
+            else:
+                return None
 
 
 class Transform(Base):
