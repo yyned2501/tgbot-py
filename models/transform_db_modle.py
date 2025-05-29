@@ -75,11 +75,9 @@ class User(TimeBase):
 
     async def get_bonus_sum_for_website(self, site_name: str) -> float:
         """
-        获取当前用户在指定站点的 bonus 总和。
-
+        获取当前用户在指定站点的 bonus 总和 正负相加的结果。
         参数:
             site_name (str): 站点名称
-
         返回:
             float: bonus 总和
         """
@@ -90,43 +88,24 @@ class User(TimeBase):
             bonus_sum = (await session.execute(stmt)).scalar_one_or_none()
             return bonus_sum if bonus_sum is not None else 0
 
-    async def get_bonus_count_sum_for_website(
-        self, site_name: str
-    ) -> tuple[int, float]:
-        """
-        获取当前用户在指定站点的 发送给我的次数、魔力总和。
-
-        参数:
-            site_name (str): 站点名称
-
-        返回:
-            tuple[int, float]: (次数, 魔力总和)
-        """
-        async with async_session_maker() as session, session.begin():
-            stmt = select(func.sum(Transform.bonus), func.count()).where(
-                Transform.user_id == self.user_id,
-                Transform.website == site_name,
-                Transform.bonus > 0,
-            )
-            result = await session.execute(stmt)
-            bonus_sum, bonus_count = result.one_or_none() or (0, 0)
-            return bonus_count, bonus_sum
-
-    async def pay_bonus_count_sum_for_website(self, site_name: str) -> tuple[str, str]:
+    
+    async def get_pay_bonus_count_sum_for_website(self, site_name: str, Direction: str) -> tuple[str, str]:
         """
         获取当前用户在指定站点的我发送的 bonus 总和。
-
         参数:
             site_name (str): 站点名称
-
         返回:
             tuple[str, str]: (发送次数, 发送总额字符串)
         """
         async with async_session_maker() as session, session.begin():
+            if Direction == "pay":
+                flag = Transform.bonus < 0               
+            else:
+                flag = Transform.bonus > 0               
             stmt = select(func.sum(Transform.bonus), func.count()).where(
                 Transform.user_id == self.user_id,
                 Transform.website == site_name,
-                Transform.bonus < 0,
+                flag,
             )
             result = await session.execute(stmt)
             bonus_sum, bonus_count = result.one_or_none() or (0, 0)
@@ -134,12 +113,11 @@ class User(TimeBase):
             bonus_count = bonus_count or 0
             return f"{bonus_count:,}", f"{abs(bonus_sum):,.2f}"
 
-    async def get_bonus_leaderboard_by_website(
+    async def get_pay_bonus_leaderboard_by_website(
         self, site_name: str, Direction: str, top_n: int = 10
     ):
         """
         获取排行榜
-
         参数:
             site_name (str): 站点名称
             Direction (str): 排行榜方向，"pay"为发放榜，其他为接收榜
@@ -176,7 +154,7 @@ class User(TimeBase):
                 for i, (tg_id, name, count, bonus_sum) in enumerate(rows)
             ]
 
-    async def get_user_bonus_rank(self, website: str, Direction: str = "get") -> int:
+    async def get_pay_user_bonus_rank(self, website: str, Direction: str = "get") -> int:
         """
         获取当前用户在某网站上的 bonus 总和排名（降序）。
 
