@@ -5,7 +5,7 @@ from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF
 from typing import Optional, Tuple
 from datetime import datetime, timedelta, date
 from models.redpocket_db_modle import Redpocket
-
+from schedulers import scheduler
 
 SITE_NAME = "zhuque"
 
@@ -42,8 +42,6 @@ async def fireGenshinCharacterMagic() -> Optional[Tuple[str, float]]:
 
 ################朱雀释放##################################
 async def zhuque_autofire_firsttimeget():
-    from app import scheduler
-
     try:
         last_time = await Redpocket.get_today_latest_fire_createtime(
             SITE_NAME, "firegenshin"
@@ -58,12 +56,16 @@ async def zhuque_autofire_firsttimeget():
     else:
         next_time = datetime.now() + timedelta(seconds=30)
 
-    scheduler.add_job(zhuque_autofire, "date", run_date=next_time, id="firegenshin")
+    scheduler.add_job(
+        zhuque_autofire,
+        "date",
+        run_date=next_time,
+        id="firegenshin",
+        replace_existing=True,
+    )
 
 
 async def zhuque_autofire():
-    from app import scheduler
-
     try:
         result1 = await fireGenshinCharacterMagic()
         await asyncio.sleep(2)
