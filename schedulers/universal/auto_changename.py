@@ -37,7 +37,7 @@ async def auto_changename_action():
             raise Exception("修改 last_name 失败")
     except Exception as e:
         trac = "\n".join(traceback.format_exception(e))
-        await logger.info(f"更新失败! \n{trac}")
+        logger.info(f"更新失败! \n{trac}")
 
 async def auto_changename_temp():
     changename_switch = state_manager.get_item("SCHEDULER","changename","off")
