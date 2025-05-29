@@ -12,3 +12,7 @@ async def start_scheduler():
     for job in (schedulers := state_manager.get_section("scheduler", {})):
         if schedulers[job] == "on" and job in scheduler_jobs.keys():
             await scheduler_jobs[job]()
+
+
+def get_scheduler():
+    return scheduler
