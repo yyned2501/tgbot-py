@@ -13,24 +13,40 @@ async def scheduler_switch_handler(client: Client, message: Message):
     用法: /leaderboard website on|off 或 /payleaderboard website on|off 或 /notification website on|off
     """
 
-    if len(message.command) < 2:
-        await message.reply("❌ 参数不足。\n用法：`/autofire website on|off` 或 `/autochangename website on|off`")
+    if len(message.command) < 3:
+        await message.reply(
+            "❌ 参数不足。\n用法：\n"
+            "`/autofire website on|off`\n"
+            "`/autochangename website on|off`"
+        )
         return
+
     command = message.command[0].lower().lstrip('/')
     website = message.command[1].lower()
     action = message.command[2].lower()
+
     valid_modes = {"on", "off"}
-    websites = {"zhuque","audiences","ptvicomo","hddolby","redleaves","springsunday"}
+    valid_websites = {"zhuque", "audiences", "ptvicomo", "hddolby", "redleaves", "springsunday"}
+
+    # 检查开关是否合法
     if action not in valid_modes:
-        await message.reply("❌ 参数非法。\n有效选项：`on` `off`")
+        await message.reply("❌ 参数非法。\n有效选项：`on` 或 `off`")
         return
-    if website not in websites:
-        await message.reply(f"❌ 参数非法。\n有效选项：{websites}")
+
+    # 检查网站名是否合法
+    if website != "all" and website not in valid_websites:
+        site_list = ', '.join(sorted(valid_websites))
+        await message.reply(f"❌ 参数非法。\n有效网站：`{site_list}` 或 `all`")
         return
-    header = website.upper()
-    state_manager.set_section(header, {command: action})
-    if action == "off":
-        await message.reply(f"🛑 `{website}站点 {command}` 模式已关闭")
-    else:
-        await message.reply(f"✅ `{website}站点 {command}` 模式已开启")
+
+    # 应用设置
+    targets = valid_websites if website == "all" else [website]
+    for site in targets:
+        header = site.upper()
+        state_manager.set_section(header, {command: action})
+
+    # 回复确认
+    action_text = "已开启 ✅" if action == "on" else "已关闭 🛑"
+    site_text = "所有站点" if website == "all" else f"{website}站点"
+    await message.reply(f"`{site_text} {command}` 模式 {action_text}")
        
