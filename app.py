@@ -10,7 +10,7 @@ from models import create_all, async_engine
 from models.alter_tables import alter_columns
 from config.config import API_HASH, API_ID, BOT_TOKEN, PT_GROUP_ID, proxy_set
 from user_scripts import zhuque, universal
-from schedulers import scheduler
+from schedulers import scheduler, start_scheduler
 
 user_app_terminated = False
 user_app: Client = None
@@ -98,6 +98,7 @@ async def start_app():
 
     # 启动任务调度和保活任务
     scheduler.start()
+    await start_scheduler()
     # await zhuque.zhuque_autofire_firsttimeget()
     await universal.auto_changename_temp()
     logger.info(f"{project_name} 监听程序启动成功")
