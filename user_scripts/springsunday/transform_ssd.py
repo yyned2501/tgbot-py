@@ -12,9 +12,9 @@ TARGET = [-1002014253433, -1001173590111]
 SITE_NAME = "springsunday"
 BONUS_NAME = "茉莉"
 
-leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
-payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
-notification = state_manager.get_item("ZHUQUE","notification","off")
+leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 
 
 ###################收到他人的茉莉转入##################################

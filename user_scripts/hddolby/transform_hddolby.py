@@ -9,9 +9,9 @@ TARGET = [-1002131053667]
 SITE_NAME = "hddolby"
 BONUS_NAME = "鲸币"
 
-leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
-payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
-notification = state_manager.get_item("ZHUQUE","notification","off")
+leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 
 ###################收到他人的鲸币转入##################################
 @Client.on_message(

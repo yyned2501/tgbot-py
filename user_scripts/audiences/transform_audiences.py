@@ -11,9 +11,9 @@ TARGET = [-1002372175195]
 SITE_NAME = "audiences"
 BONUS_NAME = "爆米花"
 
-leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
-payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
-notification = state_manager.get_item("ZHUQUE","notification","off")
+leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 
 ###################收到他人的爆米花转入##################################
 @Client.on_message(                                                                    

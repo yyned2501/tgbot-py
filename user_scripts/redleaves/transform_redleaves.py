@@ -13,9 +13,9 @@ TARGET = [-1001788987573, -1001873711923]
 SITE_NAME = "redleaves"
 BONUS_NAME = "魔力"
 
-leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
-payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
-notification = state_manager.get_item("ZHUQUE","notification","off")
+leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 
 
 ###################收到他人的魔力转入##################################

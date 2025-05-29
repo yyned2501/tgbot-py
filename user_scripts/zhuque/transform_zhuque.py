@@ -11,9 +11,9 @@ TARGET = [-1001833464786, -1002262543959]
 SITE_NAME = "zhuque"
 BONUS_NAME = "灵石"
 
-leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
-payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
-notification = state_manager.get_item("ZHUQUE","notification","off")
+leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 
 
 
