@@ -46,6 +46,11 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
     (
+        BotCommand("autochangename", "自动修改报时昵称"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    
+    (
         BotCommand("state", "查看当前状态参数"),
         [CommandScope.PRIVATE_CHATS],
     ),

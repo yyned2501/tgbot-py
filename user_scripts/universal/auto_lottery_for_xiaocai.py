@@ -16,7 +16,7 @@ from config.reply_message import NO_AOUTOLOTTERY_REPLY_MESSAGE,LOTTERY_Sticker_R
 
 
 lottery_list = {}
-lottert_switch = state_manager.get_item("LOTTERY","lottert_switch","")
+lottert_switch = state_manager.get_item("LOTTERY","lottert_switch","off")
 ################# 判断当前时间是否在 cron 时间范围内 #######################
 def is_within_time_ranges():
     now = datetime.now().time()
@@ -89,7 +89,7 @@ async def lottery_draw_result(client:Client, message:Message):
 
     finish_key = ""
     winner = message.matches[0].group(1)
-    logger.info(f"lottery_list befor = {lottery_list} ")
+    logger.info(f"lottery_list befor = {lottery_list} ") 
     if lottert_switch:
         if message.chat.id in LOTTERY_TARGET_GROUP:
             match1 = re.search(r"抽奖 ID：(.+)", message.text)

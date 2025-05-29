@@ -1,0 +1,1 @@
+from .fireGenshinCharacterMagic_zhuque import zhuque_autofire_firsttimeget
