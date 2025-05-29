@@ -63,14 +63,14 @@ async def zhuque_autofire_firsttimeget():
     else:
         next_time = datetime.now() + timedelta(seconds=30)
     scheduler = get_scheduler()
-    scheduler.scheduled_job(
+    scheduler.add_job(
         zhuque_autofire,
         "date",
         run_date=next_time,
         id="firegenshin",
         replace_existing=True,
     )
-    scheduler.scheduled_job(
+    scheduler.add_job(
         test,
         "interval",
         seconds=10,
