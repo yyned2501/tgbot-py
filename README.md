@@ -1,6 +1,7 @@
-Tgbot安装用compose.yaml
+Tgbot安装用compose.yam
 
 version: '3.8'
+
 services:
   Tgbot_pyrogram:
     image: luckydonne/python-for-bot:latest
