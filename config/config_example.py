@@ -15,11 +15,12 @@ ADMIN_ID = [
     1111111111,
     1111111111
 ]   
- #这是我为CMS建了一个群，然后将群里的消息转发给CMSbot，将CMSbot的小转发到群里  这里ADMIN_ID 会被转发到CMSbot的成员ID
+# ADMIN 这是我为CMSbot建了一个群，然后将群里的消息转发给CMSbot，将CMSbot的小转发到这个群里
+# 这里ADMIN_ID里面设定的ID成员所发的消息 会被转发到CMSbot
 
 M115_GROUP_ID = {
     "CMS_BOT_ID":111111,  #CMS的BOT的 ID（不是API_tokn）
-    "CMS_TRANS_CHAT":-1111111  #自自己的转发群 如果不用转发则随意写
+    "CMS_TRANS_CHAT":-1111111  #这就是上文说的自己建立的CMSbot的群 如果不用转发则随意写
 }
 
 EMBY_API_KEY = "11111111111111"  # EMBY 的 API 密钥 用于检索enby
@@ -51,15 +52,15 @@ proxy_set = {
 
 
 PT_GROUP_ID = {
-    "ZHUQUE_ID":-11111111, 
-    "ZHUQUEBOCAI_ID":-111111111,
-    "SSD_ID":-11111111,
-    "SSDPUBLIC_ID":-11111111,
-    "HY_ID":-1111111111,
-    "HYSTAFF_ID":-11111111,
-    "DOLBY_ID":-11111111,
-    "AUDIENCES_ID":-1111111,
-    "BOT_MESSAGE_CHAT":MY_TGID,
+    "ZHUQUE_ID":-11111111,        #朱雀群ID
+    "ZHUQUEBOCAI_ID":-111111111,  #朱雀菠菜群ID
+    "SSD_ID":-11111111,           #SSD群ID
+    "SSDPUBLIC_ID":-11111111,     #SSD公开群ID
+    "HY_ID":-1111111111,          #红叶群ID
+    "HYSTAFF_ID":-11111111,       #红叶二群ID 没有的话写和上面一个写一样ID（不可删除这个键名）
+    "DOLBY_ID":-11111111,         #杜比群ID
+    "AUDIENCES_ID":-1111111,      #观众群ID
+    "BOT_MESSAGE_CHAT":MY_TGID,   #本脚本bot提示消息发送群 如果设置了群ID 则需要把bot加入对应的群 然后设为管理员，如果例设定 MY_TGID 则bot直接和个人私发
 }
 
 
@@ -93,11 +94,11 @@ PRIZE_LIST = {
 
 DB_INFO = {
     "dbset":"mySQL", #mySQL/SQLite
-    "address":"111.111.1.11",
-    "db_name":"数据库名称",    
-    "port":3306,
-    "user":"用户名",
-    "password":"密码"
+    "address":"111.111.1.11", #mySQL数据库的IP地址 前面docker安装的mysql如果是bridge/host则同宿主ip
+    "db_name":"数据库名称",    #mySQL数据库命名 对应安装数据库时的设定
+    "port":3306,               #数据库端口  看安装时的映射
+    "user":"用户名",            #数据用户名 root 或者安装时设定的username
+    "password":"密码"           #对应用户名的密码
 }
 
 
