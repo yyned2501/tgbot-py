@@ -10,11 +10,11 @@ from libs.state import state_manager
 async def scheduler_switch_handler(client: Client, message: Message):
     """
     控制调度任务的开关（如自动释放技能、自动更改昵称）。
-    用法: /leaderboard on|off 或 /payleaderboard on|off 或 /notification on|off
+    用法: /leaderboard website on|off 或 /payleaderboard website on|off 或 /notification website on|off
     """
 
     if len(message.command) < 2:
-        await message.reply("❌ 参数不足。\n用法：`/autofire on|off` 或 `/autochangename on|off`")
+        await message.reply("❌ 参数不足。\n用法：`/autofire website on|off` 或 `/autochangename website on|off`")
         return
     command = message.command[0].lower().lstrip('/')
     website = message.command[1].lower()
