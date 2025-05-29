@@ -1,42 +1,203 @@
-# pyrogram_mytgbot
-个人tg脚本:
+Tgbot安装用compose.yaml
 
-1.使用前需要安装依赖包:
+version: '3.8'
+services:
+  Tgbot_pyrogram:
+    image: luckydonne/python-for-bot:latest
+    container_name: Tgbot_pyrogram
+    working_dir: /app
+    volumes:
+      - ./config:/app/config      
+      - ./logs:/app/logs            #log文件
+      - ./sessions:/app/sessions    #tg登录文件
+      - ./db_file:/app/db_file      #数据库相关文件夹
+      - ./temp_file:/app/temp_file  #临时文件夹，映射出来方便删除可能没自动删除的  
 
-    1.1 pyrogram    
-    1.2 tgcrypto    
-    1.3 aiohttp    
-    1.4 pymysql     
-    1.5 apscheduler    
-    1.6 openai
-    1.7
-2.将下载后的所有*_example文件文件名里面的"_example"删除 如config_example.py改成config.py
+    environment:
+      - TZ=Asia/Shanghai
+      - GIT_REMOTE=https://github.com/DonneChang/tgbot-py.git
+      - GIT_BRANCH=main
+      - INSTALL_SUPERVISOR=true    #是否启用SUPERVISOR
+      - SUPERVISOR_USERNAME=admin  #SUPERVISOR  用户名 
+      - SUPERVISOR_PASSWORD=admin  #SUPERVISOR 密码
+    network_mode: bridge  #bridge不行的话就用host
+    ports:
+      - '51901:51901'
+    tty: true
 
-3.配置config文件:
 
-    3.1 config内有举例说明则不再赘述
 
-4.配置完成后首次登录运行请用python3 mybotmain.py,不要使用nohup python3 mybotmain.py，登录完后生成.session文件后则无关可以直接./tgpu启动
 
-5.请妥善保管您的.session文件，这是您tg的登录信息。
 
-6.之后每次运行只需要运行mybotmain.py文件，或者使用./tgpu
 
-7各文件说明:
 
-    7.1 libs文件夹中的都是一些被引用的函数型方法      
-        7.1.1 spinThePrizeWheel.py 是朱雀的大转盘抽奖方法函数       
-        7.1.2 zhuque_getInfo.py 是朱雀的个人信息获取方法       
-        7.1.3 zhuque_listBackpack.py 是朱雀的背包清单查询       
-        7.1.4 zhuque_recycleMagicCard.py 是朱雀背包卡片回收       
-        7.1.5 others.py中是自定义的一些函数，方便程序引用        
-        7.1.6 database.py 是Mysql数据库访问的一些方法    
-    7.2 filters文件夹中是自定义的tg消息过滤    
-    7.3 scrpts文件中是针对tg的脚本      
-        7.3.1 normal.py 转发抽奖信息到个人群组作为提醒       
-        7.3.2 testmessage.py 测试使用       
-        7.3.3 zhuque_aiohttp 是将libs中的一些朱雀操作方法整合至tg内使用       
-        7.3.4 zhuque_ firegenshinmagic.py 朱雀tg群内自动释放脚本        
-        7.3.5 zhuque_function_summary.py 目前为朱雀群内转账记录 后续会将7.3.3 7.3.4都整合至里面
-    7.4 repy_message.py 是tg群内作为回复的一些内容整个内有具体说明
+
+
+
+
+
+
+
+
+
+
+
+
+mySQL数据库安装用compose.yaml
+version: "3"
+services:
+  mysql:
+    image: mysql:8.3.0
+    container_name: mysql 
+    restart: on-failure:3 
+    network_mode: bridge
+    command: 
+      - --default-authentication-plugin=caching_sha2_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --explicit_defaults_for_timestamp=true
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./mysqlBackup:/data/mysqlBackup 
+      - ./init:/docker-entrypoint-initdb.d #如果没有初始化先关设置这个可以删除
+    ports:
+      - "23036:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    environment:
+      - MYSQL_ROOT_PASSWORD=password  # 数据库 root 的密码 
+      - MYSQL_DATABASE=tgbotdb   #数据库的名字
+
+
+mySQL数据库设定文件 init-users.sql   放在init文件夹
+
+-- 创建数据库（如果不存在）
+CREATE DATABASE IF NOT EXISTS tgbotdb CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+-- 创建读写用户（只允许从 xx.xx.xx ip 登录）
+CREATE USER IF NOT EXISTS 'username'@'xx.xx.xx' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON luckydonne.* TO 'username'@'xx.xx.xx';
+-- 创建允许指定ip xx.xx.xx 登录的 root 用户（注意密码与你 yaml 中的 ROOT 密码保持一致或自行定义）
+CREATE USER IF NOT EXISTS 'root'@'xx.xx.xx' IDENTIFIED BY 'password'; 
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'xx.xx.xx' WITH GRANT OPTION;
+-- 删除其他 IP 地址的 root 用户
+DROP USER 'root'@'%';
+-- 应用权限
+FLUSH PRIVILEGES;
+
+安装完成复制tgbot相关文件夹内config文件的文件重名删除example从图1变成图2
+
+   
+图1                            图2
+
+
+现在开始配置config.py
+
+1.Telegram相关配置根据备注修改 
+#######################登录基础配置########################
+
+API_ID = 11111
+API_HASH = '1111111'
+BOT_TOKEN = "脚本设定用botapi"
+MY_NAME = 'dddd'    #  tg昵称榜单显示作用
+NY_USERNAME = 'ssssss'   # tg 用户名
+MY_TGID = 123344 # 自己的telegram id
+
+2.监听115群信息查询自己emby库如果不存在则把分享链接发给CMS bot
+############## movie_monitor_for115配置(将115分享群的电影进行TMDb检索并emby查询是否含有) #################
+
+ADMIN_ID = [
+    1111111111,
+    1111111111,
+    1111111111
+]   
+ #ADMIN 这是我为CMSbot建了一个群，然后将群里的消息转发给CMSbot，将CMSbot的小转发到这个群里  这里ADMIN_ID里面设定的ID成员所发的消息 会被转发到CMSbot
+M115_GROUP_ID = {
+    "CMS_BOT_ID":111111,  #CMS的BOT的 ID（不是API_tokn）
+    "CMS_TRANS_CHAT":-1111111  #这就是上文说的自己建立的CMSbot的群 如果不用转发则随意写
+}
+EMBY_API_KEY = "11111111111111"  # EMBY 的 API 密钥 用于检索enby
+EMBY_SERVER = "http://192.168.1.1:8096/"  # EMBY 服务器地址
+TMDB_API_KEY = "1111111111111111"  # TMDB 的 API 密钥
+
+
+运行代理设置
+########################运行代理配置########################
+
+proxy_set = {
+    'proxy_enable':True,#如果需要使用代理登录则设为true 反之False
+    #tg登录的代理
+    'proxy':{
+        'scheme': 'socks5',  # "socks4", "socks5" and "http" are supported
+        "hostname": '127.0.0.1',
+        'port': 10801,
+        'username': "",
+        'password': ""
+        },
+    #网页访问用代理
+    'PROXY_URL': 'http://127.0.0.1:10801'
+}
+
+
+相关群的配置
+PT_GROUP_ID = {
+    "ZHUQUE_ID":-11111111,        #朱雀群ID
+    "ZHUQUEBOCAI_ID":-111111111,  #朱雀菠菜群ID
+    "SSD_ID":-11111111,           #SSD群ID
+    "SSDPUBLIC_ID":-11111111,     #SSD公开群ID
+    "HY_ID":-1111111111,          #红叶群ID
+    "HYSTAFF_ID":-11111111,       #红叶二群ID 没有的话写和上面一个写一样ID（不可删除这个键名）
+    "DOLBY_ID":-11111111,         #杜比群ID
+    "AUDIENCES_ID":-1111111,      #观众群ID
+    "BOT_MESSAGE_CHAT":MY_TGID,   #本脚本bot提示消息发送群 如果设置了群ID 则需要把bot加入对应的群 然后设为管理员，如果例设定 MY_TGID 则bot直接和个人私发
+}
+
+
+
+
+
+
+
+自动参与抽奖设置 无需修改
+###################################auto_lotttery配置#############################
+
+#参与抽奖的群组
+LOTTERY_TARGET_GROUP = [
+    PT_GROUP_ID['ZHUQUE_ID'],
+    PT_GROUP_ID['DOLBY_ID'],
+    PT_GROUP_ID['HY_ID'],
+    PT_GROUP_ID['HYSTAFF_ID'],
+    PT_GROUP_ID['SSD_ID'],
+    PT_GROUP_ID['AUDIENCES_ID']
+]
+#参与抽奖的奖品
+PRIZE_LIST = {
+    "ZHUQUE_ID":['灵石','零食','LS'],            
+    "DOLBY_ID":['鲸币','🐳币','JB'],
+    "SSD_ID":['茉莉'],
+    "AUDIENCES_ID":['爆米花'],
+    "PTclub":['猫粮'],
+    "HHclub":['憨豆'],
+    "Test_ID":['test']
+}   #设置需要参数的奖品名 暂不支持修改新增key
+
+数据库相关设置
+
+################################数据库配置##############################
+DB_INFO = {
+    "dbset":"mySQL", #mySQL/SQLite
+    "address":"111.111.1.11", #mySQL数据库的IP地址 前面docker安装的mysql如果是bridge/host则同宿主ip
+    "db_name":"数据库名称",    #mySQL数据库命名 对应安装数据库时的设定
+    "port":3306,               #数据库端口  看安装时的映射
+    "user":"用户名",            #数据用户名 root 或者安装时设定的username
+    "password":"密码"           #对应用户名的密码
+}
+
+朱雀站点的Cookie 
+#####################朱雀Cookie##############################
+
+ZHUQUE_COOKIE = "sssss"
+ZHUQUE_X_CSRF = "xxxxxxxd"
 
