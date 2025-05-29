@@ -9,6 +9,7 @@ from libs.state import state_manager
 from pyrogram import filters, Client
 from pyrogram.types import Message
 from datetime import datetime, timedelta, timezone
+from schedulers import scheduler
 
 
 
@@ -38,10 +39,8 @@ async def auto_changename_action():
         trac = "\n".join(traceback.format_exception(e))
         await logger.info(f"更新失败! \n{trac}")
 
-
 async def auto_changename_temp():
-    from app import scheduler
-    changename_switch = state_manager.get_item("UNIVERSAL","changename","off")
+    changename_switch = state_manager.get_item("SCHEDULER","changename","off")
     if changename_switch == 'on':
         if not scheduler.get_job("autochangename"):
             scheduler.add_job(auto_changename_action,"cron", second=0, id="autochangename")

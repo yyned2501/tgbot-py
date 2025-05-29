@@ -4,7 +4,7 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 from config.config import MY_TGID
 from libs.state import state_manager
-from user_scripts import universal
+from schedulers import auto_changename_temp
 
 
 
@@ -21,9 +21,9 @@ async def auto_changename(client: Client, message: Message):
     if action not in valid_modes:
         await message.reply("❌ 参数非法。\n有效选项：`on` `off`")
         return
-    state_manager.set_section("UNIVERSAL", {"changename": action})
+    state_manager.set_section("SCHEDULER", {"changename": action})
 
-    await universal.auto_changename_temp()
+    await auto_changename_temp()
     if action == "on":
         await message.reply(f"✅ 自动报时昵称已启用")        
     else:

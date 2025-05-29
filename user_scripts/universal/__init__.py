@@ -1,1 +1,0 @@
-from .auto_changename import auto_changename_temp
