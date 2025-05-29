@@ -54,6 +54,18 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
     (
+        BotCommand("leaderboard", "转入排名图片开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("payleaderboard", "转出排名图片开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("notification", "转入转出消息提示开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
         BotCommand("state", "查看当前状态参数"),
         [CommandScope.PRIVATE_CHATS],
     ),
@@ -62,7 +74,6 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
 ]
-
 
 async def setup_commands():
     bot_app = get_bot_app()
