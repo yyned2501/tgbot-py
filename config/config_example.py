@@ -2,7 +2,7 @@
 
 API_ID = 11111
 API_HASH = '1111111'
-BOT_TOKEN = "转发bot的API暂时未写"
+BOT_TOKEN = "脚本设定用botapi"
 MY_NAME = 'dddd'    #  tg昵称榜单显示作用
 NY_USERNAME = 'ssssss'   # tg 用户名
 MY_TGID = 123344 # 自己的telegram id
@@ -64,14 +64,6 @@ PT_GROUP_ID = {
 
 
 ###################################auto_lotttery配置#############################
-
-auto_choujiang = True # 是否开启自动抽奖功能
-MY_PTID = 'xxxxx'
-#抽奖开启时段可以自己加 (xx，ss) 每个时间一定要是 00~23:59 以内 注意扩后后面的“，” 除了最后一个其他的都要“，”
-TIME_RANGES = [
-    ("08:00", "12:00"),
-    ("14:00", "22:00")
-]
 
 #参与抽奖的群组
 LOTTERY_TARGET_GROUP = [
