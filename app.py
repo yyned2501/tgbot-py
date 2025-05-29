@@ -98,7 +98,7 @@ async def start_app():
 
     # 启动任务调度和保活任务
     scheduler.start()
-    await zhuque.zhuque_autofire_firsttimeget()
+    # await zhuque.zhuque_autofire_firsttimeget()
     await universal.auto_changename_temp()
     logger.info(f"{project_name} 监听程序启动成功")
 
