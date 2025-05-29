@@ -3,7 +3,7 @@ from pyrogram.types import Message
 
 from config.config import MY_TGID
 from libs.state import state_manager
-from schedulers import scheduler
+from schedulers import scheduler, scheduler_jobs
 from schedulers import zhuque_autofire_firsttimeget,auto_changename_temp
 
 
@@ -23,10 +23,7 @@ async def scheduler_switch_handler(client: Client, message: Message):
     控制调度任务的开关（如自动释放技能、自动更改昵称）。
     用法: /autofire on|off 或 /autochangename on|off
     """
-    scheduler_jobs = {
-        "autofire": zhuque_autofire_firsttimeget,
-        "changename": auto_changename_temp
-    }    
+
     if len(message.command) < 2:
         await message.reply("❌ 参数不足。\n用法：`/autofire on|off` 或 `/autochangename on|off`")
         return
@@ -51,7 +48,7 @@ async def scheduler_switch_handler(client: Client, message: Message):
         await message.reply(f"🛑 `{command}` 模式已关闭")
     else:
         try:            
-            await scheduler_jobs[command](client)
+            await scheduler_jobs[command]()
             await message.reply(f"✅ `{command}` 模式已开启")
         except Exception as e:
             await message.reply(f"⚠️ 执行 `{command}` 时出错: {e}")
