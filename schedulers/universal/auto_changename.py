@@ -40,7 +40,7 @@ async def auto_changename_action():
         logger.info(f"更新失败! \n{trac}")
 
 async def auto_changename_temp():
-    changename_switch = state_manager.get_item("SCHEDULER","changename","off")
+    changename_switch = state_manager.get_item("SCHEDULER","autochangename","off")
     if changename_switch == 'on':
         if not scheduler.get_job("autochangename"):
             scheduler.add_job(auto_changename_action,"cron", second=0, id="autochangename")

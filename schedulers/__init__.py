@@ -10,7 +10,7 @@ from .universal.auto_changename import auto_changename_temp
 
 scheduler_jobs = {
     "autofire": zhuque_autofire_firsttimeget,
-    "changename": auto_changename_temp
+    "autochangename": auto_changename_temp
 }
 
 async def start_scheduler():    
