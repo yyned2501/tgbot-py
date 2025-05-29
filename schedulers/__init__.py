@@ -6,13 +6,21 @@ scheduler = AsyncIOScheduler()
 
 
 from .zhuque.fireGenshinCharacterMagic import zhuque_autofire_firsttimeget
+from .universal.auto_changename import auto_changename_temp
 
-scheduler_jobs = {"autofire": zhuque_autofire_firsttimeget}
+scheduler_jobs = {
+    "autofire": zhuque_autofire_firsttimeget,
+    "changename": auto_changename_temp
+}
 
-
-async def start_scheduler():
+async def start_scheduler():    
     for job in (schedulers := state_manager.get_section("SCHEDULER", {})):
         logger.info(f"Checking scheduler job: {job}")
-        if schedulers[job] == "on" and job in scheduler_jobs.keys():
+        if schedulers[job] == "on" and job in scheduler_jobs:
             logger.info(f"Starting scheduler job: {job}")
-            await scheduler_jobs[job]()
+            try:
+                await scheduler_jobs[job]()  # 异步执行调度任务
+            except Exception as e:
+                logger.error(f"Failed to start job '{job}': {e}")
+
+
