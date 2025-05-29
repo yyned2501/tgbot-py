@@ -40,6 +40,13 @@ async def fireGenshinCharacterMagic() -> Optional[Tuple[str, float]]:
     return None
 
 
+async def test():
+    """
+    测试函数，用于验证 API 调用是否正常。
+    """
+    logger.info("scheduler log")
+
+
 ################朱雀释放##################################
 async def zhuque_autofire_firsttimeget():
     try:
@@ -56,10 +63,17 @@ async def zhuque_autofire_firsttimeget():
     else:
         next_time = datetime.now() + timedelta(seconds=30)
     scheduler = get_scheduler()
-    scheduler.add_job(
+    scheduler.scheduled_job(
         zhuque_autofire,
         "date",
         run_date=next_time,
+        id="firegenshin",
+        replace_existing=True,
+    )
+    scheduler.scheduled_job(
+        test,
+        "interval",
+        seconds=10,
         id="firegenshin",
         replace_existing=True,
     )
