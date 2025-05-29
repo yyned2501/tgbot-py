@@ -74,7 +74,7 @@ async def zhuque_autofire_firsttimeget():
         test,
         "interval",
         seconds=10,
-        id="firegenshin",
+        id="test",
         replace_existing=True,
     )
 
