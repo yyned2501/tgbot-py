@@ -1,22 +1,17 @@
 import os
 import json
 from pathlib import Path
-from libs.log import logger
+
 from pyrogram import Client, idle
-from models import create_all, async_engine
+
+from libs.log import logger
 from libs.sys_info import system_version_get
+from models import create_all, async_engine
 from models.alter_tables import alter_columns
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, BOT_TOKEN, PT_GROUP_ID, proxy_set
-from user_scripts import zhuque,universal
-#from user_scripts.universal.auto_changename import auto_changename_temp
-#from user_scripts.universal.auto_changename import auto_changename_temp
-#from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import (
-#    zhuque_autofire_firsttimeget,
-#)
+from user_scripts import zhuque, universal
+from schedulers import scheduler
 
-
-scheduler = AsyncIOScheduler()
 user_app_terminated = False
 user_app: Client = None
 bot_app: Client = None
