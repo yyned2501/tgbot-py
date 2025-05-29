@@ -5,12 +5,15 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 from filters import custom_filters
 from libs.transform_dispatch import transform
-from models import async_session_maker
+from libs.state import state_manager
 
 TARGET = [-1002372175195]
 SITE_NAME = "audiences"
 BONUS_NAME = "爆米花"
 
+leaderboard = state_manager.get_item("ZHUQUE","leaderboard","off")
+payleaderboard = state_manager.get_item("ZHUQUE","payleaderboard","off")
+notification = state_manager.get_item("ZHUQUE","notification","off")
 
 ###################收到他人的爆米花转入##################################
 @Client.on_message(                                                                    
@@ -23,7 +26,16 @@ BONUS_NAME = "爆米花"
 async def audiences_transform_get(client:Client, message:Message):
     bonus = message.matches[0].group(1)    
     transform_message = message.reply_to_message
-    await transform(transform_message, Decimal(f"{bonus}"), SITE_NAME, BONUS_NAME,True)
+    await transform(
+        transform_message,
+        Decimal(f"{bonus}"),
+        SITE_NAME, BONUS_NAME,
+        "get",
+        leaderboard,
+        "off",
+        notification
+    )
+
 
 ###################转出爆米花给他人##################################
 @Client.on_message(
@@ -35,4 +47,12 @@ async def audiences_transform_get(client:Client, message:Message):
 async def audiences_transform_pay(client:Client, message:Message):
     bonus = message.matches[0].group(1)    
     transform_message = message.reply_to_message.reply_to_message
-    await transform(transform_message, Decimal(f"-{bonus}"), SITE_NAME, BONUS_NAME,False)
+    await transform(
+        transform_message,
+        Decimal(f"-{bonus}"),
+        SITE_NAME, BONUS_NAME,
+        "pay",
+        "off",
+        payleaderboard,
+        notification
+    )
