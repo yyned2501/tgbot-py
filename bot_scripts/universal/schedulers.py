@@ -7,8 +7,18 @@ from schedulers import scheduler
 from schedulers.zhuque.fireGenshinCharacterMagic import zhuque_autofire_firsttimeget
 
 
-@Client.on_message(filters.chat(MY_TGID) & filters.command("autofire"))
+@Client.on_message(filters.chat(MY_TGID) & filters.command("scheduler_jobs"))
 async def zhuque_fanda_switch(client: Client, message: Message):
+    jobs = scheduler.get_jobs()
+    if not jobs:
+        await message.reply("当前没有正在运行的调度任务。")
+    else:
+        job_list = "\n".join([f"- {job.id}" for job in jobs])
+        await message.reply(f"当前运行的调度任务有：\n{job_list}")
+
+
+@Client.on_message(filters.chat(MY_TGID) & filters.command("autofire"))
+async def zhuque_autofire_switch(client: Client, message: Message):
     """
     自动释放技能开关监听
     用法：/autofire on | off

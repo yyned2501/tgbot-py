@@ -57,6 +57,10 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         BotCommand("state", "查看当前状态参数"),
         [CommandScope.PRIVATE_CHATS],
     ),
+    (
+        BotCommand("scheduler_jobs", "查询定时任务"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
 ]
 
 
