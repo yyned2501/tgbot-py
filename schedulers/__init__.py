@@ -5,10 +5,6 @@ from libs.log import logger
 scheduler = AsyncIOScheduler()
 
 
-def get_scheduler():
-    return scheduler
-
-
 from .zhuque.fireGenshinCharacterMagic import zhuque_autofire_firsttimeget
 
 scheduler_jobs = {"autofire": zhuque_autofire_firsttimeget}

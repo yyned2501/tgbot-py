@@ -5,7 +5,7 @@ from config.config import ZHUQUE_COOKIE, ZHUQUE_X_CSRF
 from typing import Optional, Tuple
 from datetime import datetime, timedelta, date
 from models.redpocket_db_modle import Redpocket
-from schedulers import get_scheduler
+from schedulers import scheduler
 
 SITE_NAME = "zhuque"
 
@@ -55,7 +55,6 @@ async def zhuque_autofire_firsttimeget():
             next_time = last_time + timedelta(days=1)
     else:
         next_time = datetime.now() + timedelta(seconds=30)
-    scheduler = get_scheduler()
     scheduler.add_job(
         zhuque_autofire,
         "date",
@@ -86,7 +85,6 @@ async def zhuque_autofire():
         else:
             next_time = datetime.now() + timedelta(minutes=15)
             logger.warning(f"释放失败或无奖励，15分钟后重试：{next_time.isoformat()}")
-        scheduler = get_scheduler()
         scheduler.add_job(
             zhuque_autofire,
             "date",

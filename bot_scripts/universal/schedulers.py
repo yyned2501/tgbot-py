@@ -3,13 +3,12 @@ from pyrogram.types import Message
 
 from config.config import MY_TGID
 from libs.state import state_manager
-from schedulers import get_scheduler
+from schedulers import scheduler
 from schedulers.zhuque.fireGenshinCharacterMagic import zhuque_autofire_firsttimeget
 
 
 @Client.on_message(filters.chat(MY_TGID) & filters.command("scheduler_jobs"))
 async def zhuque_fanda_switch(client: Client, message: Message):
-    scheduler = get_scheduler()
     jobs = scheduler.get_jobs()
     if not jobs:
         await message.reply("当前没有正在运行的调度任务。")
@@ -37,7 +36,6 @@ async def zhuque_autofire_switch(client: Client, message: Message):
     state_manager.set_section("SCHEDULER", {"autofire": action})
     if action == "off":
         await message.reply("🛑 自动释放技能已关闭")
-        scheduler = get_scheduler()
         scheduler.remove_job("firegenshin")
     else:
         await message.reply(f"✅ 自动释放技能模式 `{action}` 已开启")
