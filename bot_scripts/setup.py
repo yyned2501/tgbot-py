@@ -34,6 +34,10 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         [CommandScope.PRIVATE_CHATS],
     ),
     (
+        BotCommand("autofire", "朱雀自动释放技能开关"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
         BotCommand("lotterysw", "小菜自动参与抽奖开关"),
         [CommandScope.PRIVATE_CHATS],
     ),
@@ -49,9 +53,12 @@ BOT_COMMANDS: list[tuple[BotCommand, list[CommandScope]]] = [
         BotCommand("autochangename", "自动修改报时昵称"),
         [CommandScope.PRIVATE_CHATS],
     ),
-    
     (
         BotCommand("state", "查看当前状态参数"),
+        [CommandScope.PRIVATE_CHATS],
+    ),
+    (
+        BotCommand("scheduler_jobs", "查询定时任务"),
         [CommandScope.PRIVATE_CHATS],
     ),
 ]

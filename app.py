@@ -1,22 +1,17 @@
 import os
 import json
 from pathlib import Path
-from libs.log import logger
+
 from pyrogram import Client, idle
-from models import create_all, async_engine
+
+from libs.log import logger
 from libs.sys_info import system_version_get
+from models import create_all, async_engine
 from models.alter_tables import alter_columns
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config.config import API_HASH, API_ID, BOT_TOKEN, PT_GROUP_ID, proxy_set
-from user_scripts import zhuque,universal
-#from user_scripts.universal.auto_changename import auto_changename_temp
-#from user_scripts.universal.auto_changename import auto_changename_temp
-#from user_scripts.zhuque.fireGenshinCharacterMagic_zhuque import (
-#    zhuque_autofire_firsttimeget,
-#)
+from user_scripts import zhuque, universal
+from schedulers import scheduler, start_scheduler
 
-
-scheduler = AsyncIOScheduler()
 user_app_terminated = False
 user_app: Client = None
 bot_app: Client = None
@@ -103,7 +98,8 @@ async def start_app():
 
     # 启动任务调度和保活任务
     scheduler.start()
-    await zhuque.zhuque_autofire_firsttimeget()
+    await start_scheduler()
+    # await zhuque.zhuque_autofire_firsttimeget()
     await universal.auto_changename_temp()
     logger.info(f"{project_name} 监听程序启动成功")
 
