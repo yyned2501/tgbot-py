@@ -27,22 +27,6 @@ services:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 mySQL数据库安装用compose.yaml
 version: "3"
 services:
