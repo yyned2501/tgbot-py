@@ -11,9 +11,7 @@ TARGET = [-1002372175195]
 SITE_NAME = "audiences"
 BONUS_NAME = "爆米花"
 
-leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
-payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
-notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
+
 
 ###################收到他人的爆米花转入##################################
 @Client.on_message(                                                                    
@@ -26,6 +24,8 @@ notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 async def audiences_transform_get(client:Client, message:Message):
     bonus = message.matches[0].group(1)    
     transform_message = message.reply_to_message
+    leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"{bonus}"),
@@ -47,6 +47,9 @@ async def audiences_transform_get(client:Client, message:Message):
 async def audiences_transform_pay(client:Client, message:Message):
     bonus = message.matches[0].group(1)    
     transform_message = message.reply_to_message.reply_to_message
+
+    payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"-{bonus}"),
