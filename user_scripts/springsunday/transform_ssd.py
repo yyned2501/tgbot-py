@@ -12,11 +12,6 @@ TARGET = [-1002014253433, -1001173590111]
 SITE_NAME = "springsunday"
 BONUS_NAME = "茉莉"
 
-leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
-payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
-notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
-
-
 ###################收到他人的茉莉转入##################################
 @Client.on_message(                                                                    
         filters.chat(TARGET)
@@ -27,6 +22,8 @@ notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
 async def ssd_transform_get(client:Client, message:Message):
     bonus = message.reply_to_message.text[1:]
     transform_message = message.reply_to_message
+    leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"{bonus}"),
@@ -46,6 +43,8 @@ async def ssd_transform_get(client:Client, message:Message):
 async def ssd_transform_get_edit(client:Client, message:Message):
     bonus = message.reply_to_message.text[1:]
     transform_message = message.reply_to_message
+    leaderboard = state_manager.get_item(SITE_NAME.upper(),"leaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"{bonus}"),
@@ -69,6 +68,8 @@ async def ssd_transform_get_edit(client:Client, message:Message):
 async def ssd_transform_pay(client:Client, message:Message):
     bonus = message.reply_to_message.text[1:]   
     transform_message = message.reply_to_message.reply_to_message
+    payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"-{bonus}"),
@@ -88,6 +89,8 @@ async def ssd_transform_pay(client:Client, message:Message):
 async def ssd_transform_pay_edit(client:Client, message:Message):
     bonus = message.reply_to_message.text[1:]   
     transform_message = message.reply_to_message.reply_to_message
+    payleaderboard = state_manager.get_item(SITE_NAME.upper(),"payleaderboard","off")
+    notification = state_manager.get_item(SITE_NAME.upper(),"notification","off")
     await transform(
         transform_message,
         Decimal(f"-{bonus}"),
